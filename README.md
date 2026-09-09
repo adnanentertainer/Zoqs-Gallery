@@ -226,6 +226,92 @@ This function backs new admin-only policies added on top of the existing Phase 7
 - No image upload — image management is URL-based, matching the existing Phase 7 architecture (no Storage bucket configured in this project).
 - No audit log beyond the existing `updated_at` timestamps.
 
+## 14. Production deployment (Phase 12)
+
+This section documents how to take the app live. Nothing in it claims a live production deployment already exists — creating the Vercel project, pushing to GitHub, configuring a custom domain, and promoting the first production admin are all manual steps only you can perform (they require your own Vercel/GitHub/Supabase accounts and credentials). What follows is a checklist plus the reasoning behind each step.
+
+### 14.1 Git repository
+
+The full project (Phases 2–11) is committed on `main` as of this phase. `.gitignore` already excludes `.env*` (except `.env.example`), `.next/`, `node_modules/`, `.vercel`, and `*.tsbuildinfo` — no secrets are tracked. Push the branch to a GitHub remote yourself (`git remote add origin <your-repo-url>` then `git push -u origin main`); this was intentionally left for you to do rather than done automatically.
+
+### 14.2 Vercel project setup
+
+1. In the Vercel dashboard, "Add New… → Project" and import the GitHub repository once it's pushed.
+2. Framework preset: Next.js (auto-detected). No custom build/install command is needed — `npm install` and `npm run build` (Vercel's defaults) are correct as-is; no `vercel.json` is required for this app.
+3. Node.js version: this project declares `"engines": { "node": ">=20.9.0" }` in `package.json` (required by Next.js 16.3.4). Vercel reads this automatically; no manual Node version setting is needed unless your team's Vercel project has an older default pinned.
+
+### 14.3 Environment variables (set in Vercel → Project Settings → Environment Variables)
+
+| Variable | Value | Notes |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL | Public |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key | Public |
+| `NEXT_PUBLIC_SITE_URL` | `https://your-domain.com` (placeholder — use your real production URL) | Used for `metadataBase` (canonical/OG URL resolution). Falls back to `http://localhost:3000` only when unset, which is correct for local dev and must not be relied on in production. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Only if you intend to run `scripts/seed.ts` against production — most teams should NOT set this in Vercel at all, since the running app never needs it. | **Secret.** Do not set as a client-exposed variable; never prefix with `NEXT_PUBLIC_`. |
+
+Set each for the "Production" environment (and "Preview" too, pointed at a separate non-production Supabase project, if you want preview deployments to have working data).
+
+### 14.4 Supabase production configuration
+
+This project has been developed and tested throughout against one real Supabase project (`ntjanhpuglrskdbyydwv`). That is the project used for every RLS/authorization/order-flow verification referenced elsewhere in this README — it has not been treated as a separate, freshly-provisioned "production" instance distinct from development. Before going live, decide explicitly whether to:
+
+- **(a)** continue using that same project as production, or
+- **(b)** provision a new Supabase project for production and re-run the migrations there.
+
+Either way:
+
+1. Run all four migrations in `supabase/migrations/` in order (Dashboard SQL Editor, or `npx supabase db push` against a linked project).
+2. In Supabase → Authentication → URL Configuration, set **Site URL** and **Redirect URLs** to your real production domain (`https://your-domain.com`). Leaving these pointed at `localhost` will break password-reset and auth-callback links in production.
+3. Promote your own account to admin using the SQL documented in §13 ("Initial admin setup") — there is no UI for this, by design.
+
+### 14.5 Custom domain
+
+1. Vercel → Project → Settings → Domains → add `your-domain.com`.
+2. Vercel provides the exact DNS records to add (an `A`/`ALIAS` record or `CNAME`, depending on whether it's an apex domain or subdomain) — add those at your DNS registrar.
+3. Vercel provisions a TLS certificate automatically once DNS propagates; no manual HTTPS configuration is needed. DNS propagation and certificate issuance happen outside this codebase and cannot be verified here — check `https://your-domain.com` in a browser yourself once DNS has propagated.
+4. Update `NEXT_PUBLIC_SITE_URL` (Vercel env var) and the Supabase Auth URL configuration (§14.4) to match the final domain.
+
+### 14.6 Security headers
+
+`next.config.ts` now sets `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and a restrictive `Permissions-Policy` on every route. A `Content-Security-Policy` is deliberately not included: a CSP strict enough to matter can silently break Supabase API calls, `next/image`-optimized images, or web fonts, and that combination hasn't been tested against a live deployment. Add one deliberately later, tested against your real production traffic.
+
+### 14.7 Rollback plan
+
+- **Application**: Vercel keeps every deployment; use Vercel → Deployments → "Promote to Production" on a previous deployment to roll back instantly if a release misbehaves. No destructive action is needed.
+- **Database**: prefer a forward-fix (a new migration that corrects the issue) over reverting a migration, since reverting can drop columns/data other rows now depend on. If a migration must be undone, take a Supabase backup/snapshot immediately before running any destructive rollback SQL, and never run `DROP`/destructive rollback statements without one.
+
+### 14.8 Monitoring (recommended, not implemented)
+
+Nothing beyond application logs is wired up today. Recommended, using tools already available in your Vercel/Supabase plan rather than adding a new dependency:
+
+- **Vercel** → Deployments/Observability: build failures and runtime errors on serverless functions are visible here by default.
+- **Supabase Dashboard** → Database/Auth/Logs: query performance, failed-auth attempts, and API error rates.
+- Optionally, watch for orders stuck in `payment_status = 'pending'` for an unusual length of time (a query, not a new feature) as an early signal of a checkout-flow problem.
+
+### 14.9 Pre-launch checklist
+
+- [x] `npx tsc --noEmit` — passes
+- [x] `npm run lint` — passes
+- [x] `npm run format:check` — passes
+- [x] `npm run build` — passes (all routes compile, 40 static pages generated)
+- [x] `npm audit` — 0 vulnerabilities
+- [x] Working tree committed to git (`main`, no secrets tracked)
+- [ ] Pushed to a GitHub remote — **you** need to do this
+- [ ] Vercel project created and env vars set — **you** need to do this
+- [ ] Supabase Auth redirect URLs updated to the production domain — **you** need to do this
+- [ ] Custom domain DNS configured and verified live in a browser — **you** need to do this
+- [ ] First production admin promoted via SQL — **you** need to do this
+
+## 15. Troubleshooting
+
+- **"Invalid `metadataBase`" or broken Open Graph URLs in production** — `NEXT_PUBLIC_SITE_URL` isn't set in Vercel's environment variables (§14.3). It's the only source `metadataBase` reads besides the `localhost` dev fallback.
+- **Password reset / magic link redirects to `localhost` or errors out in production** — Supabase's Auth "Site URL"/"Redirect URLs" (§14.4) still point at a dev URL. Update them to your production domain.
+- **A logged-in customer can view `/admin` and gets a 404** — this is intentional, not a bug: non-admin visitors to any `/admin/*` route get a plain 404 rather than an "Access Denied" page, so the route's existence isn't disclosed (see §13, "Role architecture").
+- **New products/categories don't appear on the storefront** — check `is_active` on the row; only active rows are visible to the public `anon` key under RLS (§5).
+- **"Total Order Value" or other aggregate queries fail with `PGRST123`** — this Supabase project has PostgREST's aggregate `select` syntax (e.g. `total.sum()`) disabled at the project level; the dashboard already works around this by summing in application code (§13, "Known limitations"). This isn't something app code can toggle — it's a Supabase project setting.
+- **A direct `PATCH` to `/rest/v1/profiles` setting `role` is rejected with `42501 permission denied`** — expected behavior, not a misconfiguration; `role` is intentionally excluded from the columns `authenticated` users may update (§13, "Role architecture").
+- **`npm run build` fails locally but not in CI, or vice versa** — confirm your local Node version satisfies the `"engines"` constraint in `package.json` (`>=20.9.0`, required by Next.js 16.3.4).
+
 ## Project structure
 
 ```

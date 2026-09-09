@@ -18,6 +18,26 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async headers() {
+    // Deliberately no Content-Security-Policy here: a restrictive CSP can
+    // silently break Supabase requests, next/image, or Google Fonts, and
+    // that combination hasn't been tested against a live deployment. These
+    // headers are the ones that are safe to ship without that testing.
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
