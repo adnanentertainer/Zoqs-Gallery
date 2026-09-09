@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Self-hosting (e.g. GoDaddy cPanel's Node.js Selector) needs a plain
+  // server.js it can hand to Passenger, plus a pruned node_modules it can
+  // run without a full `npm install` on the host. `next build` emits both
+  // into .next/standalone/ when this is set. Vercel ignores this option and
+  // is unaffected by it.
+  output: "standalone",
   images: {
     remotePatterns: [
       {

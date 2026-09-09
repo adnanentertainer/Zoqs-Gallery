@@ -242,12 +242,12 @@ The full project (Phases 2–11) is committed on `main` as of this phase. `.giti
 
 ### 14.3 Environment variables (set in Vercel → Project Settings → Environment Variables)
 
-| Variable | Value | Notes |
-| --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL | Public |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key | Public |
-| `NEXT_PUBLIC_SITE_URL` | `https://your-domain.com` (placeholder — use your real production URL) | Used for `metadataBase` (canonical/OG URL resolution). Falls back to `http://localhost:3000` only when unset, which is correct for local dev and must not be relied on in production. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Only if you intend to run `scripts/seed.ts` against production — most teams should NOT set this in Vercel at all, since the running app never needs it. | **Secret.** Do not set as a client-exposed variable; never prefix with `NEXT_PUBLIC_`. |
+| Variable                        | Value                                                                                                                                                   | Notes                                                                                                                                                                                 |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Your Supabase project URL                                                                                                                               | Public                                                                                                                                                                                |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key                                                                                                                                  | Public                                                                                                                                                                                |
+| `NEXT_PUBLIC_SITE_URL`          | `https://your-domain.com` (placeholder — use your real production URL)                                                                                  | Used for `metadataBase` (canonical/OG URL resolution). Falls back to `http://localhost:3000` only when unset, which is correct for local dev and must not be relied on in production. |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Only if you intend to run `scripts/seed.ts` against production — most teams should NOT set this in Vercel at all, since the running app never needs it. | **Secret.** Do not set as a client-exposed variable; never prefix with `NEXT_PUBLIC_`.                                                                                                |
 
 Set each for the "Production" environment (and "Preview" too, pointed at a separate non-production Supabase project, if you want preview deployments to have working data).
 
@@ -302,7 +302,71 @@ Nothing beyond application logs is wired up today. Recommended, using tools alre
 - [ ] Custom domain DNS configured and verified live in a browser — **you** need to do this
 - [ ] First production admin promoted via SQL — **you** need to do this
 
-## 15. Troubleshooting
+## 15. Self-hosting on GoDaddy cPanel (Node.js Selector)
+
+This is an alternative to Vercel (§14) for anyone whose domain/hosting is on GoDaddy shared hosting with cPanel. It's a more fragile path than Vercel — shared hosting has real resource limits and cPanel's Node.js support (Phusion Passenger) expects a single Node entry file it manages itself, not `npm start` the way a VPS would. Only use this if you specifically want to keep everything on GoDaddy.
+
+**Before starting**, confirm your plan actually has this: log into cPanel and look for **"Setup Node.js App"** (usually under Software). Not all GoDaddy shared hosting tiers include it — if it's missing, this path isn't available on your plan and Vercel (§14) is the practical option regardless of where the domain is registered.
+
+### 15.1 Why this needs `output: "standalone"`
+
+`next.config.ts` sets `output: "standalone"`. Passenger (cPanel's Node process manager) loads one JS file and expects it to start listening on the port it assigns — it doesn't run arbitrary npm scripts. `next build` with this option emits exactly that file at `.next/standalone/server.js`, along with a pruned `node_modules` containing only what's actually needed at runtime (this project has no native/compiled dependencies, so a build done on one OS is safe to copy to GoDaddy's Linux servers). This setting is inert on Vercel — it doesn't affect that deployment path at all.
+
+### 15.2 Build the deployable folder
+
+Do this locally (or in CI) rather than on the shared host itself, since shared hosting CPU/memory limits can make a full `next build` unreliable there:
+
+```bash
+npm run build
+cp -r .next/static .next/standalone/.next/static
+cp -r public .next/standalone/public
+```
+
+`.next/standalone/` now contains everything needed to run: `server.js`, `node_modules`, `.next/`, and `public/`. This whole folder is what gets uploaded — nothing else from the repo needs to go on the server.
+
+### 15.3 Set up the cPanel Node.js app
+
+1. cPanel → **Setup Node.js App** → **Create Application**.
+2. **Node.js version**: 20.9.0 or later (required by Next.js 16.3.4) — pick the closest available version at or above this.
+3. **Application mode**: Production.
+4. **Application root**: a folder for the app, e.g. `zoqsgallery` (cPanel creates this under your home directory).
+5. **Application URL**: your domain (or subdomain).
+6. **Application startup file**: `server.js` — this only exists after you've uploaded the built `.next/standalone/` contents into the application root (step 15.4).
+
+### 15.4 Upload the build
+
+Upload the contents of `.next/standalone/` (from §15.2) into the Application root from §15.3 — via cPanel File Manager, SFTP, or by zipping it locally and extracting on the server. The `server.js` file should end up directly inside the application root cPanel created.
+
+### 15.5 Environment variables
+
+In the same "Setup Node.js App" screen, add environment variables (never edit `.env` files with real secrets on shared hosting where other users/processes might share the filesystem):
+
+| Variable                        | Value                                                |
+| ------------------------------- | ---------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Your Supabase project URL                            |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key                               |
+| `NEXT_PUBLIC_SITE_URL`          | `https://your-domain.com` (your real GoDaddy domain) |
+
+Do not set `SUPABASE_SERVICE_ROLE_KEY` here — the running app never needs it; it's only used by the local `scripts/seed.ts` script (§7).
+
+### 15.6 Start it and update Supabase
+
+1. In cPanel, click **Restart** on the Node.js app.
+2. Update Supabase → Authentication → URL Configuration (Site URL + Redirect URLs) to your real GoDaddy domain, same as §14.4 — otherwise password reset/auth-callback links will still point at `localhost`.
+3. Visit your domain and verify the homepage, a product page, and login work before considering this live.
+
+### 15.7 Redeploying after a code change
+
+Repeat §15.2 (rebuild locally) and §15.4 (re-upload `.next/standalone/`) — there is no `git push`-to-deploy here, unlike Vercel. Then click **Restart** in cPanel's Node.js app screen.
+
+### 15.8 Known limitations of this path
+
+- **Resource limits**: shared hosting CPU/memory is far below a dedicated Node host. Under real traffic this may need upgrading to GoDaddy VPS, or moving to Vercel.
+- **No automatic redeploy on push**: every update is a manual rebuild-and-reupload (§15.7), unlike Vercel's git-integrated deploys.
+- **Image optimization**: `next/image` works without extra setup (Next.js ships a built-in fallback processor when the optional `sharp` package isn't installed), but it's slower than with `sharp`. If image-heavy pages feel slow, `npm install sharp` in the application root via cPanel's terminal for that Node app.
+- **This path has not been tested against a live GoDaddy account in this project** — it's built from Next.js's documented self-hosting/standalone-output support and cPanel's documented Node.js Selector behavior, not verified end-to-end the way the Vercel path was. Treat §15.6's checks as required, not optional.
+
+## 16. Troubleshooting
 
 - **"Invalid `metadataBase`" or broken Open Graph URLs in production** — `NEXT_PUBLIC_SITE_URL` isn't set in Vercel's environment variables (§14.3). It's the only source `metadataBase` reads besides the `localhost` dev fallback.
 - **Password reset / magic link redirects to `localhost` or errors out in production** — Supabase's Auth "Site URL"/"Redirect URLs" (§14.4) still point at a dev URL. Update them to your production domain.
