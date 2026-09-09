@@ -20,7 +20,7 @@ export const footerColumns: FooterColumn[] = [
   {
     title: "Customer Care",
     links: [
-      { label: "Contact Us", href: "#contact" },
+      { label: "Contact Us", href: "/contact" },
       { label: "Delivery Information", href: "#delivery-information" },
       { label: "Returns & Exchanges", href: "#returns-exchanges" },
       { label: "Track Order", href: "#track-order" },

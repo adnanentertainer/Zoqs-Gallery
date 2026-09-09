@@ -8,7 +8,8 @@ export const siteConfig = {
   freeShippingThreshold: 3000,
   flatShippingCost: 250,
   announcement: "Free Delivery on Orders Above Rs. 3,000",
-  // Displayed on the checkout Easypaisa/JazzCash payment options.
+  // Displayed on the checkout Easypaisa/JazzCash payment options and the
+  // Contact Us page.
   mobileWalletNumber: "0331 6668233",
   socialLinks: {
     instagram: "https://instagram.com/zoqsgallery",
