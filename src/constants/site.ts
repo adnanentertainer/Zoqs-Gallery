@@ -12,8 +12,7 @@ export const siteConfig = {
   mobileWalletNumber: "0331 6668233",
   socialLinks: {
     instagram: "https://instagram.com/zoqsgallery",
-    // TODO: replace with the real Facebook page URL.
-    facebook: "#",
+    facebook: "https://www.facebook.com/profile.php?id=61593653865604",
     tiktok: "#",
     whatsapp: "https://wa.me/923316668233",
   },
