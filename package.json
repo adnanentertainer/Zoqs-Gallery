@@ -14,17 +14,17 @@
     "format:check": "prettier --check .",
     "seed": "tsx scripts/seed.ts"
   },
-  "dependencies": {
-    "@supabase/ssr": "^0.12.7",
-    "@supabase/supabase-js": "^2.116.0",
-    "@swc/helpers": "^0.5.23",
-    "client-only": "^0.0.1",
-    "lightningcss": "^1.33.0",
-    "lucide-react": "^1.43.0",
-    "next": "16.3.4",
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
-  },
+"dependencies": {
+  "@supabase/ssr": "^0.12.7",
+  "@supabase/supabase-js": "^2.116.0",
+  "@swc/helpers": "^0.5.23",
+  "client-only": "^0.0.1",
+  "lightningcss": "^1.33.0",
+  "lucide-react": "^1.43.0",
+  "next": "16.3.4",
+  "react": "19.2.8",
+  "react-dom": "19.2.8"
+}
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
