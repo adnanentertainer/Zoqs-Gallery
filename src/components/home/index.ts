@@ -1,0 +1,10 @@
+export { HeroSection } from "@/components/home/HeroSection";
+export { CategorySection } from "@/components/home/CategorySection";
+export { CategoryCard } from "@/components/home/CategoryCard";
+export { ProductSection } from "@/components/home/ProductSection";
+export { PromotionalBanner } from "@/components/home/PromotionalBanner";
+export { BridalSection } from "@/components/home/BridalSection";
+export { BenefitsSection } from "@/components/home/BenefitsSection";
+export { ReviewsSection } from "@/components/home/ReviewsSection";
+export { NewsletterSection } from "@/components/home/NewsletterSection";
+export { SocialGallery } from "@/components/home/SocialGallery";

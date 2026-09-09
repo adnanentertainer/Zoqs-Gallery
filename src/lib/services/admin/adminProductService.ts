@@ -1,0 +1,389 @@
+import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth/requireAdmin";
+import { LOW_STOCK_THRESHOLD } from "@/lib/products";
+import type {
+  AdminProductDetail,
+  AdminProductFilters,
+  AdminProductInput,
+  AdminProductListItem,
+} from "@/types/admin";
+import type { PaginationResult } from "@/types/admin";
+import type { Database } from "@/types/supabase";
+
+type ProductRow = Database["public"]["Tables"]["products"]["Row"];
+
+interface ProductListRow extends ProductRow {
+  categories: { name: string } | null;
+  product_images: { image_url: string; display_order: number }[];
+}
+
+export async function listAdminProducts(
+  filters: AdminProductFilters,
+): Promise<PaginationResult<AdminProductListItem>> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+
+  let query = supabase
+    .from("products")
+    .select("*, categories(name), product_images(image_url, display_order)", {
+      count: "exact",
+    });
+
+  if (filters.search) {
+    const term = filters.search.trim();
+    if (term) query = query.or(`name.ilike.%${term}%,slug.ilike.%${term}%`);
+  }
+  if (filters.categoryId) {
+    query = query.eq("category_id", filters.categoryId);
+  }
+  if (filters.status === "active") query = query.eq("is_active", true);
+  if (filters.status === "inactive") query = query.eq("is_active", false);
+  if (filters.inventory === "out-of-stock") query = query.eq("stock", 0);
+  if (filters.inventory === "low-stock") {
+    query = query.gt("stock", 0).lte("stock", LOW_STOCK_THRESHOLD);
+  }
+  if (filters.inventory === "in-stock") {
+    query = query.gt("stock", LOW_STOCK_THRESHOLD);
+  }
+
+  switch (filters.sort) {
+    case "oldest":
+      query = query.order("created_at", { ascending: true });
+      break;
+    case "name-asc":
+      query = query.order("name", { ascending: true });
+      break;
+    case "name-desc":
+      query = query.order("name", { ascending: false });
+      break;
+    case "price-asc":
+      query = query.order("price", { ascending: true });
+      break;
+    case "price-desc":
+      query = query.order("price", { ascending: false });
+      break;
+    case "newest":
+    default:
+      query = query.order("created_at", { ascending: false });
+      break;
+  }
+
+  const from = (filters.page - 1) * filters.pageSize;
+  const to = from + filters.pageSize - 1;
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
+  if (error) {
+    console.error("[adminProductService.listAdminProducts] failed:", error);
+    throw new Error("Unable to load products right now.");
+  }
+
+  const rows = (data ?? []) as unknown as ProductListRow[];
+  const items: AdminProductListItem[] = rows.map((row) => {
+    const sortedImages = [...row.product_images].sort(
+      (a, b) => a.display_order - b.display_order,
+    );
+    return {
+      id: row.id,
+      name: row.name,
+      slug: row.slug,
+      categoryName: row.categories?.name ?? "—",
+      price: row.price,
+      stock: row.stock,
+      isActive: row.is_active,
+      imageUrl: sortedImages[0]?.image_url ?? null,
+      createdAt: row.created_at,
+    };
+  });
+
+  const totalCount = count ?? 0;
+  return {
+    items,
+    page: filters.page,
+    pageSize: filters.pageSize,
+    totalCount,
+    totalPages: Math.max(1, Math.ceil(totalCount / filters.pageSize)),
+  };
+}
+
+export async function getAdminProductById(
+  id: string,
+): Promise<AdminProductDetail | null> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+
+  const { data: product, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[adminProductService.getAdminProductById] failed:", error);
+    throw new Error("Unable to load this product right now.");
+  }
+  if (!product) return null;
+
+  const [imagesResult, variantsResult, orderItemsResult] = await Promise.all([
+    supabase
+      .from("product_images")
+      .select("*")
+      .eq("product_id", id)
+      .order("display_order", { ascending: true }),
+    supabase
+      .from("product_variants")
+      .select("*")
+      .eq("product_id", id)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("order_items")
+      .select("id", { count: "exact", head: true })
+      .eq("product_id", id),
+  ]);
+
+  if (imagesResult.error) throw imagesResult.error;
+  if (variantsResult.error) throw variantsResult.error;
+  if (orderItemsResult.error) throw orderItemsResult.error;
+
+  return {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    shortDescription: product.short_description ?? "",
+    description: product.description,
+    categoryId: product.category_id,
+    price: product.price,
+    originalPrice: product.original_price,
+    stock: product.stock,
+    material: product.material ?? "",
+    color: product.color ?? "",
+    occasion: product.occasion ?? "",
+    isActive: product.is_active,
+    isFeatured: product.is_featured,
+    hasOrderHistory: (orderItemsResult.count ?? 0) > 0,
+    images: (imagesResult.data ?? []).map((image) => ({
+      id: image.id,
+      imageUrl: image.image_url,
+      altText: image.alt_text ?? "",
+    })),
+    variants: (variantsResult.data ?? []).map((variant) => ({
+      id: variant.id,
+      optionType: variant.option_type,
+      optionValue: variant.option_value,
+      priceAdjustment: variant.price_adjustment,
+      stock: variant.stock,
+      sku: variant.sku ?? "",
+      isActive: variant.is_active,
+    })),
+  };
+}
+
+async function isSlugTaken(slug: string, excludeId?: string): Promise<boolean> {
+  const supabase = await getSupabaseServerClient();
+  let query = supabase.from("products").select("id").eq("slug", slug);
+  if (excludeId) query = query.neq("id", excludeId);
+  const { data, error } = await query.maybeSingle();
+  if (error) throw error;
+  return data !== null;
+}
+
+const VARIANT_GROUP_LABELS: Record<string, string> = {
+  color: "Color",
+  size: "Size",
+  style: "Style",
+};
+
+export async function createProduct(
+  input: AdminProductInput,
+): Promise<{ id?: string; error?: string }> {
+  await requireAdmin();
+
+  if (await isSlugTaken(input.slug)) {
+    return { error: "A product with this slug already exists." };
+  }
+
+  const supabase = await getSupabaseServerClient();
+  const { data: product, error } = await supabase
+    .from("products")
+    .insert({
+      name: input.name,
+      slug: input.slug,
+      short_description: input.shortDescription || null,
+      description: input.description,
+      category_id: input.categoryId,
+      price: input.price,
+      original_price: input.originalPrice,
+      stock: input.stock,
+      material: input.material || null,
+      color: input.color || null,
+      occasion: input.occasion || null,
+      is_active: input.isActive,
+      is_featured: input.isFeatured,
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    console.error("[adminProductService.createProduct] failed:", error);
+    return { error: "Unable to create this product right now." };
+  }
+
+  try {
+    await syncProductImagesAndVariants(product.id, input);
+  } catch (syncError) {
+    console.error(
+      "[adminProductService.createProduct] image/variant sync failed:",
+      syncError,
+    );
+    return {
+      id: product.id,
+      error:
+        "Product created, but its images or variants couldn't be saved. Edit the product to try again.",
+    };
+  }
+  return { id: product.id };
+}
+
+export async function updateProduct(
+  id: string,
+  input: AdminProductInput,
+): Promise<{ error?: string }> {
+  await requireAdmin();
+
+  if (await isSlugTaken(input.slug, id)) {
+    return { error: "A product with this slug already exists." };
+  }
+
+  const supabase = await getSupabaseServerClient();
+  const { error } = await supabase
+    .from("products")
+    .update({
+      name: input.name,
+      slug: input.slug,
+      short_description: input.shortDescription || null,
+      description: input.description,
+      category_id: input.categoryId,
+      price: input.price,
+      original_price: input.originalPrice,
+      stock: input.stock,
+      material: input.material || null,
+      color: input.color || null,
+      occasion: input.occasion || null,
+      is_active: input.isActive,
+      is_featured: input.isFeatured,
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error("[adminProductService.updateProduct] failed:", error);
+    return { error: "Unable to update this product right now." };
+  }
+
+  try {
+    await syncProductImagesAndVariants(id, input);
+  } catch (syncError) {
+    console.error(
+      "[adminProductService.updateProduct] image/variant sync failed:",
+      syncError,
+    );
+    return {
+      error:
+        "Product details were saved, but its images or variants couldn't be updated. Please try again.",
+    };
+  }
+  return {};
+}
+
+async function syncProductImagesAndVariants(
+  productId: string,
+  input: AdminProductInput,
+): Promise<void> {
+  const supabase = await getSupabaseServerClient();
+
+  const { error: deleteImagesError } = await supabase
+    .from("product_images")
+    .delete()
+    .eq("product_id", productId);
+  if (deleteImagesError) throw deleteImagesError;
+
+  if (input.images.length > 0) {
+    const { error: insertImagesError } = await supabase
+      .from("product_images")
+      .insert(
+        input.images.map((image, index) => ({
+          product_id: productId,
+          image_url: image.imageUrl,
+          alt_text: image.altText || null,
+          display_order: index,
+        })),
+      );
+    if (insertImagesError) throw insertImagesError;
+  }
+
+  const { error: deleteVariantsError } = await supabase
+    .from("product_variants")
+    .delete()
+    .eq("product_id", productId);
+  if (deleteVariantsError) throw deleteVariantsError;
+
+  if (input.variants.length > 0) {
+    const { error: insertVariantsError } = await supabase
+      .from("product_variants")
+      .insert(
+        input.variants.map((variant) => ({
+          product_id: productId,
+          name: VARIANT_GROUP_LABELS[variant.optionType],
+          option_type: variant.optionType,
+          option_value: variant.optionValue,
+          price_adjustment: variant.priceAdjustment,
+          stock: variant.stock,
+          sku: variant.sku || null,
+          is_active: variant.isActive,
+        })),
+      );
+    if (insertVariantsError) throw insertVariantsError;
+  }
+}
+
+export async function setProductActive(
+  id: string,
+  isActive: boolean,
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+  const { error } = await supabase
+    .from("products")
+    .update({ is_active: isActive })
+    .eq("id", id);
+
+  if (error) {
+    console.error("[adminProductService.setProductActive] failed:", error);
+    return { error: "Unable to update this product right now." };
+  }
+  return {};
+}
+
+export async function deleteProduct(id: string): Promise<{ error?: string }> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+
+  const { count, error: countError } = await supabase
+    .from("order_items")
+    .select("id", { count: "exact", head: true })
+    .eq("product_id", id);
+  if (countError) throw countError;
+
+  if ((count ?? 0) > 0) {
+    return {
+      error:
+        "This product has order history and can't be deleted. Deactivate it instead.",
+    };
+  }
+
+  const { error } = await supabase.from("products").delete().eq("id", id);
+  if (error) {
+    console.error("[adminProductService.deleteProduct] failed:", error);
+    return { error: "Unable to delete this product right now." };
+  }
+  return {};
+}

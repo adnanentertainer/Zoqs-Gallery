@@ -1,0 +1,108 @@
+"use server";
+
+import { getServerUser } from "@/lib/auth/getServerUser";
+import { createOrder } from "@/lib/services/orderService";
+import {
+  validateAddressLine1,
+  validateCity,
+  validateCustomerNotes,
+  validateEmail,
+  validateFullName,
+  validatePakistaniPhone,
+  validatePostalCode,
+  validateProvince,
+} from "@/lib/checkout/validation";
+import type { CheckoutCartLine, PaymentMethod } from "@/types/order";
+
+export interface PlaceOrderInput {
+  items: CheckoutCartLine[];
+  paymentMethod: PaymentMethod;
+  shipping: {
+    fullName: string;
+    email: string;
+    phone: string;
+    addressLine1: string;
+    addressLine2: string;
+    city: string;
+    province: string;
+    postalCode: string;
+    country: string;
+  };
+  customerNotes: string;
+}
+
+export interface PlaceOrderResult {
+  orderNumber?: string;
+  error?: string;
+}
+
+/**
+ * Server Action behind the "Place Order" button — the trust boundary for
+ * checkout. It re-validates every field the client already validated (never
+ * trust client-side validation alone, per the Phase 9 spec) and passes only
+ * product identifiers + quantities down to createOrder(), which in turn
+ * calls the create_order() database function that does the actual pricing,
+ * stock, and total calculation. No price, total, or shipping cost ever
+ * travels from the client into this function.
+ */
+export async function placeOrder(
+  input: PlaceOrderInput,
+): Promise<PlaceOrderResult> {
+  const user = await getServerUser();
+  if (!user) {
+    return { error: "You must be signed in to place an order." };
+  }
+
+  if (!Array.isArray(input.items) || input.items.length === 0) {
+    return { error: "Your cart is empty." };
+  }
+  for (const item of input.items) {
+    if (
+      typeof item.productSlug !== "string" ||
+      item.productSlug.length === 0 ||
+      !Number.isInteger(item.quantity) ||
+      item.quantity < 1
+    ) {
+      return { error: "Your cart contains an invalid item." };
+    }
+  }
+
+  if (
+    input.paymentMethod !== "cod" &&
+    input.paymentMethod !== "bank_transfer"
+  ) {
+    return { error: "Select a payment method." };
+  }
+
+  const shippingErrors = [
+    validateFullName(input.shipping.fullName),
+    validateEmail(input.shipping.email),
+    validatePakistaniPhone(input.shipping.phone),
+    validateAddressLine1(input.shipping.addressLine1),
+    validateCity(input.shipping.city),
+    validateProvince(input.shipping.province),
+    validatePostalCode(input.shipping.postalCode),
+    validateCustomerNotes(input.customerNotes),
+  ].filter(Boolean);
+
+  if (shippingErrors.length > 0) {
+    return { error: shippingErrors[0] };
+  }
+
+  try {
+    const result = await createOrder({
+      items: input.items,
+      paymentMethod: input.paymentMethod,
+      shipping: input.shipping,
+      customerNotes: input.customerNotes,
+    });
+    return { orderNumber: result.orderNumber };
+  } catch (error) {
+    return {
+      error:
+        error instanceof Error
+          ? error.message
+          : "We couldn't place your order right now. Please try again.",
+    };
+  }
+}

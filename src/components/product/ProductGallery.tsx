@@ -1,0 +1,78 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import { ZoomIn } from "lucide-react";
+import { ProductLightbox } from "@/components/product/ProductLightbox";
+import { cn } from "@/lib/utils";
+
+interface ProductGalleryProps {
+  images: string[];
+  productName: string;
+}
+
+export function ProductGallery({ images, productName }: ProductGalleryProps) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  return (
+    <div className="flex flex-col gap-4 lg:flex-row-reverse">
+      <button
+        type="button"
+        onClick={() => setIsLightboxOpen(true)}
+        aria-label={`View ${productName} image ${activeIndex + 1} of ${images.length} full screen`}
+        className="group relative aspect-square w-full overflow-hidden rounded-sm bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+      >
+        <Image
+          src={images[activeIndex]}
+          alt={`${productName} — image ${activeIndex + 1} of ${images.length}`}
+          fill
+          priority={activeIndex === 0}
+          sizes="(max-width: 1024px) 100vw, 50vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+        <span className="absolute bottom-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-primary opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
+          <ZoomIn className="h-4 w-4" aria-hidden="true" />
+        </span>
+      </button>
+
+      {images.length > 1 && (
+        <div className="flex gap-3 overflow-x-auto pb-1 lg:w-20 lg:flex-col lg:overflow-x-visible lg:overflow-y-auto lg:pb-0">
+          {images.map((image, index) => (
+            <button
+              key={`${image}-${index}`}
+              type="button"
+              onClick={() => setActiveIndex(index)}
+              aria-label={`Show image ${index + 1} of ${images.length}`}
+              aria-current={index === activeIndex}
+              className={cn(
+                "relative aspect-square w-16 shrink-0 overflow-hidden rounded-sm border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold lg:w-full",
+                index === activeIndex
+                  ? "border-gold"
+                  : "border-transparent hover:border-beige",
+              )}
+            >
+              <Image
+                src={image}
+                alt=""
+                aria-hidden="true"
+                fill
+                sizes="80px"
+                className="object-cover"
+              />
+            </button>
+          ))}
+        </div>
+      )}
+
+      <ProductLightbox
+        images={images}
+        productName={productName}
+        activeIndex={activeIndex}
+        isOpen={isLightboxOpen}
+        onClose={() => setIsLightboxOpen(false)}
+        onIndexChange={setActiveIndex}
+      />
+    </div>
+  );
+}
