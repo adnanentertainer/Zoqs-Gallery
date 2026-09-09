@@ -67,10 +67,13 @@ export async function placeOrder(
     }
   }
 
-  if (
-    input.paymentMethod !== "cod" &&
-    input.paymentMethod !== "bank_transfer"
-  ) {
+  const validPaymentMethods: PaymentMethod[] = [
+    "cod",
+    "bank_transfer",
+    "easypaisa",
+    "jazzcash",
+  ];
+  if (!validPaymentMethods.includes(input.paymentMethod)) {
     return { error: "Select a payment method." };
   }
 

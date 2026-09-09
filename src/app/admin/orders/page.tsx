@@ -29,7 +29,12 @@ const PAYMENT_STATUSES: PaymentStatus[] = [
   "failed",
   "refunded",
 ];
-const PAYMENT_METHOD_VALUES: PaymentMethod[] = ["cod", "bank_transfer"];
+const PAYMENT_METHOD_VALUES: PaymentMethod[] = [
+  "cod",
+  "bank_transfer",
+  "easypaisa",
+  "jazzcash",
+];
 
 export default async function AdminOrdersPage({
   searchParams,

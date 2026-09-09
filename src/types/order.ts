@@ -8,7 +8,7 @@ export type OrderStatus =
 
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
 
-export type PaymentMethod = "cod" | "bank_transfer";
+export type PaymentMethod = "cod" | "bank_transfer" | "easypaisa" | "jazzcash";
 
 export interface ShippingAddress {
   fullName: string;

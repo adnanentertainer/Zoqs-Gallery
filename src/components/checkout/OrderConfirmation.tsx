@@ -50,17 +50,12 @@ export function OrderConfirmation({ order }: { order: Order }) {
         </Text>
       </div>
 
-      {order.paymentMethod === "cod" ? (
-        <AuthMessage
-          variant="success"
-          message="Your order has been placed successfully. Please pay when your order arrives."
-        />
-      ) : (
-        <AuthMessage
-          variant="success"
-          message="Your order has been received. Bank transfer instructions will be provided separately."
-        />
-      )}
+      <AuthMessage
+        variant="success"
+        message={
+          paymentMethod?.confirmationMessage ?? "Your order has been received."
+        }
+      />
 
       <div className="grid grid-cols-1 gap-4 rounded-sm border border-beige p-6 sm:grid-cols-2">
         <div>
