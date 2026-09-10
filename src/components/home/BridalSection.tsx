@@ -13,7 +13,7 @@ export function BridalSection() {
         <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm border border-gold/40">
           <Image
             src={bridalBannerImage}
-            alt="Traditional gold bridal necklace and earrings jewellery set"
+            alt="Bride wearing an elaborate traditional gold bridal jewellery set with necklace, maang tikka and earrings"
             fill
             loading="lazy"
             sizes="(max-width: 1024px) 100vw, 50vw"

@@ -13,7 +13,7 @@ export function HeroSection() {
         <div className="relative order-1 aspect-[4/5] w-full overflow-hidden rounded-sm lg:order-2">
           <Image
             src={heroImage}
-            alt="Model styled in a delicate layered gold pendant necklace"
+            alt="Elegant woman wearing an elaborate gold statement choker necklace and drop earrings"
             fill
             priority
             sizes="(max-width: 1024px) 100vw, 50vw"
