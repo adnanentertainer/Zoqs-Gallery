@@ -22,6 +22,13 @@ const nextConfig: NextConfig = {
         hostname: "*.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
+      {
+        // Cloudinary-hosted product photos, e.g.
+        // https://res.cloudinary.com/<cloud-name>/image/upload/v.../file.jpg
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
     ],
   },
   async headers() {
