@@ -60,6 +60,11 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: ["/og-image.png"],
   },
+  verification: {
+    // Confirms domain ownership for Google Search Console — do not remove,
+    // even after verification succeeds, or Search Console loses access.
+    google: "NG2dySLIOEj5PqZ1xPGXemAW9vxmYRvEwNJPN-rEiCQ",
+  },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
