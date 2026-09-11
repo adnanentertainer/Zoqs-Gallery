@@ -30,7 +30,7 @@ export const footerColumns: FooterColumn[] = [
   {
     title: "About ZOQ's Gallery",
     links: [
-      { label: "Our Story", href: "#our-story" },
+      { label: "Our Story", href: "/about" },
       { label: "Privacy Policy", href: "#privacy-policy" },
       { label: "Terms & Conditions", href: "#terms-and-conditions" },
     ],
