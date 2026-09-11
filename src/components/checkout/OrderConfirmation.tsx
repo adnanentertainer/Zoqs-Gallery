@@ -1,12 +1,21 @@
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, ShoppingBag, User } from "lucide-react";
 import { Heading, Text } from "@/components/ui/Typography";
 import { buttonVariants } from "@/components/ui/Button";
 import { AuthMessage } from "@/components/auth";
 import { CheckoutItem } from "@/components/checkout/CheckoutItem";
 import { CheckoutTotals } from "@/components/checkout/CheckoutTotals";
+import { WhatsAppIcon } from "@/components/icons/social-icons";
 import { PAYMENT_METHODS } from "@/lib/checkout/paymentMethods";
+import { formatPrice } from "@/lib/utils";
+import { siteConfig } from "@/constants/site";
 import type { Order } from "@/types/order";
+
+const RECEIPT_PAYMENT_METHODS: Order["paymentMethod"][] = [
+  "easypaisa",
+  "jazzcash",
+  "bank_transfer",
+];
 
 const orderStatusLabel: Record<Order["status"], string> = {
   pending: "Pending",
@@ -34,6 +43,12 @@ export function OrderConfirmation({ order }: { order: Order }) {
     day: "numeric",
   });
 
+  const needsReceipt = RECEIPT_PAYMENT_METHODS.includes(order.paymentMethod);
+  const whatsAppMessage = needsReceipt
+    ? `Hi ${siteConfig.name}! I've placed order ${order.orderNumber} for ${formatPrice(order.total)} via ${paymentMethod?.label ?? order.paymentMethod}. Here is my payment receipt.`
+    : `Hi ${siteConfig.name}! I've placed order ${order.orderNumber} for ${formatPrice(order.total)} via ${paymentMethod?.label ?? order.paymentMethod}.`;
+  const whatsAppHref = `${siteConfig.socialLinks.whatsapp}?text=${encodeURIComponent(whatsAppMessage)}`;
+
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-8">
       <div className="flex flex-col items-center gap-3 text-center">
@@ -56,6 +71,23 @@ export function OrderConfirmation({ order }: { order: Order }) {
           paymentMethod?.confirmationMessage ?? "Your order has been received."
         }
       />
+
+      <div className="flex flex-col items-center gap-3 rounded-sm border border-beige bg-secondary p-6 text-center">
+        <Text variant="bodySm" className="text-muted">
+          {needsReceipt
+            ? "Tap below to open WhatsApp with your order details already filled in — just attach your payment receipt and hit send."
+            : "Tap below to open WhatsApp with your order details already filled in — just hit send to let us know."}
+        </Text>
+        <a
+          href={whatsAppHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={buttonVariants("primary", "lg", "h-14 text-base")}
+        >
+          <WhatsAppIcon className="h-5 w-5" aria-hidden="true" />
+          Send Order Details via WhatsApp
+        </a>
+      </div>
 
       <div className="grid grid-cols-1 gap-4 rounded-sm border border-beige p-6 sm:grid-cols-2">
         <div>
@@ -136,17 +168,27 @@ export function OrderConfirmation({ order }: { order: Order }) {
         />
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-4 sm:flex-row">
         <Link
           href="/shop"
-          className={buttonVariants("outline", "lg", "flex-1")}
+          className={buttonVariants(
+            "outline",
+            "lg",
+            "h-14 flex-1 text-base",
+          )}
         >
+          <ShoppingBag className="h-5 w-5" aria-hidden="true" />
           Continue Shopping
         </Link>
         <Link
           href="/account"
-          className={buttonVariants("primary", "lg", "flex-1")}
+          className={buttonVariants(
+            "primary",
+            "lg",
+            "h-14 flex-1 text-base",
+          )}
         >
+          <User className="h-5 w-5" aria-hidden="true" />
           My Account
         </Link>
       </div>
