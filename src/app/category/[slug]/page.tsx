@@ -45,6 +45,9 @@ export async function generateMetadata({
   return {
     title: `${category.name} | ZOQ's Gallery`,
     description: category.description,
+    alternates: {
+      canonical: `/category/${category.slug}`,
+    },
   };
 }
 

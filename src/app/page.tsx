@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   title: "ZOQ's Gallery | Premium Artificial Jewellery in Pakistan",
   description:
     "Discover elegant artificial jewellery, bridal collections and fashion accessories at ZOQ's Gallery. Premium styles for every occasion in Pakistan.",
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default async function Home() {

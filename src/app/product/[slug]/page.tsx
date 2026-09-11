@@ -59,6 +59,9 @@ export async function generateMetadata({
   return {
     title: `${product.name} | ZOQ's Gallery`,
     description: `Shop ${product.name} from ZOQ's Gallery. Elegant artificial jewellery designed for everyday style and special occasions.`,
+    alternates: {
+      canonical: `/product/${product.slug}`,
+    },
     openGraph: {
       title: `${product.name} | ZOQ's Gallery`,
       description: product.description,

@@ -9,7 +9,23 @@ import { WishlistProvider } from "@/context/WishlistContext";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { getServerUser } from "@/lib/auth/getServerUser";
+import { safeJsonLd } from "@/lib/utils";
 import "../styles/globals.css";
+
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+const organizationJsonLd = {
+  "@context": "https://schema.org/",
+  "@type": "Organization",
+  name: siteConfig.name,
+  url: baseUrl,
+  logo: `${baseUrl}/icon.png`,
+  sameAs: [
+    siteConfig.socialLinks.instagram,
+    siteConfig.socialLinks.facebook,
+    siteConfig.socialLinks.whatsapp,
+  ],
+};
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair",
@@ -31,6 +47,19 @@ export const metadata: Metadata = {
   ),
   title: siteConfig.name,
   description: siteConfig.description,
+  openGraph: {
+    type: "website",
+    siteName: siteConfig.name,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: ["/og-image.png"],
+  },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
@@ -43,6 +72,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${playfairDisplay.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-white font-body text-primary">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(organizationJsonLd) }}
+        />
         <ToastProvider>
           <AuthProvider initialUser={initialUser}>
             <WishlistProvider>
