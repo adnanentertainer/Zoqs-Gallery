@@ -28,6 +28,7 @@ export const galleryImages = {
   modelWearingPendant: unsplash("1611085583191-a3b181a88401", 1200),
 } as const;
 
-export const heroImage = unsplash("1694062045776-f48d9b6de57e", 1600);
+export const heroImage =
+  "https://res.cloudinary.com/mg0ric2u/image/upload/f_auto,q_auto/v1789245397/791820734_1808653773643197_2323804366856272096_n.jpg";
 export const promoBannerImage = unsplash("1611085583191-a3b181a88401", 1600);
 export const bridalBannerImage = unsplash("1610173827043-9db50e0d8ef9", 1600);
