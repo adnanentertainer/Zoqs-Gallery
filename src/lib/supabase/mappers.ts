@@ -91,15 +91,62 @@ const CSS_NAMED_COLORS = new Set([
   "yellowgreen",
 ]);
 
+// "Multicolor" describes several colors at once, so no single CSS color can
+// represent it -- shown as a small rainbow ring instead via `background`
+// (not `backgroundColor`, which can't render a gradient) in VariantSelector.
+const MULTICOLOR_SWATCH =
+  "conic-gradient(from 180deg, #D9A6A0, #B08D57, #C7C9CC, #1F1F1F, #D9A6A0)";
+
+// True for a single edit (one substituted, missing, or extra letter) between
+// two same-ish-length strings -- enough to tolerate a typo like "Maron" for
+// "Maroon" without being loose enough to match unrelated words.
+function isOneEditApart(a: string, b: string): boolean {
+  if (a === b) return true;
+  if (Math.abs(a.length - b.length) > 1) return false;
+
+  let i = 0;
+  let j = 0;
+  let edits = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) {
+      i++;
+      j++;
+      continue;
+    }
+    edits++;
+    if (edits > 1) return false;
+    if (a.length === b.length) {
+      i++;
+      j++;
+    } else if (a.length > b.length) {
+      i++;
+    } else {
+      j++;
+    }
+  }
+  edits += a.length - i + (b.length - j);
+  return edits <= 1;
+}
+
 function resolveColorSwatch(value: string): string | undefined {
-  const curated = COLOR_SWATCHES[value as ProductColor];
+  const normalized = value.trim().toLowerCase().replace(/[\s-]+/g, "");
+  if (normalized === "multicolor" || normalized === "multi") {
+    return MULTICOLOR_SWATCH;
+  }
+
+  const curated = COLOR_SWATCHES[value.trim() as ProductColor];
   if (curated) return curated;
 
   const trimmed = value.trim();
   if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(trimmed)) return trimmed;
 
-  const normalized = trimmed.toLowerCase().replace(/\s+/g, "");
-  return CSS_NAMED_COLORS.has(normalized) ? normalized : undefined;
+  const spacedNormalized = trimmed.toLowerCase().replace(/\s+/g, "");
+  if (CSS_NAMED_COLORS.has(spacedNormalized)) return spacedNormalized;
+
+  for (const known of CSS_NAMED_COLORS) {
+    if (isOneEditApart(spacedNormalized, known)) return known;
+  }
+  return undefined;
 }
 
 export interface ProductRatingAggregate {

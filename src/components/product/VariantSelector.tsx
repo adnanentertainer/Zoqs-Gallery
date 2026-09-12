@@ -59,7 +59,7 @@ export function VariantSelector({
                   : "border-beige hover:border-gold",
                 isDisabled && "cursor-not-allowed opacity-40",
               )}
-              style={isSwatch ? { backgroundColor: option.swatch } : undefined}
+              style={isSwatch ? { background: option.swatch } : undefined}
             >
               {!isSwatch && option.label}
             </button>

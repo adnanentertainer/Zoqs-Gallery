@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ZoomIn } from "lucide-react";
 import { ProductLightbox } from "@/components/product/ProductLightbox";
@@ -17,21 +17,42 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const { variantImage } = useProductVariantImage();
-  // The selected variant's own photo (e.g. the Silver bangle instead of Gold)
-  // takes over the main preview, while thumbnails stay on the base product
-  // photos -- switching color shouldn't reshuffle the whole gallery.
-  const mainImage = variantImage || images[activeIndex];
+  // True once the shopper has manually picked a base-product thumbnail while
+  // a variant image was showing -- lets them browse the other photos without
+  // the variant's photo snapping back on every render. A NEW variant pick
+  // (color change) always takes over again, via the effect below.
+  const [manualOverride, setManualOverride] = useState(false);
 
-  // The fullscreen viewer needs to include the variant's own photo too --
-  // otherwise "expanding" it while a variant is selected would pop open the
-  // lightbox on a completely different (base) photo instead of the one on
-  // screen. Put the currently-shown photo first so the viewer opens on it.
-  const lightboxImages = variantImage
-    ? [mainImage, ...images.filter((image) => image !== mainImage)]
+  useEffect(() => {
+    setManualOverride(false);
+  }, [variantImage]);
+
+  const showVariantImage = Boolean(variantImage) && !manualOverride;
+  const mainImage = showVariantImage ? variantImage! : images[activeIndex];
+
+  // One ordered list drives the main image, the thumbnail rail, and the
+  // fullscreen viewer, so all three always agree on what's currently shown --
+  // the variant's own photo (if any) leads, followed by the product's own
+  // uploaded photos (with the variant's photo deduped out if it's a repeat).
+  const displayImages = variantImage
+    ? [variantImage, ...images.filter((image) => image !== variantImage)]
     : images;
+  const displayActiveIndex = showVariantImage
+    ? 0
+    : displayImages.indexOf(images[activeIndex]);
+
+  function selectThumbnail(index: number) {
+    const clicked = displayImages[index];
+    if (variantImage && clicked === variantImage) {
+      setManualOverride(false);
+      return;
+    }
+    setActiveIndex(images.indexOf(clicked));
+    setManualOverride(true);
+  }
 
   function openLightbox() {
-    setLightboxIndex(variantImage ? 0 : activeIndex);
+    setLightboxIndex(displayActiveIndex);
     setIsLightboxOpen(true);
   }
 
@@ -56,18 +77,18 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         </span>
       </button>
 
-      {images.length > 1 && (
+      {displayImages.length > 1 && (
         <div className="flex gap-3 overflow-x-auto pb-1 lg:w-20 lg:flex-col lg:overflow-x-visible lg:overflow-y-auto lg:pb-0">
-          {images.map((image, index) => (
+          {displayImages.map((image, index) => (
             <button
               key={`${image}-${index}`}
               type="button"
-              onClick={() => setActiveIndex(index)}
-              aria-label={`Show image ${index + 1} of ${images.length}`}
-              aria-current={index === activeIndex}
+              onClick={() => selectThumbnail(index)}
+              aria-label={`Show image ${index + 1} of ${displayImages.length}`}
+              aria-current={index === displayActiveIndex}
               className={cn(
                 "relative aspect-square w-16 shrink-0 overflow-hidden rounded-sm border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold lg:w-full",
-                index === activeIndex
+                index === displayActiveIndex
                   ? "border-gold"
                   : "border-transparent hover:border-beige",
               )}
@@ -86,7 +107,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       )}
 
       <ProductLightbox
-        images={lightboxImages}
+        images={displayImages}
         productName={productName}
         activeIndex={lightboxIndex}
         isOpen={isLightboxOpen}
