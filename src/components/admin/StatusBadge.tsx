@@ -14,7 +14,10 @@ export type StatusBadgeValue =
   | "inactive"
   | "in-stock"
   | "low-stock"
-  | "out-of-stock";
+  | "out-of-stock"
+  | "completed"
+  | "unpaid"
+  | "partial";
 
 const STATUS_CONFIG: Record<
   StatusBadgeValue,
@@ -34,6 +37,9 @@ const STATUS_CONFIG: Record<
   "in-stock": { label: "In Stock", variant: "success" },
   "low-stock": { label: "Low Stock", variant: "warning" },
   "out-of-stock": { label: "Out of Stock", variant: "error" },
+  completed: { label: "Completed", variant: "success" },
+  unpaid: { label: "Unpaid", variant: "error" },
+  partial: { label: "Partial", variant: "warning" },
 };
 
 export function StatusBadge({ status }: { status: StatusBadgeValue }) {
