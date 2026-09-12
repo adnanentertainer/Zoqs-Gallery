@@ -49,6 +49,7 @@ function emptyProduct(): AdminProductInput {
     occasion: OCCASIONS[0],
     isActive: true,
     isFeatured: false,
+    isNew: false,
     images: [],
     variants: [],
     sku: "",
@@ -413,6 +414,15 @@ export function ProductForm({
               className="h-4 w-4 accent-gold"
             />
             Featured
+          </label>
+          <label className="flex items-center gap-2 font-body text-sm text-primary">
+            <input
+              type="checkbox"
+              checked={values.isNew}
+              onChange={(event) => update("isNew", event.target.checked)}
+              className="h-4 w-4 accent-gold"
+            />
+            New Arrival
           </label>
           <label className="flex items-center gap-2 font-body text-sm text-primary">
             <input

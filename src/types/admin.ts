@@ -79,6 +79,8 @@ export interface AdminProductInput {
   occasion: string;
   isActive: boolean;
   isFeatured: boolean;
+  /** Shows the product in the storefront's "New Arrivals" section. */
+  isNew: boolean;
   images: AdminProductImageInput[];
   variants: AdminProductVariantInput[];
   /** Left blank to auto-generate a category-coded ID (e.g. NEC-0001). */
