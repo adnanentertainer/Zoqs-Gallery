@@ -53,7 +53,7 @@ export default async function Home() {
         subtitle="Loved and worn again and again by ZOQ's Gallery customers."
         products={bestSellers}
         viewAllLabel="View All Best Sellers"
-        viewAllHref="/shop?special=best-seller"
+        viewAllHref="/best-sellers"
         background="cream"
       />
       <BridalSection />

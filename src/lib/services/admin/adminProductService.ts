@@ -229,6 +229,7 @@ export async function getAdminProductById(
     isActive: product.is_active,
     isFeatured: product.is_featured,
     isNew: product.is_new,
+    isBestSeller: product.is_best_seller,
     sku: product.sku ?? "",
     costPrice: product.cost_price,
     minStockLevel: product.min_stock_level,
@@ -308,6 +309,7 @@ export async function createProduct(
       is_active: input.isActive,
       is_featured: input.isFeatured,
       is_new: input.isNew,
+      is_best_seller: input.isBestSeller,
       // Omitted (undefined) rather than null when blank, so the database's
       // own generate_product_sku() trigger auto-fills a category-coded ID —
       // passing null would bypass that trigger's "already set?" check.
@@ -373,6 +375,7 @@ export async function updateProduct(
       is_active: input.isActive,
       is_featured: input.isFeatured,
       is_new: input.isNew,
+      is_best_seller: input.isBestSeller,
       // On update the row already has a SKU (the insert-time trigger only
       // fires once), so an empty field here means "clear it back to null"
       // rather than "auto-generate" — unlike createProduct, this must be an

@@ -50,6 +50,7 @@ function emptyProduct(): AdminProductInput {
     isActive: true,
     isFeatured: false,
     isNew: false,
+    isBestSeller: false,
     images: [],
     variants: [],
     sku: "",
@@ -423,6 +424,15 @@ export function ProductForm({
               className="h-4 w-4 accent-gold"
             />
             New Arrival
+          </label>
+          <label className="flex items-center gap-2 font-body text-sm text-primary">
+            <input
+              type="checkbox"
+              checked={values.isBestSeller}
+              onChange={(event) => update("isBestSeller", event.target.checked)}
+              className="h-4 w-4 accent-gold"
+            />
+            Best Seller
           </label>
           <label className="flex items-center gap-2 font-body text-sm text-primary">
             <input
