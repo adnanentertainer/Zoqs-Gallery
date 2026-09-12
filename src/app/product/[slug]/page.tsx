@@ -11,6 +11,7 @@ import {
   ProductPrice,
   ProductReviews,
   ProductTabs,
+  ReviewForm,
   ReviewSummary,
 } from "@/components/product";
 import { ProductSection } from "@/components/home/ProductSection";
@@ -217,6 +218,7 @@ export default async function ProductPage({
           breakdown={breakdown}
         />
         <ProductReviews reviews={productReviews} />
+        <ReviewForm productId={product.id} productSlug={product.slug} />
       </Container>
 
       <ProductSection

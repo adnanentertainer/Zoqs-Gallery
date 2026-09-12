@@ -9,6 +9,7 @@ import {
   Truck,
   ClipboardList,
   FileBarChart,
+  Star,
   type LucideIcon,
 } from "lucide-react";
 
@@ -27,6 +28,7 @@ export const adminNavItems: AdminNavItem[] = [
   { label: "Purchases", href: "/admin/purchases", icon: ClipboardList },
   { label: "Reports", href: "/admin/reports", icon: FileBarChart },
   { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
+  { label: "Reviews", href: "/admin/reviews", icon: Star },
   { label: "Customers", href: "/admin/customers", icon: Users },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];

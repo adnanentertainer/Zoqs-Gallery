@@ -169,6 +169,7 @@ export interface Database {
         Row: {
           id: string;
           product_id: string;
+          user_id: string | null;
           customer_name: string;
           rating: number;
           review: string;
@@ -181,6 +182,7 @@ export interface Database {
         Insert: {
           id?: string;
           product_id: string;
+          user_id?: string | null;
           customer_name: string;
           rating: number;
           review: string;

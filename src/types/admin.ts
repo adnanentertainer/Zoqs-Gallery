@@ -402,3 +402,15 @@ export type ReportType =
   | "movements"
   | "sales"
   | "inventory-value";
+
+export interface AdminReviewListItem {
+  id: string;
+  productId: string;
+  productName: string;
+  customerName: string;
+  rating: number;
+  reviewText: string;
+  reviewDate: string;
+  isVerifiedPurchase: boolean;
+  isApproved: boolean;
+}

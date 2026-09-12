@@ -16,3 +16,4 @@ export { CareInstructions } from "@/components/product/CareInstructions";
 export { ProductTabs } from "@/components/product/ProductTabs";
 export { ReviewSummary } from "@/components/product/ReviewSummary";
 export { ProductReviews } from "@/components/product/ProductReviews";
+export { ReviewForm } from "@/components/product/ReviewForm";
