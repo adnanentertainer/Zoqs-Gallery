@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
@@ -9,6 +9,13 @@ import { cn } from "@/lib/utils";
 
 const navButtonStyles =
   "inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold";
+
+// Opens already magnified 1.5x (50%), and the shopper can scroll/pinch to
+// zoom in further, up to MAX_ZOOM -- clamped so it can never zoom back out
+// past the starting point, which is already closer than a plain fit-to-screen.
+const BASE_ZOOM = 1.5;
+const MAX_ZOOM = 3.5;
+const ZOOM_SENSITIVITY = 0.0015;
 
 interface ProductLightboxProps {
   images: string[];
@@ -29,6 +36,13 @@ export function ProductLightbox({
 }: ProductLightboxProps) {
   useEscapeKey(isOpen, onClose);
   useBodyScrollLock(isOpen);
+  const [zoom, setZoom] = useState(BASE_ZOOM);
+
+  // Each photo (and each time the viewer reopens) starts back at the same
+  // base magnification rather than wherever the shopper last zoomed to.
+  useEffect(() => {
+    setZoom(BASE_ZOOM);
+  }, [activeIndex, isOpen]);
 
   const showPrevious = () =>
     onIndexChange((activeIndex - 1 + images.length) % images.length);
@@ -47,10 +61,26 @@ export function ProductLightbox({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, activeIndex, images.length]);
 
+  // Scrolling/pinching while over the photo zooms just the photo -- this
+  // preventDefault keeps the gesture from also scrolling or zooming the
+  // browser page behind the viewer.
+  function handleWheelZoom(event: React.WheelEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setZoom((previous) =>
+      Math.min(MAX_ZOOM, Math.max(BASE_ZOOM, previous - event.deltaY * ZOOM_SENSITIVITY)),
+    );
+  }
+
+  // A click that lands directly on this element's own background (not on
+  // the photo or a button nested inside it) closes the viewer -- i.e.
+  // clicking beside the image, at any point in the dialog, dismisses it.
+  function closeOnBackgroundClick(event: React.MouseEvent<HTMLDivElement>) {
+    if (event.target === event.currentTarget) onClose();
+  }
+
   return (
     <div className={cn("fixed inset-0 z-50", !isOpen && "pointer-events-none")}>
       <div
-        onClick={onClose}
         aria-hidden="true"
         className={cn(
           "absolute inset-0 bg-primary/90 transition-opacity duration-300",
@@ -62,6 +92,7 @@ export function ProductLightbox({
         aria-modal="true"
         aria-label={`${productName} image viewer`}
         aria-hidden={!isOpen}
+        onClick={closeOnBackgroundClick}
         className={cn(
           "absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300",
           isOpen ? "opacity-100" : "pointer-events-none opacity-0",
@@ -92,13 +123,18 @@ export function ProductLightbox({
           </button>
         )}
 
-        <div className="relative h-[70vh] w-[92vw] max-w-3xl sm:h-[80vh]">
+        <div
+          onClick={closeOnBackgroundClick}
+          onWheel={handleWheelZoom}
+          className="relative h-[70vh] w-[92vw] max-w-3xl overflow-hidden sm:h-[80vh]"
+        >
           <Image
             src={images[activeIndex]}
             alt={`${productName} — image ${activeIndex + 1} of ${images.length}`}
             fill
             sizes="92vw"
-            className="object-contain"
+            className="object-contain transition-transform duration-150 ease-out"
+            style={{ transform: `scale(${zoom})` }}
             priority={isOpen}
           />
         </div>
