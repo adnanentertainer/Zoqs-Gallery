@@ -121,7 +121,7 @@ export function ProductGallery({
           fill
           priority={activeIndex === 0}
           sizes="(max-width: 1024px) 100vw, 50vw"
-          className="object-cover transition-transform duration-300 ease-out"
+          className="object-contain transition-transform duration-300 ease-out"
           style={{ transform: `scale(${zoomScale})`, transformOrigin: zoomOrigin }}
         />
         <span className="absolute bottom-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-primary opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
