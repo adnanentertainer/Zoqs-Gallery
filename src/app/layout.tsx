@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { siteConfig } from "@/constants/site";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
@@ -93,6 +94,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             </WishlistProvider>
           </AuthProvider>
         </ToastProvider>
+        <Analytics />
       </body>
     </html>
   );
