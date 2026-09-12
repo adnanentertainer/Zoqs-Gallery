@@ -1,7 +1,8 @@
 "use server";
 
 import { getServerUser } from "@/lib/auth/getServerUser";
-import { createOrder } from "@/lib/services/orderService";
+import { createOrder, getOrderByOrderNumber } from "@/lib/services/orderService";
+import { sendNewOrderNotificationEmail } from "@/lib/email/orderNotification";
 import {
   validateAddressLine1,
   validateCity,
@@ -99,6 +100,21 @@ export async function placeOrder(
       shipping: input.shipping,
       customerNotes: input.customerNotes,
     });
+
+    // Best-effort admin notification, awaited (not fire-and-forget) so it
+    // isn't cut off when the serverless function returns — but isolated in
+    // its own try/catch, since the order is already committed at this point
+    // and a notification failure must never surface as a checkout error.
+    try {
+      const order = await getOrderByOrderNumber(result.orderNumber);
+      if (order) await sendNewOrderNotificationEmail(order);
+    } catch (notificationError) {
+      console.error(
+        "[checkout.placeOrder] order notification failed:",
+        notificationError,
+      );
+    }
+
     return { orderNumber: result.orderNumber };
   } catch (error) {
     return {

@@ -17,6 +17,9 @@ export const siteConfig = {
     tiktok: "#",
     whatsapp: "https://wa.me/923316668233",
   },
+  // Where "a new order was placed" notification emails are sent from/to.
+  orderNotificationFromEmail: "ZOQ's Gallery Orders <orders@zoqsgallery.com>",
+  orderNotificationToEmail: "zoqsgallery@gmail.com",
 } as const;
 
 export type SiteConfig = typeof siteConfig;
