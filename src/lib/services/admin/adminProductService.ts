@@ -87,10 +87,12 @@ export async function listAdminProducts(
       id: row.id,
       name: row.name,
       slug: row.slug,
+      sku: row.sku,
       categoryName: row.categories?.name ?? "—",
       price: row.price,
       stock: row.stock,
       isActive: row.is_active,
+      forceUnavailable: row.force_unavailable,
       imageUrl: sortedImages[0]?.image_url ?? null,
       createdAt: row.created_at,
     };
@@ -160,6 +162,12 @@ export async function getAdminProductById(
     occasion: product.occasion ?? "",
     isActive: product.is_active,
     isFeatured: product.is_featured,
+    sku: product.sku ?? "",
+    costPrice: product.cost_price,
+    minStockLevel: product.min_stock_level,
+    maxStockLevel: product.max_stock_level,
+    forceUnavailable: product.force_unavailable,
+    primarySupplierId: product.primary_supplier_id,
     hasOrderHistory: (orderItemsResult.count ?? 0) > 0,
     images: (imagesResult.data ?? []).map((image) => ({
       id: image.id,
@@ -187,6 +195,15 @@ async function isSlugTaken(slug: string, excludeId?: string): Promise<boolean> {
   return data !== null;
 }
 
+async function isSkuTaken(sku: string, excludeId?: string): Promise<boolean> {
+  const supabase = await getSupabaseServerClient();
+  let query = supabase.from("products").select("id").eq("sku", sku);
+  if (excludeId) query = query.neq("id", excludeId);
+  const { data, error } = await query.maybeSingle();
+  if (error) throw error;
+  return data !== null;
+}
+
 const VARIANT_GROUP_LABELS: Record<string, string> = {
   color: "Color",
   size: "Size",
@@ -200,6 +217,9 @@ export async function createProduct(
 
   if (await isSlugTaken(input.slug)) {
     return { error: "A product with this slug already exists." };
+  }
+  if (input.sku.trim() && (await isSkuTaken(input.sku.trim()))) {
+    return { error: "A product with this SKU already exists." };
   }
 
   const supabase = await getSupabaseServerClient();
@@ -219,6 +239,15 @@ export async function createProduct(
       occasion: input.occasion || null,
       is_active: input.isActive,
       is_featured: input.isFeatured,
+      // Omitted (undefined) rather than null when blank, so the database's
+      // own generate_product_sku() trigger auto-fills a category-coded ID —
+      // passing null would bypass that trigger's "already set?" check.
+      sku: input.sku.trim() || undefined,
+      cost_price: input.costPrice,
+      min_stock_level: input.minStockLevel,
+      max_stock_level: input.maxStockLevel,
+      force_unavailable: input.forceUnavailable,
+      primary_supplier_id: input.primarySupplierId,
     })
     .select("id")
     .single();
@@ -253,6 +282,9 @@ export async function updateProduct(
   if (await isSlugTaken(input.slug, id)) {
     return { error: "A product with this slug already exists." };
   }
+  if (input.sku.trim() && (await isSkuTaken(input.sku.trim(), id))) {
+    return { error: "A product with this SKU already exists." };
+  }
 
   const supabase = await getSupabaseServerClient();
   const { error } = await supabase
@@ -271,6 +303,16 @@ export async function updateProduct(
       occasion: input.occasion || null,
       is_active: input.isActive,
       is_featured: input.isFeatured,
+      // On update the row already has a SKU (the insert-time trigger only
+      // fires once), so an empty field here means "clear it back to null"
+      // rather than "auto-generate" — unlike createProduct, this must be an
+      // explicit null, not omitted.
+      sku: input.sku.trim() || null,
+      cost_price: input.costPrice,
+      min_stock_level: input.minStockLevel,
+      max_stock_level: input.maxStockLevel,
+      force_unavailable: input.forceUnavailable,
+      primary_supplier_id: input.primarySupplierId,
     })
     .eq("id", id);
 

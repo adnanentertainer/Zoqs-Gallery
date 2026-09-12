@@ -4,6 +4,7 @@ import { AdminPageHeader } from "@/components/admin";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { getAdminProductById } from "@/lib/services/admin/adminProductService";
 import { listAdminCategories } from "@/lib/services/admin/adminCategoryService";
+import { listSupplierOptions } from "@/lib/services/admin/supplierService";
 
 export const metadata: Metadata = {
   title: "Edit Product | Admin | ZOQ's Gallery",
@@ -18,9 +19,10 @@ export default async function EditProductPage({
   params,
 }: EditProductPageProps) {
   const { id } = await params;
-  const [product, categories] = await Promise.all([
+  const [product, categories, suppliers] = await Promise.all([
     getAdminProductById(id),
     listAdminCategories(),
+    listSupplierOptions(),
   ]);
 
   if (!product) notFound();
@@ -34,6 +36,7 @@ export default async function EditProductPage({
         initialValues={product}
         hasOrderHistory={product.hasOrderHistory}
         categories={categories}
+        suppliers={suppliers}
       />
     </div>
   );

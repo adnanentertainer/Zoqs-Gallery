@@ -28,10 +28,12 @@ export interface AdminProductListItem {
   id: string;
   name: string;
   slug: string;
+  sku: string | null;
   categoryName: string;
   price: number;
   stock: number;
   isActive: boolean;
+  forceUnavailable: boolean;
   imageUrl: string | null;
   createdAt: string;
 }
@@ -68,6 +70,18 @@ export interface AdminProductInput {
   isFeatured: boolean;
   images: AdminProductImageInput[];
   variants: AdminProductVariantInput[];
+  /** Left blank to auto-generate a category-coded ID (e.g. NEC-0001). */
+  sku: string;
+  costPrice: number | null;
+  minStockLevel: number;
+  maxStockLevel: number | null;
+  /**
+   * Manual "pause selling" override — independent of both `isActive` (which
+   * removes the product from the site entirely) and real stock. Stays
+   * visible/browsable but shows "Out of Stock" and blocks purchase.
+   */
+  forceUnavailable: boolean;
+  primarySupplierId: string | null;
 }
 
 export interface AdminProductDetail extends AdminProductInput {
@@ -135,4 +149,172 @@ export interface AdminDashboardMetrics {
    */
   totalOrderValue: number;
   recentOrders: AdminOrderListItem[];
+}
+
+// ============================================================================
+// Suppliers
+// ============================================================================
+
+export type AdminSupplierStatus = "active" | "inactive";
+
+export interface AdminSupplierFilters {
+  search?: string;
+  status?: AdminSupplierStatus;
+  page: number;
+  pageSize: number;
+}
+
+export interface SupplierOption {
+  id: string;
+  name: string;
+  status: AdminSupplierStatus;
+}
+
+export interface AdminSupplierListItem {
+  id: string;
+  name: string;
+  contactPerson: string | null;
+  phone: string | null;
+  email: string | null;
+  status: AdminSupplierStatus;
+  productCount: number;
+  createdAt: string;
+}
+
+export interface AdminSupplierInput {
+  name: string;
+  contactPerson: string;
+  phone: string;
+  email: string;
+  address: string;
+  notes: string;
+  status: AdminSupplierStatus;
+}
+
+export interface AdminSupplierDetail extends AdminSupplierInput {
+  id: string;
+  products: { id: string; name: string; sku: string | null; stock: number }[];
+}
+
+// ============================================================================
+// Inventory movements
+// ============================================================================
+
+export type MovementType =
+  | "stock_in"
+  | "stock_out"
+  | "sale"
+  | "return"
+  | "adjustment"
+  | "damaged"
+  | "purchase";
+
+export interface AdminInventoryMovementFilters {
+  productId?: string;
+  categoryId?: string;
+  movementType?: MovementType;
+  dateFrom?: string;
+  dateTo?: string;
+  page: number;
+  pageSize: number;
+}
+
+export interface AdminInventoryMovementListItem {
+  id: string;
+  productId: string | null;
+  productName: string | null;
+  sku: string | null;
+  movementType: MovementType;
+  quantityChange: number;
+  previousQuantity: number;
+  newQuantity: number;
+  reason: string | null;
+  referenceNumber: string | null;
+  createdByEmail: string | null;
+  createdAt: string;
+}
+
+/**
+ * Input for the Stock In / Stock Out / Adjust admin actions. `direction` is
+ * explicit rather than inferred from `movementType`, because "adjustment"
+ * alone is ambiguous — a correction can go either way. `quantity` is always
+ * a positive magnitude; the service combines it with `direction` to compute
+ * the signed delta the database actually needs.
+ */
+export interface StockAdjustmentInput {
+  productId: string;
+  variantId: string | null;
+  movementType: MovementType;
+  direction: "increase" | "decrease";
+  quantity: number;
+  reason: string;
+  referenceNumber: string;
+}
+
+// ============================================================================
+// Purchases
+// ============================================================================
+
+export type PurchaseStatus = "pending" | "completed" | "cancelled";
+export type PurchasePaymentStatus = "unpaid" | "partial" | "paid";
+
+export interface AdminPurchaseFilters {
+  search?: string;
+  supplierId?: string;
+  status?: PurchaseStatus;
+  page: number;
+  pageSize: number;
+}
+
+export interface AdminPurchaseListItem {
+  id: string;
+  purchaseNumber: string;
+  supplierName: string;
+  status: PurchaseStatus;
+  paymentStatus: PurchasePaymentStatus;
+  totalAmount: number;
+  itemCount: number;
+  createdAt: string;
+}
+
+export interface AdminPurchaseItemInput {
+  productId: string;
+  variantId: string | null;
+  productName: string;
+  sku: string;
+  quantity: number;
+  costPrice: number;
+}
+
+export interface AdminPurchaseInput {
+  supplierId: string;
+  paymentStatus: PurchasePaymentStatus;
+  notes: string;
+  items: AdminPurchaseItemInput[];
+}
+
+export interface AdminPurchaseDetail {
+  id: string;
+  purchaseNumber: string;
+  supplierId: string;
+  supplierName: string;
+  status: PurchaseStatus;
+  paymentStatus: PurchasePaymentStatus;
+  totalAmount: number;
+  notes: string;
+  items: (AdminPurchaseItemInput & { id: string; lineTotal: number })[];
+  createdAt: string;
+}
+
+// ============================================================================
+// Inventory dashboard
+// ============================================================================
+
+export interface AdminInventoryDashboardMetrics {
+  totalProducts: number;
+  totalStockQuantity: number;
+  lowStockCount: number;
+  outOfStockCount: number;
+  totalInventoryValue: number;
+  recentMovements: AdminInventoryMovementListItem[];
 }

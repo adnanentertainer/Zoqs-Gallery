@@ -24,6 +24,8 @@ export interface Database {
           product_count: number;
           is_active: boolean;
           display_order: number;
+          sku_prefix: string;
+          next_sku_seq: number;
           created_at: string;
           updated_at: string;
         };
@@ -35,6 +37,9 @@ export interface Database {
           image_url?: string | null;
           is_active?: boolean;
           display_order?: number;
+          // Auto-derived from `name` by generate_category_sku_prefix() if
+          // omitted — see the inventory-management migration.
+          sku_prefix?: string;
         };
         Update: Partial<Database["public"]["Tables"]["categories"]["Insert"]>;
         Relationships: [];
@@ -63,6 +68,12 @@ export interface Database {
           care_instructions: string[] | null;
           tags: string[];
           is_active: boolean;
+          sku: string | null;
+          cost_price: number | null;
+          min_stock_level: number;
+          max_stock_level: number | null;
+          force_unavailable: boolean;
+          primary_supplier_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -89,6 +100,14 @@ export interface Database {
           care_instructions?: string[] | null;
           tags?: string[];
           is_active?: boolean;
+          // Auto-generated as a category-coded ID (e.g. NEC-0001) by
+          // generate_product_sku() if omitted.
+          sku?: string | null;
+          cost_price?: number | null;
+          min_stock_level?: number;
+          max_stock_level?: number | null;
+          force_unavailable?: boolean;
+          primary_supplier_id?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["products"]["Insert"]>;
         Relationships: [];
@@ -275,6 +294,117 @@ export interface Database {
         Update: never;
         Relationships: [];
       };
+      suppliers: {
+        Row: {
+          id: string;
+          name: string;
+          contact_person: string | null;
+          phone: string | null;
+          email: string | null;
+          address: string | null;
+          notes: string | null;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          contact_person?: string | null;
+          phone?: string | null;
+          email?: string | null;
+          address?: string | null;
+          notes?: string | null;
+          status?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["suppliers"]["Insert"]>;
+        Relationships: [];
+      };
+      // No Insert/Update policy exists at all — every row is written by the
+      // record_stock_movement(), complete_purchase(), or create_order()
+      // SECURITY DEFINER functions, never directly by client code.
+      inventory_movements: {
+        Row: {
+          id: string;
+          product_id: string | null;
+          variant_id: string | null;
+          sku: string | null;
+          movement_type: string;
+          quantity_change: number;
+          previous_quantity: number;
+          new_quantity: number;
+          reason: string | null;
+          reference_number: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      purchases: {
+        Row: {
+          id: string;
+          purchase_number: string;
+          supplier_id: string;
+          status: string;
+          payment_status: string;
+          total_amount: number;
+          notes: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          purchase_number: string;
+          supplier_id: string;
+          status?: string;
+          payment_status?: string;
+          total_amount?: number;
+          notes?: string | null;
+          created_by?: string | null;
+        };
+        // purchase_number and created_by are stable once set — only the
+        // fields below are ever edited from the admin UI.
+        Update: Partial<{
+          supplier_id: string;
+          status: string;
+          payment_status: string;
+          total_amount: number;
+          notes: string | null;
+        }>;
+        Relationships: [];
+      };
+      purchase_items: {
+        Row: {
+          id: string;
+          purchase_id: string;
+          product_id: string | null;
+          variant_id: string | null;
+          product_name: string;
+          sku: string | null;
+          quantity: number;
+          cost_price: number;
+          line_total: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          purchase_id: string;
+          product_id?: string | null;
+          variant_id?: string | null;
+          product_name: string;
+          sku?: string | null;
+          quantity: number;
+          cost_price: number;
+          line_total: number;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["purchase_items"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -291,6 +421,28 @@ export interface Database {
           subtotal: number;
           shipping_cost: number;
           total: number;
+        };
+      };
+      record_stock_movement: {
+        Args: {
+          p_product_id: string | null;
+          p_variant_id: string | null;
+          p_movement_type: string;
+          p_quantity_change: number;
+          p_reason?: string | null;
+          p_reference_number?: string | null;
+        };
+        Returns: {
+          previous_quantity: number;
+          new_quantity: number;
+        };
+      };
+      complete_purchase: {
+        Args: {
+          p_purchase_id: string;
+        };
+        Returns: {
+          purchase_number: string;
         };
       };
     };

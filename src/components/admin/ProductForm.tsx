@@ -14,7 +14,11 @@ import {
   setProductActiveAction,
   updateProductAction,
 } from "@/app/admin/products/actions";
-import type { AdminCategoryListItem, AdminProductInput } from "@/types/admin";
+import type {
+  AdminCategoryListItem,
+  AdminProductInput,
+  SupplierOption,
+} from "@/types/admin";
 import Link from "next/link";
 
 const MATERIALS = [
@@ -46,6 +50,12 @@ function emptyProduct(): AdminProductInput {
     isFeatured: false,
     images: [],
     variants: [],
+    sku: "",
+    costPrice: null,
+    minStockLevel: 5,
+    maxStockLevel: null,
+    forceUnavailable: false,
+    primarySupplierId: null,
   };
 }
 
@@ -55,6 +65,7 @@ interface ProductFormProps {
   initialValues?: AdminProductInput;
   hasOrderHistory?: boolean;
   categories: AdminCategoryListItem[];
+  suppliers: SupplierOption[];
 }
 
 const selectStyles =
@@ -69,6 +80,7 @@ export function ProductForm({
   initialValues,
   hasOrderHistory = false,
   categories,
+  suppliers,
 }: ProductFormProps) {
   const router = useRouter();
   const [values, setValues] = useState<AdminProductInput>(
@@ -322,6 +334,64 @@ export function ProductForm({
             value={values.stock}
             onChange={(event) => update("stock", Number(event.target.value))}
           />
+          <Input
+            label="Cost Price (PKR, optional)"
+            type="number"
+            min={0}
+            value={values.costPrice ?? ""}
+            onChange={(event) =>
+              update(
+                "costPrice",
+                event.target.value === "" ? null : Number(event.target.value),
+              )
+            }
+          />
+          <Input
+            label="SKU / Product ID"
+            placeholder="Auto-generated if left blank"
+            value={values.sku}
+            onChange={(event) => update("sku", event.target.value)}
+          />
+          <div className="flex flex-col gap-1.5">
+            <label className={fieldLabelStyles}>Supplier (optional)</label>
+            <select
+              value={values.primarySupplierId ?? ""}
+              onChange={(event) =>
+                update("primarySupplierId", event.target.value || null)
+              }
+              className={selectStyles}
+            >
+              <option value="">No supplier</option>
+              {suppliers.map((supplier) => (
+                <option key={supplier.id} value={supplier.id}>
+                  {supplier.name}
+                  {supplier.status === "inactive" ? " (Inactive)" : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+          <Input
+            label="Minimum Stock Level"
+            type="number"
+            min={0}
+            required
+            value={values.minStockLevel}
+            onChange={(event) =>
+              update("minStockLevel", Number(event.target.value))
+            }
+          />
+          <Input
+            label="Maximum Stock Level (optional)"
+            type="number"
+            min={0}
+            value={values.maxStockLevel ?? ""}
+            onChange={(event) =>
+              update(
+                "maxStockLevel",
+                event.target.value === "" ? null : Number(event.target.value),
+              )
+            }
+          />
         </div>
         <div className="flex flex-wrap gap-6">
           <label className="flex items-center gap-2 font-body text-sm text-primary">
@@ -341,6 +411,17 @@ export function ProductForm({
               className="h-4 w-4 accent-gold"
             />
             Featured
+          </label>
+          <label className="flex items-center gap-2 font-body text-sm text-primary">
+            <input
+              type="checkbox"
+              checked={values.forceUnavailable}
+              onChange={(event) =>
+                update("forceUnavailable", event.target.checked)
+              }
+              className="h-4 w-4 accent-gold"
+            />
+            Force Unavailable (stays visible, blocks purchase, stock untouched)
           </label>
         </div>
       </section>
