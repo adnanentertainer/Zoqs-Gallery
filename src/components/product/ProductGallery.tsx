@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { ZoomIn } from "lucide-react";
 import { ProductLightbox } from "@/components/product/ProductLightbox";
+import { useProductVariantImage } from "@/context/ProductVariantImageContext";
 import { cn } from "@/lib/utils";
 
 interface ProductGalleryProps {
@@ -14,6 +15,11 @@ interface ProductGalleryProps {
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const { variantImage } = useProductVariantImage();
+  // The selected variant's own photo (e.g. the Silver bangle instead of Gold)
+  // takes over the main preview, while thumbnails/lightbox stay on the base
+  // product photos -- switching color shouldn't reshuffle the whole gallery.
+  const mainImage = variantImage || images[activeIndex];
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row-reverse">
@@ -24,7 +30,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         className="group relative aspect-square w-full overflow-hidden rounded-sm bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
       >
         <Image
-          src={images[activeIndex]}
+          src={mainImage}
           alt={`${productName} — image ${activeIndex + 1} of ${images.length}`}
           fill
           priority={activeIndex === 0}

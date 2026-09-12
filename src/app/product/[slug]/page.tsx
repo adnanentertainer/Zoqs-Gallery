@@ -14,6 +14,7 @@ import {
   ReviewSummary,
 } from "@/components/product";
 import { ProductSection } from "@/components/home/ProductSection";
+import { ProductVariantImageProvider } from "@/context/ProductVariantImageContext";
 import { siteConfig } from "@/constants/site";
 import {
   getProductBadge,
@@ -138,60 +139,62 @@ export default async function ProductPage({
         />
       </Container>
 
-      <Container className="grid grid-cols-1 gap-10 pb-16 lg:grid-cols-2 lg:gap-16">
-        <ProductGallery images={product.images} productName={product.name} />
+      <ProductVariantImageProvider>
+        <Container className="grid grid-cols-1 gap-10 pb-16 lg:grid-cols-2 lg:gap-16">
+          <ProductGallery images={product.images} productName={product.name} />
 
-        <div className="flex flex-col gap-5 pb-24 lg:pb-0">
-          <div className="flex flex-col gap-3">
-            {badge && (
-              <Badge variant={badgeVariant[badge]} className="w-fit">
-                {badge}
-              </Badge>
+          <div className="flex flex-col gap-5 pb-24 lg:pb-0">
+            <div className="flex flex-col gap-3">
+              {badge && (
+                <Badge variant={badgeVariant[badge]} className="w-fit">
+                  {badge}
+                </Badge>
+              )}
+              <Heading variant="h1" as="h1">
+                {product.name}
+              </Heading>
+              <a
+                href="#reviews"
+                className="flex w-fit items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+              >
+                <RatingStars rating={averageRating} />
+                <span className="font-body text-sm text-primary">
+                  {averageRating.toFixed(1)}
+                </span>
+                <span className="font-body text-sm text-muted underline-offset-2 hover:underline">
+                  {reviewsCount} Reviews
+                </span>
+              </a>
+            </div>
+
+            <ProductPrice product={product} />
+
+            {inStock ? (
+              <span className="inline-flex w-fit items-center gap-2 font-body text-sm font-medium text-success">
+                <span
+                  className="h-2 w-2 rounded-full bg-success"
+                  aria-hidden="true"
+                />
+                In Stock
+              </span>
+            ) : (
+              <span className="inline-flex w-fit items-center gap-2 font-body text-sm font-medium text-error">
+                <span
+                  className="h-2 w-2 rounded-full bg-error"
+                  aria-hidden="true"
+                />
+                Out of Stock
+              </span>
             )}
-            <Heading variant="h1" as="h1">
-              {product.name}
-            </Heading>
-            <a
-              href="#reviews"
-              className="flex w-fit items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-            >
-              <RatingStars rating={averageRating} />
-              <span className="font-body text-sm text-primary">
-                {averageRating.toFixed(1)}
-              </span>
-              <span className="font-body text-sm text-muted underline-offset-2 hover:underline">
-                {reviewsCount} Reviews
-              </span>
-            </a>
+
+            <Text variant="body" className="text-muted">
+              {product.description}
+            </Text>
+
+            <ProductActions product={product} />
           </div>
-
-          <ProductPrice product={product} />
-
-          {inStock ? (
-            <span className="inline-flex w-fit items-center gap-2 font-body text-sm font-medium text-success">
-              <span
-                className="h-2 w-2 rounded-full bg-success"
-                aria-hidden="true"
-              />
-              In Stock
-            </span>
-          ) : (
-            <span className="inline-flex w-fit items-center gap-2 font-body text-sm font-medium text-error">
-              <span
-                className="h-2 w-2 rounded-full bg-error"
-                aria-hidden="true"
-              />
-              Out of Stock
-            </span>
-          )}
-
-          <Text variant="body" className="text-muted">
-            {product.description}
-          </Text>
-
-          <ProductActions product={product} />
-        </div>
-      </Container>
+        </Container>
+      </ProductVariantImageProvider>
 
       <Container className="pb-16">
         <ProductTabs product={product} />

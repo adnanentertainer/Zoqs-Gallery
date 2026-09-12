@@ -88,6 +88,7 @@ function groupVariantRows(
           ? basePrice + row.price_adjustment
           : undefined,
       inStock: row.stock === 0 ? false : undefined,
+      image: row.image_url ?? undefined,
     });
   }
 

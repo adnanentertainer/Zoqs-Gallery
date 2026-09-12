@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Share2, ShoppingBag, Zap } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -12,6 +12,7 @@ import { formatPrice } from "@/lib/utils";
 import { getDefaultVariantSelections } from "@/lib/cart";
 import { LOW_STOCK_THRESHOLD, isInStock } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
+import { useProductVariantImage } from "@/context/ProductVariantImageContext";
 import type { Product } from "@/types";
 
 type CartStatus = "idle" | "loading" | "added";
@@ -26,6 +27,7 @@ interface ProductActionsProps {
 export function ProductActions({ product }: ProductActionsProps) {
   const cart = useCart();
   const router = useRouter();
+  const { setVariantImage } = useProductVariantImage();
   const [selections, setSelections] = useState<Record<string, string>>(() =>
     getDefaultVariantSelections(product),
   );
@@ -43,6 +45,14 @@ export function ProductActions({ product }: ProductActionsProps) {
   const priceOverride = selectedOptions.find(
     (option) => option.priceOverride !== undefined,
   )?.priceOverride;
+  const selectedImage = selectedOptions.find(
+    (option) => option?.image,
+  )?.image;
+
+  useEffect(() => {
+    setVariantImage(selectedImage ?? null);
+    return () => setVariantImage(null);
+  }, [selectedImage, setVariantImage]);
   const currentPrice = priceOverride ?? product.price;
   const productInStock = isInStock(product);
   const canPurchase = productInStock && !variantOutOfStock;

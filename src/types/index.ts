@@ -30,6 +30,7 @@ export interface ProductVariantOption {
   swatch?: string;
   priceOverride?: number;
   inStock?: boolean;
+  image?: string;
 }
 
 export interface ProductVariantGroup {
