@@ -5,11 +5,10 @@ export interface NavLink {
 
 export const mainNavLinks: NavLink[] = [
   { label: "Home", href: "/" },
-  { label: "Shop", href: "/shop" },
+  { label: "Products", href: "/shop" },
   { label: "New Arrivals", href: "/shop?special=new" },
   { label: "Jewellery", href: "/shop" },
   { label: "Accessories", href: "/category/accessories" },
-  { label: "Sale", href: "/shop?special=sale" },
 ];
 
 export const mobileNavLinks: NavLink[] = [
