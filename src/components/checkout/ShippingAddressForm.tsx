@@ -114,10 +114,9 @@ export function ShippingAddressForm({
         )}
       </div>
       <Input
-        label="Postal Code"
+        label="Postal Code (optional)"
         name="postalCode"
         autoComplete="postal-code"
-        required
         value={values.postalCode}
         onChange={(event) => onChange("postalCode", event.target.value)}
         error={errors.postalCode}

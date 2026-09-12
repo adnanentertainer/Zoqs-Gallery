@@ -263,7 +263,7 @@ export interface Database {
           shipping_address_line_2: string | null;
           shipping_city: string;
           shipping_province: string;
-          shipping_postal_code: string;
+          shipping_postal_code: string | null;
           shipping_country: string;
           customer_notes: string | null;
           created_at: string;

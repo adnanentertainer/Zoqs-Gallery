@@ -30,10 +30,6 @@ export function validateProvince(value: string): string | undefined {
   return value.trim().length === 0 ? "Province is required." : undefined;
 }
 
-export function validatePostalCode(value: string): string | undefined {
-  return value.trim().length === 0 ? "Postal code is required." : undefined;
-}
-
 export function validateCustomerNotes(value: string): string | undefined {
   if (value.length > CUSTOMER_NOTES_MAX_LENGTH) {
     return `Notes must be ${CUSTOMER_NOTES_MAX_LENGTH} characters or fewer.`;

@@ -125,8 +125,9 @@ export function OrderConfirmation({ order }: { order: Order }) {
             </>
           )}
           <br />
-          {order.shippingAddress.city}, {order.shippingAddress.province}{" "}
-          {order.shippingAddress.postalCode}
+          {order.shippingAddress.city}, {order.shippingAddress.province}
+          {order.shippingAddress.postalCode &&
+            ` ${order.shippingAddress.postalCode}`}
           <br />
           {order.shippingAddress.country}
           <br />

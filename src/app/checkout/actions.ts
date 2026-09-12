@@ -10,7 +10,6 @@ import {
   validateEmail,
   validateFullName,
   validatePakistaniPhone,
-  validatePostalCode,
   validateProvince,
 } from "@/lib/checkout/validation";
 import type { CheckoutCartLine, PaymentMethod } from "@/types/order";
@@ -85,7 +84,6 @@ export async function placeOrder(
     validateAddressLine1(input.shipping.addressLine1),
     validateCity(input.shipping.city),
     validateProvince(input.shipping.province),
-    validatePostalCode(input.shipping.postalCode),
     validateCustomerNotes(input.customerNotes),
   ].filter(Boolean);
 

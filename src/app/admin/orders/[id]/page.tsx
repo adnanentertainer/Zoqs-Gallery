@@ -94,8 +94,9 @@ export default async function AdminOrderDetailPage({
                 </>
               )}
               <br />
-              {order.shippingAddress.city}, {order.shippingAddress.province}{" "}
-              {order.shippingAddress.postalCode}
+              {order.shippingAddress.city}, {order.shippingAddress.province}
+              {order.shippingAddress.postalCode &&
+                ` ${order.shippingAddress.postalCode}`}
               <br />
               {order.shippingAddress.country}
             </Text>

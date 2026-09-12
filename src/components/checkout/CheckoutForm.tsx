@@ -21,7 +21,6 @@ import {
   validateEmail,
   validateFullName,
   validatePakistaniPhone,
-  validatePostalCode,
   validateProvince,
   CUSTOMER_NOTES_MAX_LENGTH,
 } from "@/lib/checkout/validation";
@@ -86,7 +85,6 @@ export function CheckoutForm({
       addressLine1: validateAddressLine1(shipping.addressLine1),
       city: validateCity(shipping.city),
       province: validateProvince(shipping.province),
-      postalCode: validatePostalCode(shipping.postalCode),
     };
     const notesError = validateCustomerNotes(customerNotes);
     const nextPaymentError = paymentMethod

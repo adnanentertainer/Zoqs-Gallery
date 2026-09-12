@@ -165,7 +165,7 @@ export function mapOrderRow(row: OrderRow, items: OrderItemRow[]): Order {
       addressLine2: row.shipping_address_line_2 ?? "",
       city: row.shipping_city,
       province: row.shipping_province,
-      postalCode: row.shipping_postal_code,
+      postalCode: row.shipping_postal_code ?? "",
       country: row.shipping_country,
     },
     customerNotes: row.customer_notes,
