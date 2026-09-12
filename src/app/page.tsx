@@ -38,7 +38,7 @@ export default async function Home() {
         subtitle="Fresh styles, just added to the collection."
         products={newArrivals}
         viewAllLabel="View All New Arrivals"
-        viewAllHref="/shop?special=new"
+        viewAllHref="/new-arrivals"
       />
       <PromotionalBanner
         title="The Everyday Elegance Collection"
