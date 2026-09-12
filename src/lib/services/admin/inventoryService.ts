@@ -4,12 +4,14 @@ import type {
   AdminInventoryDashboardMetrics,
   AdminInventoryMovementFilters,
   AdminInventoryMovementListItem,
+  LowStockProductItem,
   MovementType,
   PaginationResult,
   StockAdjustmentInput,
 } from "@/types/admin";
 
 const RECENT_MOVEMENTS_LIMIT = 10;
+const LOW_STOCK_PREVIEW_LIMIT = 10;
 
 interface MovementRow {
   id: string;
@@ -125,6 +127,49 @@ export async function recordStockMovement(
     return { error: "Unable to record this stock movement right now." };
   }
   return {};
+}
+
+/**
+ * Products at or below their own min_stock_level, most urgent (lowest
+ * stock) first. Per-row column comparison (stock vs. that same row's
+ * min_stock_level) — PostgREST filters can't express this, so it fetches
+ * candidates and compares in JS, same tradeoff as the dashboard metrics.
+ */
+export async function listLowStockProducts(): Promise<LowStockProductItem[]> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, name, sku, stock, min_stock_level, categories(name)")
+    .eq("is_active", true);
+
+  if (error) {
+    console.error("[inventoryService.listLowStockProducts] failed:", error);
+    throw new Error("Unable to load low stock products right now.");
+  }
+
+  const rows = (data ?? []) as unknown as {
+    id: string;
+    name: string;
+    sku: string | null;
+    stock: number;
+    min_stock_level: number;
+    categories: { name: string } | null;
+  }[];
+
+  return rows
+    .filter((row) => row.stock <= row.min_stock_level)
+    .sort((a, b) => a.stock - b.stock)
+    .slice(0, LOW_STOCK_PREVIEW_LIMIT)
+    .map((row) => ({
+      id: row.id,
+      name: row.name,
+      sku: row.sku,
+      categoryName: row.categories?.name ?? "—",
+      stock: row.stock,
+      minStockLevel: row.min_stock_level,
+    }));
 }
 
 export async function getInventoryDashboardMetrics(): Promise<AdminInventoryDashboardMetrics> {

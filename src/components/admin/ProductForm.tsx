@@ -137,6 +137,7 @@ export function ProductForm({
         priceAdjustment: null,
         stock: null,
         sku: "",
+        imageUrl: "",
         isActive: true,
       },
     ]);
@@ -498,91 +499,105 @@ export function ProductForm({
         {values.variants.map((variant, index) => (
           <div
             key={index}
-            className="grid grid-cols-2 gap-3 border-b border-beige pb-4 last:border-b-0 sm:grid-cols-6"
+            className="flex flex-col gap-3 border-b border-beige pb-4 last:border-b-0"
           >
-            <div className="flex flex-col gap-1.5">
-              <label className={fieldLabelStyles}>Type</label>
-              <select
-                value={variant.optionType}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-6">
+              <div className="flex flex-col gap-1.5">
+                <label className={fieldLabelStyles}>Type</label>
+                <select
+                  value={variant.optionType}
+                  onChange={(event) =>
+                    updateVariant(
+                      index,
+                      "optionType",
+                      event.target.value as (typeof VARIANT_TYPES)[number],
+                    )
+                  }
+                  className={selectStyles}
+                >
+                  {VARIANT_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type[0].toUpperCase() + type.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Input
+                label="Value"
+                placeholder="Gold"
+                value={variant.optionValue}
+                onChange={(event) =>
+                  updateVariant(index, "optionValue", event.target.value)
+                }
+              />
+              <Input
+                label="Price Adj."
+                type="number"
+                placeholder="0"
+                value={variant.priceAdjustment ?? ""}
                 onChange={(event) =>
                   updateVariant(
                     index,
-                    "optionType",
-                    event.target.value as (typeof VARIANT_TYPES)[number],
+                    "priceAdjustment",
+                    event.target.value === ""
+                      ? null
+                      : Number(event.target.value),
                   )
                 }
-                className={selectStyles}
-              >
-                {VARIANT_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {type[0].toUpperCase() + type.slice(1)}
-                  </option>
-                ))}
-              </select>
+              />
+              <Input
+                label="Stock"
+                type="number"
+                min={0}
+                placeholder="Same as product"
+                value={variant.stock ?? ""}
+                onChange={(event) =>
+                  updateVariant(
+                    index,
+                    "stock",
+                    event.target.value === ""
+                      ? null
+                      : Number(event.target.value),
+                  )
+                }
+              />
+              <Input
+                label="SKU"
+                value={variant.sku}
+                onChange={(event) =>
+                  updateVariant(index, "sku", event.target.value)
+                }
+              />
+              <div className="flex items-end gap-3">
+                <label className="flex items-center gap-2 font-body text-sm text-primary">
+                  <input
+                    type="checkbox"
+                    checked={variant.isActive}
+                    onChange={(event) =>
+                      updateVariant(index, "isActive", event.target.checked)
+                    }
+                    className="h-4 w-4 accent-gold"
+                  />
+                  Active
+                </label>
+                <button
+                  type="button"
+                  onClick={() => removeVariant(index)}
+                  aria-label={`Remove variant ${index + 1}`}
+                  className="flex h-9 items-center justify-center rounded-sm border border-beige px-2 text-error hover:border-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                >
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
             </div>
             <Input
-              label="Value"
-              placeholder="Gold"
-              value={variant.optionValue}
+              label="Image URL (optional — falls back to the product's own images)"
+              placeholder="https://…"
+              value={variant.imageUrl}
               onChange={(event) =>
-                updateVariant(index, "optionValue", event.target.value)
+                updateVariant(index, "imageUrl", event.target.value)
               }
             />
-            <Input
-              label="Price Adj."
-              type="number"
-              placeholder="0"
-              value={variant.priceAdjustment ?? ""}
-              onChange={(event) =>
-                updateVariant(
-                  index,
-                  "priceAdjustment",
-                  event.target.value === "" ? null : Number(event.target.value),
-                )
-              }
-            />
-            <Input
-              label="Stock"
-              type="number"
-              min={0}
-              placeholder="Same as product"
-              value={variant.stock ?? ""}
-              onChange={(event) =>
-                updateVariant(
-                  index,
-                  "stock",
-                  event.target.value === "" ? null : Number(event.target.value),
-                )
-              }
-            />
-            <Input
-              label="SKU"
-              value={variant.sku}
-              onChange={(event) =>
-                updateVariant(index, "sku", event.target.value)
-              }
-            />
-            <div className="flex items-end gap-3">
-              <label className="flex items-center gap-2 font-body text-sm text-primary">
-                <input
-                  type="checkbox"
-                  checked={variant.isActive}
-                  onChange={(event) =>
-                    updateVariant(index, "isActive", event.target.checked)
-                  }
-                  className="h-4 w-4 accent-gold"
-                />
-                Active
-              </label>
-              <button
-                type="button"
-                onClick={() => removeVariant(index)}
-                aria-label={`Remove variant ${index + 1}`}
-                className="flex h-9 items-center justify-center rounded-sm border border-beige px-2 text-error hover:border-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-              >
-                <Trash2 className="h-4 w-4" aria-hidden="true" />
-              </button>
-            </div>
           </div>
         ))}
       </section>

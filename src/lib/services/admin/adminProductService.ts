@@ -1,11 +1,11 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
-import { LOW_STOCK_THRESHOLD } from "@/lib/products";
 import type {
   AdminProductDetail,
   AdminProductFilters,
   AdminProductInput,
   AdminProductListItem,
+  ProductOption,
 } from "@/types/admin";
 import type { PaginationResult } from "@/types/admin";
 import type { Database } from "@/types/supabase";
@@ -17,17 +17,93 @@ interface ProductListRow extends ProductRow {
   product_images: { image_url: string; display_order: number }[];
 }
 
+/**
+ * Lightweight, unpaginated list (with variants) for populating the Stock
+ * Movement form's product picker. Fine at this catalog's scale — see the
+ * same tradeoff already documented on listSupplierOptions().
+ */
+export async function listProductOptions(): Promise<ProductOption[]> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, name, sku, stock, product_variants(id, option_value, sku, stock)")
+    .eq("is_active", true)
+    .order("name", { ascending: true });
+
+  if (error) {
+    console.error("[adminProductService.listProductOptions] failed:", error);
+    throw new Error("Unable to load products right now.");
+  }
+
+  const rows = (data ?? []) as unknown as {
+    id: string;
+    name: string;
+    sku: string | null;
+    stock: number;
+    product_variants: {
+      id: string;
+      option_value: string;
+      sku: string | null;
+      stock: number | null;
+    }[];
+  }[];
+
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    sku: row.sku,
+    stock: row.stock,
+    variants: row.product_variants.map((variant) => ({
+      id: variant.id,
+      label: variant.option_value,
+      sku: variant.sku,
+      stock: variant.stock,
+    })),
+  }));
+}
+
+function mapProductListRow(row: ProductListRow): AdminProductListItem {
+  const sortedImages = [...row.product_images].sort(
+    (a, b) => a.display_order - b.display_order,
+  );
+  return {
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    sku: row.sku,
+    categoryName: row.categories?.name ?? "—",
+    price: row.price,
+    stock: row.stock,
+    minStockLevel: row.min_stock_level,
+    isActive: row.is_active,
+    forceUnavailable: row.force_unavailable,
+    imageUrl: sortedImages[0]?.image_url ?? null,
+    createdAt: row.created_at,
+  };
+}
+
 export async function listAdminProducts(
   filters: AdminProductFilters,
 ): Promise<PaginationResult<AdminProductListItem>> {
   await requireAdmin();
   const supabase = await getSupabaseServerClient();
 
+  // "low-stock"/"in-stock" compare each row's stock against that same row's
+  // own min_stock_level — a column-vs-column comparison PostgREST filters
+  // can't express (same tradeoff as inventoryService.listLowStockProducts).
+  // Only those two values need the fetch-all-then-filter-in-JS path below;
+  // "out-of-stock" is a plain stock = 0 filter and stays server-side.
+  const needsMinStockComparison =
+    filters.inventory === "low-stock" || filters.inventory === "in-stock";
+
   let query = supabase
     .from("products")
-    .select("*, categories(name), product_images(image_url, display_order)", {
-      count: "exact",
-    });
+    .select(
+      "*, categories(name), product_images(image_url, display_order)",
+      needsMinStockComparison ? {} : { count: "exact" },
+    );
 
   if (filters.search) {
     const term = filters.search.trim();
@@ -39,12 +115,6 @@ export async function listAdminProducts(
   if (filters.status === "active") query = query.eq("is_active", true);
   if (filters.status === "inactive") query = query.eq("is_active", false);
   if (filters.inventory === "out-of-stock") query = query.eq("stock", 0);
-  if (filters.inventory === "low-stock") {
-    query = query.gt("stock", 0).lte("stock", LOW_STOCK_THRESHOLD);
-  }
-  if (filters.inventory === "in-stock") {
-    query = query.gt("stock", LOW_STOCK_THRESHOLD);
-  }
 
   switch (filters.sort) {
     case "oldest":
@@ -70,7 +140,9 @@ export async function listAdminProducts(
 
   const from = (filters.page - 1) * filters.pageSize;
   const to = from + filters.pageSize - 1;
-  query = query.range(from, to);
+  if (!needsMinStockComparison) {
+    query = query.range(from, to);
+  }
 
   const { data, error, count } = await query;
   if (error) {
@@ -78,27 +150,21 @@ export async function listAdminProducts(
     throw new Error("Unable to load products right now.");
   }
 
-  const rows = (data ?? []) as unknown as ProductListRow[];
-  const items: AdminProductListItem[] = rows.map((row) => {
-    const sortedImages = [...row.product_images].sort(
-      (a, b) => a.display_order - b.display_order,
-    );
-    return {
-      id: row.id,
-      name: row.name,
-      slug: row.slug,
-      sku: row.sku,
-      categoryName: row.categories?.name ?? "—",
-      price: row.price,
-      stock: row.stock,
-      isActive: row.is_active,
-      forceUnavailable: row.force_unavailable,
-      imageUrl: sortedImages[0]?.image_url ?? null,
-      createdAt: row.created_at,
-    };
-  });
+  let rows = (data ?? []) as unknown as ProductListRow[];
+  let totalCount = count ?? 0;
 
-  const totalCount = count ?? 0;
+  if (needsMinStockComparison) {
+    rows = rows.filter((row) =>
+      filters.inventory === "low-stock"
+        ? row.stock > 0 && row.stock <= row.min_stock_level
+        : row.stock > row.min_stock_level,
+    );
+    totalCount = rows.length;
+    rows = rows.slice(from, to + 1);
+  }
+
+  const items = rows.map(mapProductListRow);
+
   return {
     items,
     page: filters.page,
@@ -181,6 +247,7 @@ export async function getAdminProductById(
       priceAdjustment: variant.price_adjustment,
       stock: variant.stock,
       sku: variant.sku ?? "",
+      imageUrl: variant.image_url ?? "",
       isActive: variant.is_active,
     })),
   };
@@ -380,6 +447,7 @@ async function syncProductImagesAndVariants(
           price_adjustment: variant.priceAdjustment,
           stock: variant.stock,
           sku: variant.sku || null,
+          image_url: variant.imageUrl || null,
           is_active: variant.isActive,
         })),
       );

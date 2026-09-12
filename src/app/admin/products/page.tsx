@@ -7,7 +7,6 @@ import { Button, buttonVariants } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Typography";
 import { listAdminProducts } from "@/lib/services/admin/adminProductService";
 import { listAdminCategories } from "@/lib/services/admin/adminCategoryService";
-import { LOW_STOCK_THRESHOLD } from "@/lib/products";
 import { formatPrice } from "@/lib/utils";
 import {
   DEFAULT_ADMIN_PAGE_SIZE,
@@ -33,9 +32,10 @@ const SORT_OPTIONS: { value: AdminProductSort; label: string }[] = [
 
 function inventoryStatus(
   stock: number,
+  minStockLevel: number,
 ): "in-stock" | "low-stock" | "out-of-stock" {
   if (stock === 0) return "out-of-stock";
-  if (stock <= LOW_STOCK_THRESHOLD) return "low-stock";
+  if (stock <= minStockLevel) return "low-stock";
   return "in-stock";
 }
 
@@ -242,7 +242,9 @@ export default async function AdminProductsPage({
                       {formatPrice(product.price)}
                     </td>
                     <td className="px-5 py-3">
-                      <StatusBadge status={inventoryStatus(product.stock)} />
+                      <StatusBadge
+                        status={inventoryStatus(product.stock, product.minStockLevel)}
+                      />
                     </td>
                     <td className="px-5 py-3">
                       <StatusBadge

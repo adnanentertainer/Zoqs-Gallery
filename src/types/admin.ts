@@ -24,6 +24,14 @@ export interface AdminProductFilters {
   pageSize: number;
 }
 
+export interface ProductOption {
+  id: string;
+  name: string;
+  sku: string | null;
+  stock: number;
+  variants: { id: string; label: string; sku: string | null; stock: number | null }[];
+}
+
 export interface AdminProductListItem {
   id: string;
   name: string;
@@ -32,6 +40,7 @@ export interface AdminProductListItem {
   categoryName: string;
   price: number;
   stock: number;
+  minStockLevel: number;
   isActive: boolean;
   forceUnavailable: boolean;
   imageUrl: string | null;
@@ -51,6 +60,8 @@ export interface AdminProductVariantInput {
   priceAdjustment: number | null;
   stock: number | null;
   sku: string;
+  /** Falls back to the base product's own images when left blank. */
+  imageUrl: string;
   isActive: boolean;
 }
 
@@ -310,6 +321,15 @@ export interface AdminPurchaseDetail {
 // Inventory dashboard
 // ============================================================================
 
+export interface LowStockProductItem {
+  id: string;
+  name: string;
+  sku: string | null;
+  categoryName: string;
+  stock: number;
+  minStockLevel: number;
+}
+
 export interface AdminInventoryDashboardMetrics {
   totalProducts: number;
   totalStockQuantity: number;
@@ -318,3 +338,63 @@ export interface AdminInventoryDashboardMetrics {
   totalInventoryValue: number;
   recentMovements: AdminInventoryMovementListItem[];
 }
+
+// ============================================================================
+// Reports
+// ============================================================================
+
+export type StockStatus = "in-stock" | "low-stock" | "out-of-stock";
+
+export interface StockReportFilters {
+  categoryId?: string;
+  supplierId?: string;
+}
+
+export interface StockReportRow {
+  productId: string;
+  name: string;
+  sku: string | null;
+  categoryName: string;
+  stock: number;
+  minStockLevel: number;
+  maxStockLevel: number | null;
+  costPrice: number | null;
+  price: number;
+  /** null when costPrice isn't set — excluded from value totals, not zeroed. */
+  stockValue: number | null;
+  stockStatus: StockStatus;
+  isActive: boolean;
+  forceUnavailable: boolean;
+}
+
+export interface StockMovementReportFilters {
+  productId?: string;
+  categoryId?: string;
+  movementType?: MovementType;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export interface SalesReportFilters {
+  productId?: string;
+  categoryId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export interface SalesReportRow {
+  productId: string | null;
+  productName: string;
+  sku: string | null;
+  categoryName: string;
+  quantitySold: number;
+  revenue: number;
+}
+
+export type ReportType =
+  | "current-stock"
+  | "low-stock"
+  | "out-of-stock"
+  | "movements"
+  | "sales"
+  | "inventory-value";
