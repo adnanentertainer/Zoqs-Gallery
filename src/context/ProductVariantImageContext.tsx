@@ -1,41 +1,58 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import { getDefaultVariantSelections } from "@/lib/cart";
+import type { Product } from "@/types";
 
-interface ProductVariantImageContextValue {
-  variantImage: string | null;
-  setVariantImage: (image: string | null) => void;
+interface ProductVariantSelectionContextValue {
+  selections: Record<string, string>;
+  setSelections: (
+    update:
+      | Record<string, string>
+      | ((prev: Record<string, string>) => Record<string, string>),
+  ) => void;
 }
 
-const ProductVariantImageContext =
-  createContext<ProductVariantImageContextValue | null>(null);
+const ProductVariantSelectionContext =
+  createContext<ProductVariantSelectionContextValue | null>(null);
 
-// Bridges the variant swatches (ProductActions) to the main image (ProductGallery)
-// even though they're rendered as siblings with unrelated content between them on
-// the product page, rather than requiring the page to lift and thread state itself.
+// Holds the shopper's variant picks (e.g. { color: "Pink" }) so the swatches
+// (ProductActions) and the image gallery (ProductGallery) can both read and
+// change the same selection, even though they're rendered as siblings with
+// unrelated content between them on the product page.
 export function ProductVariantImageProvider({
+  product,
   children,
 }: {
+  product: Product;
   children: ReactNode;
 }) {
-  const [variantImage, setVariantImage] = useState<string | null>(null);
+  const [selections, setSelections] = useState<Record<string, string>>(() =>
+    getDefaultVariantSelections(product),
+  );
   const value = useMemo(
-    () => ({ variantImage, setVariantImage }),
-    [variantImage],
+    () => ({ selections, setSelections }),
+    [selections],
   );
 
   return (
-    <ProductVariantImageContext.Provider value={value}>
+    <ProductVariantSelectionContext.Provider value={value}>
       {children}
-    </ProductVariantImageContext.Provider>
+    </ProductVariantSelectionContext.Provider>
   );
 }
 
-export function useProductVariantImage(): ProductVariantImageContextValue {
-  const context = useContext(ProductVariantImageContext);
+export function useProductVariantSelection(): ProductVariantSelectionContextValue {
+  const context = useContext(ProductVariantSelectionContext);
   if (!context) {
     throw new Error(
-      "useProductVariantImage must be used within a ProductVariantImageProvider",
+      "useProductVariantSelection must be used within a ProductVariantImageProvider",
     );
   }
   return context;

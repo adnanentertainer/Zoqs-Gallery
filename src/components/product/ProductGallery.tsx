@@ -1,66 +1,91 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { ZoomIn } from "lucide-react";
 import { ProductLightbox } from "@/components/product/ProductLightbox";
-import { useProductVariantImage } from "@/context/ProductVariantImageContext";
+import { useProductVariantSelection } from "@/context/ProductVariantImageContext";
 import { cn } from "@/lib/utils";
+import type { ProductVariantGroup } from "@/types";
 
 interface ProductGalleryProps {
   images: string[];
   productName: string;
+  variants?: ProductVariantGroup[];
 }
 
-export function ProductGallery({ images, productName }: ProductGalleryProps) {
+interface VariantThumbnail {
+  image: string;
+  groupType: string;
+  value: string;
+}
+
+export function ProductGallery({
+  images,
+  productName,
+  variants,
+}: ProductGalleryProps) {
+  const { selections, setSelections } = useProductVariantSelection();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
-  const { variantImage } = useProductVariantImage();
-  // True once the shopper has manually picked a base-product thumbnail while
-  // a variant image was showing -- lets them browse the other photos without
-  // the variant's photo snapping back on every render. A NEW variant pick
-  // (color change) always takes over again, via the effect below.
-  const [manualOverride, setManualOverride] = useState(false);
 
+  // Every variant that has its own photo (e.g. each color option) gets a
+  // permanent thumbnail, in addition to the product's own uploaded photos --
+  // not just whichever one happens to be selected -- so a shopper can see
+  // every option at a glance before picking one.
+  const variantThumbs = useMemo(() => {
+    const seen = new Set(images);
+    const thumbs: VariantThumbnail[] = [];
+    for (const group of variants ?? []) {
+      for (const option of group.options) {
+        if (option.image && !seen.has(option.image)) {
+          seen.add(option.image);
+          thumbs.push({
+            image: option.image,
+            groupType: group.type,
+            value: option.value,
+          });
+        }
+      }
+    }
+    return thumbs;
+  }, [variants, images]);
+
+  const displayImages = useMemo(
+    () => [...images, ...variantThumbs.map((thumb) => thumb.image)],
+    [images, variantThumbs],
+  );
+
+  // Picking a color swatch in ProductActions should jump the gallery to that
+  // variant's own photo. Browsing thumbnails manually (below) doesn't feed
+  // back into `selections`, so this only reacts to the swatches themselves.
   useEffect(() => {
-    setManualOverride(false);
-  }, [variantImage]);
+    for (const thumb of variantThumbs) {
+      if (selections[thumb.groupType] === thumb.value) {
+        const index = displayImages.indexOf(thumb.image);
+        if (index !== -1) setActiveIndex(index);
+        return;
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selections]);
 
-  const showVariantImage = Boolean(variantImage) && !manualOverride;
-  const mainImage = showVariantImage ? variantImage! : images[activeIndex];
-
-  // One ordered list drives the main image, the thumbnail rail, and the
-  // fullscreen viewer, so all three always agree on what's currently shown --
-  // the variant's own photo (if any) leads, followed by the product's own
-  // uploaded photos (with the variant's photo deduped out if it's a repeat).
-  const displayImages = variantImage
-    ? [variantImage, ...images.filter((image) => image !== variantImage)]
-    : images;
-  const displayActiveIndex = showVariantImage
-    ? 0
-    : displayImages.indexOf(images[activeIndex]);
+  const mainImage = displayImages[activeIndex] ?? images[0];
 
   function selectThumbnail(index: number) {
-    const clicked = displayImages[index];
-    if (variantImage && clicked === variantImage) {
-      setManualOverride(false);
-      return;
+    setActiveIndex(index);
+    const image = displayImages[index];
+    const thumb = variantThumbs.find((t) => t.image === image);
+    if (thumb) {
+      setSelections((prev) => ({ ...prev, [thumb.groupType]: thumb.value }));
     }
-    setActiveIndex(images.indexOf(clicked));
-    setManualOverride(true);
-  }
-
-  function openLightbox() {
-    setLightboxIndex(displayActiveIndex);
-    setIsLightboxOpen(true);
   }
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row-reverse">
       <button
         type="button"
-        onClick={openLightbox}
+        onClick={() => setIsLightboxOpen(true)}
         aria-label={`View ${productName} image full screen`}
         className="group relative aspect-square w-full overflow-hidden rounded-sm bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
       >
@@ -85,10 +110,10 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               type="button"
               onClick={() => selectThumbnail(index)}
               aria-label={`Show image ${index + 1} of ${displayImages.length}`}
-              aria-current={index === displayActiveIndex}
+              aria-current={index === activeIndex}
               className={cn(
                 "relative aspect-square w-16 shrink-0 overflow-hidden rounded-sm border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold lg:w-full",
-                index === displayActiveIndex
+                index === activeIndex
                   ? "border-gold"
                   : "border-transparent hover:border-beige",
               )}
@@ -109,10 +134,10 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       <ProductLightbox
         images={displayImages}
         productName={productName}
-        activeIndex={lightboxIndex}
+        activeIndex={activeIndex}
         isOpen={isLightboxOpen}
         onClose={() => setIsLightboxOpen(false)}
-        onIndexChange={setLightboxIndex}
+        onIndexChange={setActiveIndex}
       />
     </div>
   );

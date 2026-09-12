@@ -139,9 +139,13 @@ export default async function ProductPage({
         />
       </Container>
 
-      <ProductVariantImageProvider>
+      <ProductVariantImageProvider product={product}>
         <Container className="grid grid-cols-1 gap-10 pb-16 lg:grid-cols-2 lg:gap-16">
-          <ProductGallery images={product.images} productName={product.name} />
+          <ProductGallery
+            images={product.images}
+            productName={product.name}
+            variants={product.variants}
+          />
 
           <div className="flex flex-col gap-5 pb-24 lg:pb-0">
             <div className="flex flex-col gap-3">
