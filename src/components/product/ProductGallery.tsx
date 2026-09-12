@@ -30,7 +30,6 @@ export function ProductGallery({
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
-  const [isClickZoomed, setIsClickZoomed] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
 
   // Every variant that has its own photo (e.g. each color option) gets a
@@ -85,10 +84,9 @@ export function ProductGallery({
     }
   }
 
-  // Hovering magnifies to 1.25x and follows the cursor; a click while
-  // hovering locks it in at 1.6x until the shopper clicks anywhere else on
-  // the page (a plain mouse-leave alone doesn't undo a click-triggered zoom).
-  const zoomScale = isClickZoomed ? 1.6 : isHovering ? 1.25 : 1;
+  // Hovering magnifies to 1.35x in place, following the cursor; clicking
+  // opens the full photo as a popup (the lightbox) instead of zooming further.
+  const zoomScale = isHovering ? 1.35 : 1;
 
   function handleImageMouseMove(event: React.MouseEvent<HTMLDivElement>) {
     const rect = imageContainerRef.current?.getBoundingClientRect();
@@ -98,37 +96,24 @@ export function ProductGallery({
     setZoomOrigin(`${x}% ${y}%`);
   }
 
-  // Switching photos (thumbnail, swatch, or lightbox) while locked into the
-  // click-zoom shouldn't leave the next photo stuck zoomed in too.
-  useEffect(() => {
-    setIsClickZoomed(false);
-  }, [activeIndex]);
-
-  useEffect(() => {
-    if (!isClickZoomed) return;
-
-    function handleOutsideClick(event: MouseEvent) {
-      if (
-        imageContainerRef.current &&
-        !imageContainerRef.current.contains(event.target as Node)
-      ) {
-        setIsClickZoomed(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [isClickZoomed]);
-
   return (
     <div className="flex flex-col gap-4 lg:flex-row-reverse">
       <div
         ref={imageContainerRef}
+        role="button"
+        tabIndex={0}
+        aria-label={`View ${productName} image full screen`}
         onMouseEnter={() => setIsHovering(true)}
         onMouseMove={handleImageMouseMove}
         onMouseLeave={() => setIsHovering(false)}
-        onClick={() => setIsClickZoomed(true)}
-        className="group relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-sm bg-beige"
+        onClick={() => setIsLightboxOpen(true)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setIsLightboxOpen(true);
+          }
+        }}
+        className="group relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-sm bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
       >
         <Image
           src={mainImage}
@@ -139,17 +124,9 @@ export function ProductGallery({
           className="object-cover transition-transform duration-300 ease-out"
           style={{ transform: `scale(${zoomScale})`, transformOrigin: zoomOrigin }}
         />
-        <button
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            setIsLightboxOpen(true);
-          }}
-          aria-label={`View ${productName} image full screen`}
-          className="absolute bottom-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-primary opacity-0 shadow-sm transition-opacity focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold group-hover:opacity-100"
-        >
+        <span className="absolute bottom-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-primary opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
           <ZoomIn className="h-4 w-4" aria-hidden="true" />
-        </button>
+        </span>
       </div>
 
       {displayImages.length > 1 && (
