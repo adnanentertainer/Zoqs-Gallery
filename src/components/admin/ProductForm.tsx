@@ -23,6 +23,7 @@ import Link from "next/link";
 
 const MATERIALS = [
   "Artificial Gold",
+  "Artificial Silver",
   "Kundan",
   "Pearl",
   "Crystal",

@@ -14,6 +14,7 @@ export type ProductColor =
 
 export type ProductMaterial =
   | "Artificial Gold"
+  | "Artificial Silver"
   | "Kundan"
   | "Pearl"
   | "Crystal"

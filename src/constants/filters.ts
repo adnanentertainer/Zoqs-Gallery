@@ -16,6 +16,7 @@ export const COLOR_OPTIONS: ProductColor[] = [
 
 export const MATERIAL_OPTIONS: ProductMaterial[] = [
   "Artificial Gold",
+  "Artificial Silver",
   "Kundan",
   "Pearl",
   "Crystal",
