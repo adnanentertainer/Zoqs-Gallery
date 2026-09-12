@@ -97,7 +97,7 @@ export function ProductGallery({
   }
 
   return (
-    <div className="flex flex-col gap-4 lg:flex-row-reverse">
+    <div className="flex flex-col gap-4 self-start lg:flex-row-reverse">
       <div
         ref={imageContainerRef}
         role="button"
