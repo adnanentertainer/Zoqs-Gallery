@@ -113,7 +113,7 @@ export function ProductGallery({
             setIsLightboxOpen(true);
           }
         }}
-        className="group relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-sm bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+        className="group relative aspect-[3/4] w-full cursor-zoom-in overflow-hidden rounded-sm bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
       >
         <Image
           src={mainImage}
