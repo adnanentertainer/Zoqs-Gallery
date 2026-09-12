@@ -415,13 +415,17 @@ async function syncProductImagesAndVariants(
     .eq("product_id", productId);
   if (deleteImagesError) throw deleteImagesError;
 
-  if (input.images.length > 0) {
+  // An "Add Image" row left blank (or a URL cleared without removing the
+  // row) must not become a real, empty-string image_url -- that renders as
+  // a blank thumbnail with nothing to show on the storefront.
+  const nonBlankImages = input.images.filter((image) => image.imageUrl.trim());
+  if (nonBlankImages.length > 0) {
     const { error: insertImagesError } = await supabase
       .from("product_images")
       .insert(
-        input.images.map((image, index) => ({
+        nonBlankImages.map((image, index) => ({
           product_id: productId,
-          image_url: image.imageUrl,
+          image_url: image.imageUrl.trim(),
           alt_text: image.altText || null,
           display_order: index,
         })),
