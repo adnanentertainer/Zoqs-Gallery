@@ -15,23 +15,37 @@ interface ProductGalleryProps {
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   const { variantImage } = useProductVariantImage();
   // The selected variant's own photo (e.g. the Silver bangle instead of Gold)
-  // takes over the main preview, while thumbnails/lightbox stay on the base
-  // product photos -- switching color shouldn't reshuffle the whole gallery.
+  // takes over the main preview, while thumbnails stay on the base product
+  // photos -- switching color shouldn't reshuffle the whole gallery.
   const mainImage = variantImage || images[activeIndex];
+
+  // The fullscreen viewer needs to include the variant's own photo too --
+  // otherwise "expanding" it while a variant is selected would pop open the
+  // lightbox on a completely different (base) photo instead of the one on
+  // screen. Put the currently-shown photo first so the viewer opens on it.
+  const lightboxImages = variantImage
+    ? [mainImage, ...images.filter((image) => image !== mainImage)]
+    : images;
+
+  function openLightbox() {
+    setLightboxIndex(variantImage ? 0 : activeIndex);
+    setIsLightboxOpen(true);
+  }
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row-reverse">
       <button
         type="button"
-        onClick={() => setIsLightboxOpen(true)}
-        aria-label={`View ${productName} image ${activeIndex + 1} of ${images.length} full screen`}
+        onClick={openLightbox}
+        aria-label={`View ${productName} image full screen`}
         className="group relative aspect-square w-full overflow-hidden rounded-sm bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
       >
         <Image
           src={mainImage}
-          alt={`${productName} — image ${activeIndex + 1} of ${images.length}`}
+          alt={productName}
           fill
           priority={activeIndex === 0}
           sizes="(max-width: 1024px) 100vw, 50vw"
@@ -72,12 +86,12 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       )}
 
       <ProductLightbox
-        images={images}
+        images={lightboxImages}
         productName={productName}
-        activeIndex={activeIndex}
+        activeIndex={lightboxIndex}
         isOpen={isLightboxOpen}
         onClose={() => setIsLightboxOpen(false)}
-        onIndexChange={setActiveIndex}
+        onIndexChange={setLightboxIndex}
       />
     </div>
   );

@@ -44,10 +44,9 @@ export function mapCategoryRow(row: CategoryRow): Category {
   };
 }
 
-// Mock-data swatch hexes, preserved for Supabase-sourced color variants since
-// the schema doesn't store a swatch column (not requested by the Phase 7 spec).
-// VariantSelector already renders a plain labeled pill when swatch is absent,
-// so an unmapped color name degrades gracefully rather than breaking.
+// Curated brand hexes for the site's own named colors -- these look better
+// than the raw CSS keyword would (e.g. a warm jewellery gold, not CSS's
+// mustardy #FFD700 "gold"), so they're checked first.
 const COLOR_SWATCHES: Partial<Record<ProductColor, string>> = {
   Gold: "#B08D57",
   Silver: "#C7C9CC",
@@ -55,6 +54,53 @@ const COLOR_SWATCHES: Partial<Record<ProductColor, string>> = {
   Pearl: "#F0EAE2",
   Black: "#1F1F1F",
 };
+
+// Standard CSS3 named colors. Any color variant typed in by the admin that
+// isn't one of the curated brand names above (e.g. "Maroon", "Pink") still
+// gets a real swatch as long as it's a recognized color word or hex code,
+// instead of silently falling back to a plain text pill.
+const CSS_NAMED_COLORS = new Set([
+  "aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", "beige",
+  "bisque", "black", "blanchedalmond", "blue", "blueviolet", "brown",
+  "burlywood", "cadetblue", "chartreuse", "chocolate", "coral",
+  "cornflowerblue", "cornsilk", "crimson", "cyan", "darkblue", "darkcyan",
+  "darkgoldenrod", "darkgray", "darkgreen", "darkgrey", "darkkhaki",
+  "darkmagenta", "darkolivegreen", "darkorange", "darkorchid", "darkred",
+  "darksalmon", "darkseagreen", "darkslateblue", "darkslategray",
+  "darkslategrey", "darkturquoise", "darkviolet", "deeppink", "deepskyblue",
+  "dimgray", "dimgrey", "dodgerblue", "firebrick", "floralwhite",
+  "forestgreen", "fuchsia", "gainsboro", "ghostwhite", "gold", "goldenrod",
+  "gray", "green", "greenyellow", "grey", "honeydew", "hotpink", "indianred",
+  "indigo", "ivory", "khaki", "lavender", "lavenderblush", "lawngreen",
+  "lemonchiffon", "lightblue", "lightcoral", "lightcyan",
+  "lightgoldenrodyellow", "lightgray", "lightgreen", "lightgrey",
+  "lightpink", "lightsalmon", "lightseagreen", "lightskyblue",
+  "lightslategray", "lightslategrey", "lightsteelblue", "lightyellow",
+  "lime", "limegreen", "linen", "magenta", "maroon", "mediumaquamarine",
+  "mediumblue", "mediumorchid", "mediumpurple", "mediumseagreen",
+  "mediumslateblue", "mediumspringgreen", "mediumturquoise",
+  "mediumvioletred", "midnightblue", "mintcream", "mistyrose", "moccasin",
+  "navajowhite", "navy", "oldlace", "olive", "olivedrab", "orange",
+  "orangered", "orchid", "palegoldenrod", "palegreen", "paleturquoise",
+  "palevioletred", "papayawhip", "peachpuff", "peru", "pink", "plum",
+  "powderblue", "purple", "rebeccapurple", "red", "rosybrown", "royalblue",
+  "saddlebrown", "salmon", "sandybrown", "seagreen", "seashell", "sienna",
+  "silver", "skyblue", "slateblue", "slategray", "slategrey", "snow",
+  "springgreen", "steelblue", "tan", "teal", "thistle", "tomato",
+  "turquoise", "violet", "wheat", "white", "whitesmoke", "yellow",
+  "yellowgreen",
+]);
+
+function resolveColorSwatch(value: string): string | undefined {
+  const curated = COLOR_SWATCHES[value as ProductColor];
+  if (curated) return curated;
+
+  const trimmed = value.trim();
+  if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(trimmed)) return trimmed;
+
+  const normalized = trimmed.toLowerCase().replace(/\s+/g, "");
+  return CSS_NAMED_COLORS.has(normalized) ? normalized : undefined;
+}
 
 export interface ProductRatingAggregate {
   rating: number;
@@ -81,7 +127,7 @@ function groupVariantRows(
       label: row.option_value,
       swatch:
         row.option_type === "color"
-          ? COLOR_SWATCHES[row.option_value as ProductColor]
+          ? resolveColorSwatch(row.option_value)
           : undefined,
       priceOverride:
         row.price_adjustment != null
