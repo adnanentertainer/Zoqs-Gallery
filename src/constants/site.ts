@@ -18,7 +18,10 @@ export const siteConfig = {
     whatsapp: "https://wa.me/923316668233",
   },
   // Where "a new order was placed" notification emails are sent from/to.
-  orderNotificationFromEmail: "ZOQ's Gallery Orders <orders@zoqsgallery.com>",
+  // The from-address must be on a domain verified in Resend — that's
+  // mail.zoqsgallery.com, not the bare zoqsgallery.com root domain.
+  orderNotificationFromEmail:
+    "ZOQ's Gallery Orders <orders@mail.zoqsgallery.com>",
   orderNotificationToEmail: "zoqsgallery@gmail.com",
 } as const;
 
