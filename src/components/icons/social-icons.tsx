@@ -4,7 +4,7 @@ type IconProps = SVGProps<SVGSVGElement>;
 
 // Realistic, brand-colored marks (not outline glyphs) -- each icon carries
 // its own background shape and colors, matching the real Instagram,
-// Facebook, TikTok, and WhatsApp logos rather than a generic monochrome set.
+// Facebook, and WhatsApp logos rather than a generic monochrome set.
 
 export function InstagramIcon(props: IconProps) {
   return (
@@ -53,18 +53,6 @@ export function FacebookIcon(props: IconProps) {
       <circle cx="12" cy="12" r="11" fill="#1877F2" />
       <path
         d="M13.5 21v-7.5h2.5l.4-3h-2.9V8.5c0-.9.2-1.5 1.5-1.5h1.6V3.9C16.2 3.9 15.2 3.8 14 3.8c-2.5 0-4.2 1.5-4.2 4.3v2.4H7.3v3h2.5V21h3.7Z"
-        fill="white"
-      />
-    </svg>
-  );
-}
-
-export function TikTokIcon(props: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" {...props}>
-      <circle cx="12" cy="12" r="11" fill="#1a1a1a" />
-      <path
-        d="M15.94 6.02c.32.97 1.09 1.68 2.06 1.88v1.94c-.93-.03-1.86-.23-2.7-.63-.37-.16-.71-.38-1.04-.6-.01 1.88.01 3.76-.01 5.63-.05.9-.35 1.8-.87 2.54-.85 1.24-2.31 2.04-3.81 2.07-.92.05-1.85-.2-2.63-.66-1.3-.77-2.22-2.17-2.35-3.68-.01-.32-.02-.64-.01-.96.12-1.22.72-2.4 1.66-3.2 1.07-.93 2.57-1.37 3.97-1.11.01.95-.03 1.9-.03 2.86-.64-.21-1.39-.15-1.95.24-.4.26-.71.67-.87 1.13-.14.33-.1.69-.09 1.03.15 1.06 1.17 1.94 2.25 1.85.72-.01 1.41-.42 1.78-1.03.13-.22.25-.44.26-.68.07-1.15.04-2.3.05-3.45.01-2.6-.01-5.19.01-7.78h1.35c0 .13.01.26.06.39.32.97 1.09 1.68 2.06 1.88Z"
         fill="white"
       />
     </svg>

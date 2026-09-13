@@ -14,7 +14,6 @@ export const siteConfig = {
   socialLinks: {
     instagram: "https://instagram.com/zoqsgallery",
     facebook: "https://www.facebook.com/profile.php?id=61593653865604",
-    tiktok: "#",
     whatsapp: "https://wa.me/923316668233",
   },
   // Where "a new order was placed" notification emails are sent from/to.

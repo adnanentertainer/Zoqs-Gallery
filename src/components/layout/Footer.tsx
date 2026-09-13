@@ -7,7 +7,6 @@ import { siteConfig } from "@/constants/site";
 import {
   FacebookIcon,
   InstagramIcon,
-  TikTokIcon,
   WhatsAppIcon,
 } from "@/components/icons/social-icons";
 
@@ -28,7 +27,6 @@ const socialLinks: SocialLink[] = [
     href: siteConfig.socialLinks.facebook,
     Icon: FacebookIcon,
   },
-  { label: "TikTok", href: siteConfig.socialLinks.tiktok, Icon: TikTokIcon },
   {
     label: "WhatsApp",
     href: siteConfig.socialLinks.whatsapp,
