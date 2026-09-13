@@ -42,7 +42,7 @@ export function Footer() {
   return (
     <footer className="border-t border-beige bg-secondary">
       <Container className="py-12 sm:py-16 lg:py-20">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {footerColumns.map((column) => (
             <div key={column.title}>
               <h3 className="font-heading text-sm font-semibold uppercase tracking-wide text-primary">
@@ -63,26 +63,6 @@ export function Footer() {
             </div>
           ))}
 
-          <div>
-            <h3 className="font-heading text-sm font-semibold uppercase tracking-wide text-primary">
-              Connect With Us
-            </h3>
-            <div className="mt-4 flex items-center gap-3">
-              {socialLinks.map(({ label, href, Icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-beige text-primary transition-colors hover:border-gold hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-                >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                </a>
-              ))}
-            </div>
-          </div>
-
           <div className="flex flex-col items-center text-center sm:col-span-2 sm:items-end sm:text-right lg:col-span-1">
             <Image
               src="/logo-full.png"
@@ -97,6 +77,20 @@ export function Footer() {
             <p className="mt-1 whitespace-nowrap font-body text-sm text-muted">
               {siteConfig.tagline}
             </p>
+            <div className="mt-4 flex items-center gap-3">
+              {socialLinks.map(({ label, href, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-beige text-primary transition-colors hover:border-gold hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                >
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </Container>
