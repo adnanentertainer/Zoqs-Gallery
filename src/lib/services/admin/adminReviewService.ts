@@ -84,6 +84,31 @@ export async function unapproveReview(
   return {};
 }
 
+export async function createSeedReview(input: {
+  productId: string;
+  rating: number;
+  customerName: string;
+  reviewText: string;
+}): Promise<{ error?: string }> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+
+  const { error } = await supabase.from("reviews").insert({
+    product_id: input.productId,
+    customer_name: input.customerName,
+    rating: input.rating,
+    review: input.reviewText,
+    is_verified_purchase: false,
+    is_approved: true,
+  });
+
+  if (error) {
+    console.error("[adminReviewService.createSeedReview] failed:", error);
+    return { error: "Unable to add this review right now." };
+  }
+  return {};
+}
+
 export async function deleteReview(id: string): Promise<{ error?: string }> {
   await requireAdmin();
   const supabase = await getSupabaseServerClient();

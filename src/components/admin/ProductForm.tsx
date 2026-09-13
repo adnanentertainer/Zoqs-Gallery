@@ -14,6 +14,7 @@ import {
   setProductActiveAction,
   updateProductAction,
 } from "@/app/admin/products/actions";
+import { createSeedReviewAction } from "@/app/admin/reviews/actions";
 import type {
   AdminCategoryListItem,
   AdminProductInput,
@@ -90,6 +91,9 @@ export function ProductForm({
   const [slugTouched, setSlugTouched] = useState(mode === "edit");
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [seedRating, setSeedRating] = useState(0);
+  const [seedCustomerName, setSeedCustomerName] = useState("");
+  const [seedReviewText, setSeedReviewText] = useState("");
   const [confirmAction, setConfirmAction] = useState<
     "delete" | "deactivate" | null
   >(null);
@@ -165,19 +169,49 @@ export function ProductForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (isSubmitting) return;
+
+    if (mode === "create") {
+      if (seedReviewText.trim() && seedRating === 0) {
+        setFormError("Choose a star rating for the initial review, or clear its text.");
+        return;
+      }
+      if (seedRating > 0 && !seedReviewText.trim()) {
+        setFormError("Write the initial review's text, or clear its rating.");
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     setFormError(null);
 
-    const result =
-      mode === "create"
-        ? await createProductAction(values)
-        : await updateProductAction(productId!, values);
+    let newProductId: string | undefined;
+    let error: string | undefined;
 
-    setIsSubmitting(false);
-    if (result.error) {
-      setFormError(result.error);
+    if (mode === "create") {
+      const result = await createProductAction(values);
+      newProductId = result.id;
+      error = result.error;
+    } else {
+      const result = await updateProductAction(productId!, values);
+      error = result.error;
+    }
+
+    if (error) {
+      setIsSubmitting(false);
+      setFormError(error);
       return;
     }
+
+    if (newProductId && seedRating > 0 && seedReviewText.trim()) {
+      await createSeedReviewAction({
+        productId: newProductId,
+        rating: seedRating,
+        customerName: seedCustomerName.trim() || "Customer",
+        reviewText: seedReviewText.trim(),
+      });
+    }
+
+    setIsSubmitting(false);
     router.push("/admin/products");
     router.refresh();
   }
@@ -620,6 +654,50 @@ export function ProductForm({
           </div>
         ))}
       </section>
+
+      {mode === "create" && (
+        <section className={sectionStyles}>
+          <h2 className="font-heading text-lg font-semibold text-primary">
+            Initial Review (optional)
+          </h2>
+          <p className="font-body text-xs text-muted">
+            Seed the product with a first rating and review so it doesn&apos;t
+            launch showing zero. Leave this blank to skip.
+          </p>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-1.5">
+              <label className={fieldLabelStyles}>Rating</label>
+              <select
+                value={seedRating}
+                onChange={(event) => setSeedRating(Number(event.target.value))}
+                className={selectStyles}
+              >
+                <option value={0}>No rating</option>
+                {[5, 4, 3, 2, 1].map((star) => (
+                  <option key={star} value={star}>
+                    {star} star{star === 1 ? "" : "s"}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Input
+              label="Reviewer Name (optional)"
+              placeholder="Customer"
+              value={seedCustomerName}
+              onChange={(event) => setSeedCustomerName(event.target.value)}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className={fieldLabelStyles}>Review Text</label>
+            <textarea
+              rows={3}
+              value={seedReviewText}
+              onChange={(event) => setSeedReviewText(event.target.value)}
+              className="w-full rounded-sm border border-beige bg-white px-4 py-3 font-body text-sm text-primary focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
+            />
+          </div>
+        </section>
+      )}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex gap-3">
