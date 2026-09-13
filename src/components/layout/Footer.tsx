@@ -69,7 +69,7 @@ export function Footer() {
               alt={`${siteConfig.name} - ${siteConfig.tagline}`}
               width={640}
               height={640}
-              className="h-32 w-32 shrink-0 rounded-full sm:h-40 sm:w-40 lg:h-44 lg:w-44"
+              className="h-40 w-40 shrink-0 rounded-full sm:h-48 sm:w-48 lg:h-56 lg:w-56"
             />
             <span className="mt-3 font-heading text-2xl font-semibold text-primary">
               {siteConfig.name}
