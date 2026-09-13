@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { Container } from "@/components/ui/Container";
 import { Heading } from "@/components/ui/Typography";
@@ -8,6 +7,7 @@ import { getServerUser } from "@/lib/auth/getServerUser";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { mapProfileRow } from "@/lib/supabase/mappers";
 import { getShippingSettings } from "@/lib/checkout/getShippingSettings";
+import type { ShippingSettings } from "@/lib/checkout/shipping";
 
 export const metadata: Metadata = {
   title: "Checkout | ZOQ's Gallery",
@@ -16,21 +16,23 @@ export const metadata: Metadata = {
 };
 
 export default async function CheckoutPage() {
-  // Defense in depth: src/proxy.ts already redirects unauthenticated visitors
-  // away from /checkout before this page runs, but protected content must
-  // never depend on client-only hiding, so this server-side check stands on
-  // its own too (same pattern as /account).
+  // Guest checkout is allowed — /checkout/start offers Log In / Create
+  // Account / Continue as Guest, and this page itself works for either.
   const user = await getServerUser();
-  if (!user) {
-    redirect("/login?redirect=/checkout");
-  }
 
-  const supabase = await getSupabaseServerClient();
-  const [{ data: profileRow }, shippingSettings] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-    getShippingSettings(),
-  ]);
-  const profile = profileRow ? mapProfileRow(profileRow) : null;
+  let profile = null;
+  let shippingSettings: ShippingSettings;
+  if (user) {
+    const supabase = await getSupabaseServerClient();
+    const [{ data: profileRow }, settings] = await Promise.all([
+      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+      getShippingSettings(),
+    ]);
+    profile = profileRow ? mapProfileRow(profileRow) : null;
+    shippingSettings = settings;
+  } else {
+    shippingSettings = await getShippingSettings();
+  }
 
   return (
     <Container className="flex flex-col gap-6 py-10">
@@ -44,7 +46,7 @@ export default async function CheckoutPage() {
       <CheckoutForm
         initialShipping={{
           fullName: profile?.fullName ?? "",
-          email: user.email ?? "",
+          email: user?.email ?? "",
           phone: profile?.phone ?? "",
         }}
         shippingSettings={shippingSettings}

@@ -25,6 +25,8 @@ export interface CreateOrderInput {
 
 export interface CreateOrderResult {
   orderNumber: string;
+  /** Only set for a guest (unauthenticated) order — see getGuestOrderByOrderNumber. */
+  guestToken: string | null;
 }
 
 /**
@@ -74,7 +76,7 @@ export async function createOrder(
     );
   }
 
-  return { orderNumber: data.order_number };
+  return { orderNumber: data.order_number, guestToken: data.guest_token };
 }
 
 /**
@@ -117,4 +119,37 @@ export async function getOrderByOrderNumber(
   }
 
   return mapOrderRow(orderRow, itemRows ?? []);
+}
+
+/**
+ * For a guest (unauthenticated) order, which RLS otherwise hides from
+ * everyone — even the guest who placed it — once user_id is null. Requires
+ * the exact guest_token handed back from createOrder(), so this can't be
+ * used to probe order numbers any more than the RLS-based lookup above can.
+ */
+export async function getGuestOrderByOrderNumber(
+  orderNumber: string,
+  guestToken: string,
+): Promise<Order | null> {
+  const supabase = await getSupabaseServerClient();
+
+  const { data, error } = await supabase.rpc("get_guest_order", {
+    p_order_number: orderNumber,
+    p_guest_token: guestToken,
+  });
+
+  if (error) {
+    console.error(
+      "[orderService.getGuestOrderByOrderNumber] RPC failed:",
+      error,
+    );
+    throw new Error("Unable to load this order right now.");
+  }
+  if (!data) return null;
+
+  const result = data as unknown as {
+    order: Parameters<typeof mapOrderRow>[0];
+    items: Parameters<typeof mapOrderRow>[1];
+  };
+  return mapOrderRow(result.order, result.items);
 }

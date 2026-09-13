@@ -8,7 +8,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { getProductBySlug } from "@/lib/products";
+import { getCachedProduct } from "@/lib/productCache";
 import { createLocalStorageStore } from "@/lib/localStorageStore";
 import { useToast } from "@/context/ToastContext";
 
@@ -21,6 +21,8 @@ function isValidWishlistItems(value: unknown): value is string[] {
 }
 
 // Stores product SLUGS (not ids) — see the comment in CartContext.tsx for why.
+// Full product data for rendering (e.g. on /wishlist) comes from the shared
+// client-side cache in lib/productCache.ts.
 const wishlistStore = createLocalStorageStore<string[]>(
   STORAGE_KEY,
   [],
@@ -42,7 +44,7 @@ const WishlistContext = createContext<WishlistContextValue | undefined>(
 );
 
 function resolveName(productSlug: string, productName?: string) {
-  return productName ?? getProductBySlug(productSlug)?.name;
+  return productName ?? getCachedProduct(productSlug)?.name;
 }
 
 export function WishlistProvider({ children }: { children: ReactNode }) {

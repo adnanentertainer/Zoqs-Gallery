@@ -2,7 +2,11 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isSupabaseConfigured, getSupabaseEnv } from "@/lib/supabase/env";
 
-const PROTECTED_PREFIXES = ["/account", "/checkout", "/order-confirmation"];
+// /checkout and /order-confirmation are deliberately NOT here — guest
+// checkout is allowed (see /checkout/start), and a guest's own order
+// confirmation is reached via its unguessable guest_token in the URL
+// instead of a login requirement (see get_guest_order() in the database).
+const PROTECTED_PREFIXES = ["/account"];
 
 /**
  * Runs on every non-static request (see `config.matcher` below). Refreshes

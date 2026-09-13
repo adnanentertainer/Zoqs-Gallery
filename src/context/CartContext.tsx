@@ -4,12 +4,19 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useReducer,
   useState,
   useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { getProductBySlug } from "@/lib/products";
+import {
+  ensureProductsCached,
+  getCachedProduct,
+  registerProduct,
+  subscribeToProductCache,
+} from "@/lib/productCache";
 import {
   getFreeShippingProgress,
   getVariantUnitPrice,
@@ -22,13 +29,11 @@ import type { Product } from "@/types";
 
 const STORAGE_KEY = "zoqs-gallery-cart";
 
-// Cart items are keyed by product SLUG rather than product.id. Product ids are
-// UUIDs when sourced from Supabase but "prod-XXX" strings from the local mock
-// catalog — the cart/wishlist stay intentionally mock-catalog-backed (see
-// lib/products.ts) for synchronous, network-free lookups, and slugs are the
-// one identifier guaranteed to be identical across both sources (the seed
-// script preserves them exactly), so this is what keeps a Supabase-sourced
-// product page's Add to Cart button compatible with the cart.
+// Cart items are keyed by product SLUG rather than product.id, since slug is
+// the one product identifier already present in the URL/page everywhere a
+// cart action originates. Full Product data (name, price, stock, images) is
+// resolved via the shared client-side cache in lib/productCache.ts, not
+// stored in localStorage — see that file for how it's populated.
 export interface CartItem {
   key: string;
   productSlug: string;
@@ -63,7 +68,7 @@ function clampQuantity(quantity: number, max: number): number {
 function applyCartAction(items: CartItem[], action: CartAction): CartItem[] {
   switch (action.type) {
     case "ADD": {
-      const product = getProductBySlug(action.productSlug);
+      const product = getCachedProduct(action.productSlug);
       if (!product) return items;
       const key = makeCartItemKey(action.productSlug, action.selectedVariants);
       const maxQuantity = Math.max(product.stock, 1);
@@ -98,7 +103,7 @@ function applyCartAction(items: CartItem[], action: CartAction): CartItem[] {
     case "DECREMENT": {
       return items.map((item) => {
         if (item.key !== action.key) return item;
-        const product = getProductBySlug(item.productSlug);
+        const product = getCachedProduct(item.productSlug);
         const maxQuantity = Math.max(product?.stock ?? 1, 1);
         const nextQuantity =
           action.type === "INCREMENT" ? item.quantity + 1 : item.quantity - 1;
@@ -109,7 +114,7 @@ function applyCartAction(items: CartItem[], action: CartAction): CartItem[] {
     case "SET_QUANTITY": {
       return items.map((item) => {
         if (item.key !== action.key) return item;
-        const product = getProductBySlug(item.productSlug);
+        const product = getCachedProduct(item.productSlug);
         const maxQuantity = Math.max(product?.stock ?? 1, 1);
         return {
           ...item,
@@ -164,7 +169,7 @@ interface CartContextValue {
     selectedVariants?: Record<string, string>,
   ) => boolean;
   addItem: (
-    productSlug: string,
+    product: Product,
     quantity?: number,
     selectedVariants?: Record<string, string>,
     options?: { silent?: boolean },
@@ -191,9 +196,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
     cartStore.set(applyCartAction(cartStore.getSnapshot(), action));
   }, []);
 
+  const [productCacheVersion, bumpProductCacheVersion] = useReducer(
+    (count: number) => count + 1,
+    0,
+  );
+
+  useEffect(
+    () => subscribeToProductCache(bumpProductCacheVersion),
+    [],
+  );
+
+  useEffect(() => {
+    ensureProductsCached(items.map((item) => item.productSlug));
+  }, [items]);
+
   const lineItems = useMemo<CartLineItem[]>(() => {
     return items.flatMap((item) => {
-      const product = getProductBySlug(item.productSlug);
+      const product = getCachedProduct(item.productSlug);
       if (!product) return [];
       const unitPrice = getVariantUnitPrice(product, item.selectedVariants);
       return [
@@ -205,7 +224,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         },
       ];
     });
-  }, [items]);
+    // productCacheVersion isn't read in the body above, but including it
+    // forces this memo to recompute once the background
+    // /api/products/lookup fetch resolves and populates the cache.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, productCacheVersion]);
 
   const totalQuantity = useMemo(
     () => lineItems.reduce((sum, item) => sum + item.quantity, 0),
@@ -232,15 +255,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback(
     (
-      productSlug: string,
+      product: Product,
       quantity = 1,
       selectedVariants?: Record<string, string>,
       options?: { silent?: boolean },
     ) => {
-      dispatch({ type: "ADD", productSlug, quantity, selectedVariants });
+      // Registering the product synchronously, before dispatch, guarantees
+      // the reducer's cache lookup (for stock clamping) hits immediately —
+      // no dependency on a background fetch having resolved first.
+      registerProduct(product);
+      dispatch({
+        type: "ADD",
+        productSlug: product.slug,
+        quantity,
+        selectedVariants,
+      });
       if (!options?.silent) {
-        const product = getProductBySlug(productSlug);
-        showToast(product ? `${product.name} added to cart` : "Added to cart");
+        showToast(`${product.name} added to cart`);
       }
     },
     [dispatch, showToast],
@@ -249,7 +280,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const removeItem = useCallback(
     (key: string) => {
       const item = items.find((candidate) => candidate.key === key);
-      const product = item ? getProductBySlug(item.productSlug) : undefined;
+      const product = item ? getCachedProduct(item.productSlug) : undefined;
       dispatch({ type: "REMOVE", key });
       showToast(
         product ? `${product.name} removed from cart` : "Removed from cart",

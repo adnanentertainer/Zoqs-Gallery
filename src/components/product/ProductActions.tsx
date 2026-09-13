@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Share2, ShoppingBag, Zap } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -12,6 +12,7 @@ import { formatPrice } from "@/lib/utils";
 import { LOW_STOCK_THRESHOLD, isInStock } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
 import { useProductVariantSelection } from "@/context/ProductVariantImageContext";
+import { registerProduct } from "@/lib/productCache";
 import type { Product } from "@/types";
 
 type CartStatus = "idle" | "loading" | "added";
@@ -32,6 +33,10 @@ export function ProductActions({ product }: ProductActionsProps) {
   const [linkCopied, setLinkCopied] = useState(false);
   const [shareFallbackUrl, setShareFallbackUrl] = useState<string | null>(null);
 
+  useEffect(() => {
+    registerProduct(product);
+  }, [product]);
+
   const selectedOptions = (product.variants ?? []).map((group) =>
     group.options.find((option) => option.value === selections[group.type])!,
   );
@@ -48,7 +53,7 @@ export function ProductActions({ product }: ProductActionsProps) {
 
   function handleAddToCart() {
     if (!canPurchase) return;
-    cart.addItem(product.slug, quantity, selections, { silent: true });
+    cart.addItem(product, quantity, selections, { silent: true });
     setCartStatus("loading");
     window.setTimeout(() => {
       setCartStatus("added");
@@ -58,8 +63,8 @@ export function ProductActions({ product }: ProductActionsProps) {
 
   function handleBuyNow() {
     if (!canPurchase) return;
-    cart.addItem(product.slug, quantity, selections, { silent: true });
-    router.push("/checkout");
+    cart.addItem(product, quantity, selections, { silent: true });
+    router.push("/checkout/start");
   }
 
   async function handleShare() {

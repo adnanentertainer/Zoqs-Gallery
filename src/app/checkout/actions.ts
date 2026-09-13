@@ -1,7 +1,10 @@
 "use server";
 
-import { getServerUser } from "@/lib/auth/getServerUser";
-import { createOrder, getOrderByOrderNumber } from "@/lib/services/orderService";
+import {
+  createOrder,
+  getGuestOrderByOrderNumber,
+  getOrderByOrderNumber,
+} from "@/lib/services/orderService";
 import { sendNewOrderNotificationEmail } from "@/lib/email/orderNotification";
 import {
   validateAddressLine1,
@@ -33,6 +36,8 @@ export interface PlaceOrderInput {
 
 export interface PlaceOrderResult {
   orderNumber?: string;
+  /** Only set for a guest order — must be appended to the confirmation URL. */
+  guestToken?: string | null;
   error?: string;
 }
 
@@ -48,11 +53,9 @@ export interface PlaceOrderResult {
 export async function placeOrder(
   input: PlaceOrderInput,
 ): Promise<PlaceOrderResult> {
-  const user = await getServerUser();
-  if (!user) {
-    return { error: "You must be signed in to place an order." };
-  }
-
+  // Guest checkout is allowed — create_order() itself decides whether this
+  // is a signed-in customer's order or a guest one (via auth.uid()), never
+  // trusting anything the client claims about who's placing it.
   if (!Array.isArray(input.items) || input.items.length === 0) {
     return { error: "Your cart is empty." };
   }
@@ -104,7 +107,9 @@ export async function placeOrder(
     // its own try/catch, since the order is already committed at this point
     // and a notification failure must never surface as a checkout error.
     try {
-      const order = await getOrderByOrderNumber(result.orderNumber);
+      const order = result.guestToken
+        ? await getGuestOrderByOrderNumber(result.orderNumber, result.guestToken)
+        : await getOrderByOrderNumber(result.orderNumber);
       if (order) await sendNewOrderNotificationEmail(order);
     } catch (notificationError) {
       console.error(
@@ -113,7 +118,7 @@ export async function placeOrder(
       );
     }
 
-    return { orderNumber: result.orderNumber };
+    return { orderNumber: result.orderNumber, guestToken: result.guestToken };
   } catch (error) {
     return {
       error:

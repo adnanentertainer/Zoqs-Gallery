@@ -2,11 +2,12 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AuthCard, AuthMessage, PasswordInput } from "@/components/auth";
 import { Input } from "@/components/ui/Input";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
+import { getSafeRedirect } from "@/lib/auth/redirect";
 import {
   validateConfirmPassword,
   validateEmail,
@@ -25,6 +26,12 @@ interface FieldErrors {
 export function SignupForm() {
   const { signUp } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const rawRedirect = searchParams.get("redirect");
+  const redirectTo = getSafeRedirect(rawRedirect, "/account");
+  const loginHref = rawRedirect
+    ? `/login?redirect=${encodeURIComponent(rawRedirect)}`
+    : "/login";
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -72,7 +79,7 @@ export function SignupForm() {
       return;
     }
 
-    router.push("/account");
+    router.push(redirectTo);
   }
 
   if (needsEmailConfirmation) {
@@ -86,7 +93,7 @@ export function SignupForm() {
           message="Check your email to confirm your account, then log in below."
         />
         <Link
-          href="/login"
+          href={loginHref}
           className={buttonVariants("primary", "lg", "mt-6 w-full")}
         >
           Go to Login
@@ -103,7 +110,7 @@ export function SignupForm() {
         <p className="font-body text-sm text-muted">
           Already have an account?{" "}
           <Link
-            href="/login"
+            href={loginHref}
             className="font-medium text-primary underline-offset-2 hover:underline"
           >
             Log in

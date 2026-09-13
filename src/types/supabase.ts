@@ -250,7 +250,8 @@ export interface Database {
         Row: {
           id: string;
           order_number: string;
-          user_id: string;
+          user_id: string | null;
+          guest_token: string | null;
           status: string;
           payment_method: string;
           payment_status: string;
@@ -425,7 +426,15 @@ export interface Database {
           subtotal: number;
           shipping_cost: number;
           total: number;
+          guest_token: string | null;
         };
+      };
+      get_guest_order: {
+        Args: {
+          p_order_number: string;
+          p_guest_token: string;
+        };
+        Returns: unknown;
       };
       record_stock_movement: {
         Args: {

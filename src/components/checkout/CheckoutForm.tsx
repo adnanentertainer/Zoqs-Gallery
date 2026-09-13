@@ -121,7 +121,10 @@ export function CheckoutForm({
     }
 
     cart.clearCart();
-    router.push(`/order-confirmation/${result.orderNumber}`);
+    const confirmationUrl = result.guestToken
+      ? `/order-confirmation/${result.orderNumber}?token=${result.guestToken}`
+      : `/order-confirmation/${result.orderNumber}`;
+    router.push(confirmationUrl);
   }
 
   return (

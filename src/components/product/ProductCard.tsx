@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { MouseEvent } from "react";
+import { useEffect, type MouseEvent } from "react";
 import { Eye, ShoppingBag } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { RatingStars } from "@/components/shared/RatingStars";
@@ -15,6 +15,7 @@ import {
   isInStock,
 } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
+import { registerProduct } from "@/lib/productCache";
 import type { Product, ProductBadge } from "@/types";
 
 const badgeVariant: Record<
@@ -46,10 +47,14 @@ export function ProductCard({ product }: ProductCardProps) {
   const [primaryImage, secondaryImage = primaryImage] = product.images;
   const cart = useCart();
 
+  useEffect(() => {
+    registerProduct(product);
+  }, [product]);
+
   function handleAddToCart(event: MouseEvent) {
     preventCardNavigation(event);
     if (!inStock) return;
-    cart.addItem(product.slug, 1, getDefaultVariantSelections(product));
+    cart.addItem(product, 1, getDefaultVariantSelections(product));
   }
 
   return (

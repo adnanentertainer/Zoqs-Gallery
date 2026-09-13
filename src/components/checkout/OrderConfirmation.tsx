@@ -33,7 +33,13 @@ const paymentStatusLabel: Record<Order["paymentStatus"], string> = {
   refunded: "Refunded",
 };
 
-export function OrderConfirmation({ order }: { order: Order }) {
+export function OrderConfirmation({
+  order,
+  isGuest = false,
+}: {
+  order: Order;
+  isGuest?: boolean;
+}) {
   const paymentMethod = PAYMENT_METHODS.find(
     (method) => method.value === order.paymentMethod,
   );
@@ -182,7 +188,7 @@ export function OrderConfirmation({ order }: { order: Order }) {
           Continue Shopping
         </Link>
         <Link
-          href="/account"
+          href={isGuest ? "/signup" : "/account"}
           className={buttonVariants(
             "primary",
             "lg",
@@ -190,7 +196,7 @@ export function OrderConfirmation({ order }: { order: Order }) {
           )}
         >
           <User className="h-5 w-5" aria-hidden="true" />
-          My Account
+          {isGuest ? "Create an Account" : "My Account"}
         </Link>
       </div>
     </div>

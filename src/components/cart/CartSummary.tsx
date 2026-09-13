@@ -34,7 +34,7 @@ export function CartSummary({
 
       <div className="flex flex-col gap-3">
         <Link
-          href="/checkout"
+          href="/checkout/start"
           onClick={onNavigate}
           className={buttonVariants("gold", "lg", "w-full")}
         >

@@ -1,18 +1,29 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useReducer } from "react";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { Container } from "@/components/ui/Container";
 import { Heading, Text } from "@/components/ui/Typography";
 import { EmptyState, ProductGrid } from "@/components/product";
 import { useWishlist } from "@/context/WishlistContext";
-import { getProductBySlug } from "@/lib/products";
+import {
+  ensureProductsCached,
+  getCachedProduct,
+  subscribeToProductCache,
+} from "@/lib/productCache";
 import type { Product } from "@/types";
 
 export default function WishlistPage() {
   const { items } = useWishlist();
+  const [, bumpProductCacheVersion] = useReducer((count: number) => count + 1, 0);
+
+  useEffect(() => subscribeToProductCache(bumpProductCacheVersion), []);
+  useEffect(() => {
+    ensureProductsCached(items);
+  }, [items]);
+
   const products = items
-    .map((slug) => getProductBySlug(slug))
+    .map((slug) => getCachedProduct(slug))
     .filter((product): product is Product => Boolean(product));
 
   useEffect(() => {
