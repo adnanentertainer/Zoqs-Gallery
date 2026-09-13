@@ -13,7 +13,10 @@ export const siteConfig = {
   mobileWalletNumber: "0331 6668233",
   socialLinks: {
     instagram: "https://instagram.com/zoqsgallery",
-    facebook: "https://www.facebook.com/profile.php?id=61593653865604",
+    // A real, public Facebook Page (not the old personal profile, which
+    // restricted non-friends from viewing it -- that was why customers
+    // reported the link "not opening").
+    facebook: "https://www.facebook.com/profile.php?id=61594055461228",
     whatsapp: "https://wa.me/923316668233",
   },
   // Where "a new order was placed" notification emails are sent from/to.
