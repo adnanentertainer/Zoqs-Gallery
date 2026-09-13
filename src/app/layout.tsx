@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { siteConfig } from "@/constants/site";
@@ -66,6 +66,14 @@ export const metadata: Metadata = {
     // even after verification succeeds, or Search Console loses access.
     google: "NG2dySLIOEj5PqZ1xPGXemAW9vxmYRvEwNJPN-rEiCQ",
   },
+};
+
+// Declares this site as light-only. Without it, some Android browsers
+// (Xiaomi/MIUI's among them) apply their own forced-dark-mode heuristic to
+// the whole page, which auto-inverts near-black elements to white — that's
+// what was turning the TikTok icon's dark circle into a blank white one.
+export const viewport: Viewport = {
+  colorScheme: "light",
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {

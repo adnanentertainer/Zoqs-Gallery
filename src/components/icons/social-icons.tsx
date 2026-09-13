@@ -59,18 +59,9 @@ export function FacebookIcon(props: IconProps) {
   );
 }
 
-export function TikTokIcon({ style, ...props }: IconProps) {
+export function TikTokIcon(props: IconProps) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      // Some mobile browsers' forced-dark-mode heuristics auto-invert
-      // near-black fills to white, assuming they're "light mode" text/
-      // backgrounds -- this is the only icon in the set using near-black,
-      // so it was the only one flipping to a blank white circle. Explicitly
-      // opting out of that auto-inversion keeps it rendering as authored.
-      style={{ colorScheme: "light", ...style }}
-      {...props}
-    >
+    <svg viewBox="0 0 24 24" {...props}>
       <circle cx="12" cy="12" r="11" fill="#1a1a1a" />
       <path
         d="M15.94 6.02c.32.97 1.09 1.68 2.06 1.88v1.94c-.93-.03-1.86-.23-2.7-.63-.37-.16-.71-.38-1.04-.6-.01 1.88.01 3.76-.01 5.63-.05.9-.35 1.8-.87 2.54-.85 1.24-2.31 2.04-3.81 2.07-.92.05-1.85-.2-2.63-.66-1.3-.77-2.22-2.17-2.35-3.68-.01-.32-.02-.64-.01-.96.12-1.22.72-2.4 1.66-3.2 1.07-.93 2.57-1.37 3.97-1.11.01.95-.03 1.9-.03 2.86-.64-.21-1.39-.15-1.95.24-.4.26-.71.67-.87 1.13-.14.33-.1.69-.09 1.03.15 1.06 1.17 1.94 2.25 1.85.72-.01 1.41-.42 1.78-1.03.13-.22.25-.44.26-.68.07-1.15.04-2.3.05-3.45.01-2.6-.01-5.19.01-7.78h1.35c0 .13.01.26.06.39.32.97 1.09 1.68 2.06 1.88Z"
