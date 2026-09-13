@@ -642,17 +642,28 @@ export function ProductForm({
         </div>
 
         {mode === "edit" && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="lg"
-            className="text-error hover:bg-error/10"
-            onClick={() =>
-              setConfirmAction(hasOrderHistory ? "deactivate" : "delete")
-            }
-          >
-            {hasOrderHistory ? "Deactivate Product" : "Delete Product"}
-          </Button>
+          <div className="flex gap-3">
+            {values.isActive && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="lg"
+                className="text-primary hover:bg-beige"
+                onClick={() => setConfirmAction("deactivate")}
+              >
+                Deactivate Product
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              className="text-error hover:bg-error/10"
+              onClick={() => setConfirmAction("delete")}
+            >
+              Delete Product
+            </Button>
+          </div>
         )}
       </div>
 
@@ -665,8 +676,10 @@ export function ProductForm({
         }
         description={
           confirmAction === "delete"
-            ? "This permanently removes the product, its images, and its variants. This cannot be undone."
-            : "This product has order history, so it can't be permanently deleted — deactivating hides it from the shop while keeping past orders intact."
+            ? hasOrderHistory
+              ? "This product has order history, so it can't be permanently deleted — deactivate it instead to hide it from the shop while keeping past orders intact."
+              : "This permanently removes the product, its images, and its variants. This cannot be undone."
+            : "This hides the product from the shop. You can reactivate it anytime by editing it again."
         }
         confirmLabel={confirmAction === "delete" ? "Delete" : "Deactivate"}
         isLoading={isMutating}
