@@ -40,3 +40,24 @@ body {
   outline: 2px solid var(--color-gold);
   outline-offset: 2px;
 }
+
+/* Static diagonal shine band over the header wordmark's gold gradient --
+   a fixed highlight (not animated), like light caught on a foil-stamped
+   card. See the "Foil Shimmer" wordmark option. */
+.wordmark-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.wordmark-shine::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -30%;
+  width: 30%;
+  height: 140%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  transform: skewX(-18deg);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}

@@ -43,7 +43,7 @@ export function Header() {
 
             <Link
               href="/"
-              className="rounded-sm font-heading text-xl font-semibold tracking-wider transition-[filter] duration-200 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:text-2xl lg:text-[1.75rem]"
+              className="wordmark-shine inline-block rounded-sm font-heading text-xl font-semibold tracking-wider transition-[filter] duration-200 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:text-2xl lg:text-[1.75rem]"
               style={{
                 backgroundImage:
                   "linear-gradient(180deg, #fbe8b8 0%, #e6a421 45%, #9c6f1a 100%)",
