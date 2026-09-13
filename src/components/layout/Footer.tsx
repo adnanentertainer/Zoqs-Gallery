@@ -85,9 +85,9 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-beige text-primary transition-colors hover:border-gold hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gold text-white transition-colors hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                 >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
+                  <Icon className="h-5 w-5" aria-hidden="true" />
                 </a>
               ))}
             </div>
