@@ -43,15 +43,10 @@ export function Header() {
 
             <Link
               href="/"
-              className="wordmark-shine inline-block rounded-sm font-heading text-xl font-semibold tracking-wider transition-[filter] duration-200 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:text-2xl lg:text-[1.75rem]"
+              className="rounded-sm font-heading text-xl font-semibold tracking-wider text-primary transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:text-2xl lg:text-[1.75rem]"
               style={{
-                backgroundImage:
-                  "linear-gradient(180deg, #fbe8b8 0%, #e6a421 45%, #9c6f1a 100%)",
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                color: "transparent",
                 textShadow:
-                  "0 1px 0 rgba(255,255,255,0.45), 0 2px 3px rgba(0,0,0,0.25)",
+                  "0 1px 0 rgba(255,255,255,0.9), 0 -1px 0 rgba(0,0,0,0.35)",
               }}
             >
               {siteConfig.name}
