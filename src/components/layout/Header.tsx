@@ -43,7 +43,7 @@ export function Header() {
 
             <Link
               href="/"
-              className="rounded-sm font-heading text-xl font-semibold tracking-wider text-primary transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:text-2xl lg:text-[1.75rem]"
+              className="rounded-sm font-heading text-xl font-semibold tracking-wider text-gold transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:text-2xl lg:text-[1.75rem]"
             >
               {siteConfig.name}
             </Link>
