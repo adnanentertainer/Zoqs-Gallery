@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
@@ -13,9 +13,33 @@ const navButtonStyles =
 // Opens already magnified 1.5x (50%), and the shopper can scroll/pinch to
 // zoom in further, up to MAX_ZOOM -- clamped so it can never zoom back out
 // past the starting point, which is already closer than a plain fit-to-screen.
+//
+// On narrow (mobile) viewports the photo box is width-constrained rather
+// than height-constrained (portrait product photos fill the available
+// width with little to no letterboxing), so there's no slack left to
+// absorb a forced zoom -- opening pre-zoomed there clipped real image
+// content off both sides instead of just eating empty letterbox space
+// like it does on wider screens. Mobile opens at 1x (the full photo,
+// nothing cropped) and can still be zoomed in further from there.
 const BASE_ZOOM = 1.5;
+const MOBILE_BASE_ZOOM = 1;
+const MOBILE_BREAKPOINT_QUERY = "(max-width: 639px)";
 const MAX_ZOOM = 3.5;
 const ZOOM_SENSITIVITY = 0.0015;
+
+function subscribeToMobileViewport(callback: () => void): () => void {
+  const mediaQuery = window.matchMedia(MOBILE_BREAKPOINT_QUERY);
+  mediaQuery.addEventListener("change", callback);
+  return () => mediaQuery.removeEventListener("change", callback);
+}
+
+function getIsMobileViewport(): boolean {
+  return window.matchMedia(MOBILE_BREAKPOINT_QUERY).matches;
+}
+
+function getIsMobileViewportServerSnapshot(): boolean {
+  return false;
+}
 
 interface ProductLightboxProps {
   images: string[];
@@ -37,12 +61,19 @@ export function ProductLightbox({
   useEscapeKey(isOpen, onClose);
   useBodyScrollLock(isOpen);
   const [zoom, setZoom] = useState(BASE_ZOOM);
+  const isMobileViewport = useSyncExternalStore(
+    subscribeToMobileViewport,
+    getIsMobileViewport,
+    getIsMobileViewportServerSnapshot,
+  );
+
+  const baseZoom = isMobileViewport ? MOBILE_BASE_ZOOM : BASE_ZOOM;
 
   // Each photo (and each time the viewer reopens) starts back at the same
   // base magnification rather than wherever the shopper last zoomed to.
   useEffect(() => {
-    setZoom(BASE_ZOOM);
-  }, [activeIndex, isOpen]);
+    setZoom(baseZoom);
+  }, [activeIndex, isOpen, baseZoom]);
 
   const showPrevious = () =>
     onIndexChange((activeIndex - 1 + images.length) % images.length);
@@ -67,7 +98,7 @@ export function ProductLightbox({
   function handleWheelZoom(event: React.WheelEvent<HTMLDivElement>) {
     event.preventDefault();
     setZoom((previous) =>
-      Math.min(MAX_ZOOM, Math.max(BASE_ZOOM, previous - event.deltaY * ZOOM_SENSITIVITY)),
+      Math.min(MAX_ZOOM, Math.max(baseZoom, previous - event.deltaY * ZOOM_SENSITIVITY)),
     );
   }
 
