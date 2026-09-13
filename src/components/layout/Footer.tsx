@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ComponentType, SVGProps } from "react";
 import { Container } from "@/components/ui/Container";
@@ -41,13 +42,22 @@ export function Footer() {
   return (
     <footer className="border-t border-beige bg-secondary">
       <Container className="py-12 sm:py-16 lg:py-20">
-        <div className="mb-10 border-b border-beige pb-8">
-          <span className="font-heading text-2xl font-semibold text-primary">
-            {siteConfig.name}
-          </span>
-          <p className="mt-2 max-w-md font-body text-sm text-muted">
-            {siteConfig.tagline}
-          </p>
+        <div className="mb-10 flex items-center gap-4 border-b border-beige pb-8">
+          <Image
+            src="/logo.png"
+            alt=""
+            width={56}
+            height={56}
+            className="h-14 w-14 shrink-0 rounded-full"
+          />
+          <div>
+            <span className="font-heading text-2xl font-semibold text-primary">
+              {siteConfig.name}
+            </span>
+            <p className="mt-2 max-w-md font-body text-sm text-muted">
+              {siteConfig.tagline}
+            </p>
+          </div>
         </div>
 
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
