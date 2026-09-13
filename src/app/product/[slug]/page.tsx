@@ -11,17 +11,15 @@ import {
   ProductPrice,
   ProductReviews,
   ProductTabs,
+  RecentlyViewedSection,
+  RecentlyViewedTracker,
   ReviewForm,
   ReviewSummary,
 } from "@/components/product";
 import { ProductSection } from "@/components/home/ProductSection";
 import { ProductVariantImageProvider } from "@/context/ProductVariantImageContext";
 import { siteConfig } from "@/constants/site";
-import {
-  getProductBadge,
-  getRecentlyViewedMock,
-  isInStock,
-} from "@/lib/products";
+import { getProductBadge, isInStock } from "@/lib/products";
 import {
   getProductBySlug,
   getProducts,
@@ -90,10 +88,6 @@ export default async function ProductPage({
   const averageRating =
     reviewsCount > 0 ? getAverageRating(productReviews) : product.rating;
   const relatedProducts = await getRelatedProducts(product, 4);
-  // Recently viewed is an intentionally lightweight mock (no real view-history
-  // tracking exists), so it stays sourced from the local mock catalog
-  // regardless of whether Supabase is configured — see the Phase 7 report.
-  const recentlyViewed = getRecentlyViewedMock(product, relatedProducts);
   const inStock = isInStock(product);
 
   const jsonLd = {
@@ -128,6 +122,7 @@ export default async function ProductPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
+      <RecentlyViewedTracker slug={product.slug} />
 
       <Container className="flex flex-col gap-3 pt-6 pb-4">
         <Breadcrumb
@@ -230,14 +225,7 @@ export default async function ProductPage({
         background="cream"
       />
 
-      {recentlyViewed.length > 0 && (
-        <ProductSection
-          title="Recently Viewed"
-          products={recentlyViewed}
-          viewAllLabel="Continue Shopping"
-          viewAllHref="/shop"
-        />
-      )}
+      <RecentlyViewedSection excludeSlug={product.slug} />
     </>
   );
 }

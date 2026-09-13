@@ -298,12 +298,3 @@ export function getRelatedProducts(
   return related;
 }
 
-export function getRecentlyViewedMock(
-  product: Product,
-  exclude: Product[] = [],
-): Product[] {
-  const excludedIds = new Set([product.id, ...exclude.map((item) => item.id)]);
-  return allProducts
-    .filter((candidate) => !excludedIds.has(candidate.id))
-    .slice(0, 4);
-}
