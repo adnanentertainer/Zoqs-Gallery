@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type MouseEvent } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mobileNavLinks } from "@/constants/navigation";
@@ -20,6 +21,20 @@ const navLinkStyles =
 export function MobileNav({ isOpen, onClose }: MobileNavProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const { isAuthenticated } = useAuth();
+  const pathname = usePathname();
+
+  // Clicking "Home" while already on the home page is otherwise a no-op --
+  // scroll to top instead, same as the desktop header nav.
+  function handleNavLinkClick(
+    event: MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) {
+    onClose();
+    if (href === "/" && pathname === "/") {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
 
   useEffect(() => {
     if (!isOpen) return;
@@ -88,7 +103,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
             <Link
               key={link.label}
               href={link.href}
-              onClick={onClose}
+              onClick={(event) => handleNavLinkClick(event, link.href)}
               tabIndex={isOpen ? 0 : -1}
               className={navLinkStyles}
             >

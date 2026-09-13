@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Heart, Menu, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
@@ -24,6 +25,20 @@ export function Header() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const cart = useCart();
   const wishlist = useWishlist();
+  const pathname = usePathname();
+
+  // Clicking "Home" while already on the home page is otherwise a no-op --
+  // Next.js doesn't re-navigate to the current route. Scroll to top instead,
+  // matching what a shopper actually expects from clicking it.
+  function handleNavLinkClick(
+    event: MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) {
+    if (href === "/" && pathname === "/") {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
 
   return (
     <>
@@ -60,6 +75,7 @@ export function Header() {
                 <Link
                   key={link.label}
                   href={link.href}
+                  onClick={(event) => handleNavLinkClick(event, link.href)}
                   className="rounded-sm font-body text-sm font-medium tracking-wide text-primary transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                 >
                   {link.label}
