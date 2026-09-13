@@ -92,8 +92,8 @@ export function Footer() {
                   aria-label={label}
                   className="group flex flex-col items-center gap-1.5 focus-visible:outline-none"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-beige text-primary transition-colors group-hover:border-gold group-hover:text-gold group-focus-visible:ring-2 group-focus-visible:ring-gold">
-                    <Icon className="h-4 w-4" aria-hidden="true" />
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full transition-transform group-hover:scale-110 group-focus-visible:ring-2 group-focus-visible:ring-gold">
+                    <Icon className="h-9 w-9" aria-hidden="true" />
                   </span>
                   {handle && (
                     <span className="font-body text-xs text-muted transition-colors group-hover:text-gold">
