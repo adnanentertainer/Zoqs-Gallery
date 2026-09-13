@@ -63,7 +63,7 @@ export function Footer() {
             </div>
           ))}
 
-          <div className="flex flex-col items-center text-center sm:col-span-2 sm:items-end sm:text-right lg:col-span-1">
+          <div className="flex flex-col items-center text-center sm:col-span-2 lg:col-span-1">
             <Image
               src="/logo-full.png"
               alt={`${siteConfig.name} - ${siteConfig.tagline}`}
