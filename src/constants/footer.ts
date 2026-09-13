@@ -24,15 +24,15 @@ export const footerColumns: FooterColumn[] = [
       { label: "Delivery Information", href: "#delivery-information" },
       { label: "Returns & Exchanges", href: "#returns-exchanges" },
       { label: "Track Order", href: "#track-order" },
-      { label: "FAQs", href: "#faqs" },
+      { label: "FAQs", href: "/faqs" },
     ],
   },
   {
     title: "About ZOQ's Gallery",
     links: [
       { label: "Our Story", href: "/about" },
-      { label: "Privacy Policy", href: "#privacy-policy" },
-      { label: "Terms & Conditions", href: "#terms-and-conditions" },
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms & Conditions", href: "/terms-and-conditions" },
     ],
   },
 ];
