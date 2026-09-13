@@ -42,22 +42,32 @@ export function Footer() {
   return (
     <footer className="border-t border-beige bg-secondary">
       <Container className="py-12 sm:py-16 lg:py-20">
-        <div className="mb-10 flex items-center gap-4 border-b border-beige pb-8">
-          <Image
-            src="/logo.png"
-            alt=""
-            width={56}
-            height={56}
-            className="h-14 w-14 shrink-0 rounded-full"
-          />
-          <div>
-            <span className="font-heading text-2xl font-semibold text-primary">
-              {siteConfig.name}
-            </span>
-            <p className="mt-2 max-w-md font-body text-sm text-muted">
-              {siteConfig.tagline}
-            </p>
+        <div className="mb-10 flex flex-wrap items-center justify-between gap-6 border-b border-beige pb-8">
+          <div className="flex items-center gap-4">
+            <Image
+              src="/logo.png"
+              alt=""
+              width={56}
+              height={56}
+              className="h-14 w-14 shrink-0 rounded-full"
+            />
+            <div>
+              <span className="font-heading text-2xl font-semibold text-primary">
+                {siteConfig.name}
+              </span>
+              <p className="mt-2 max-w-md font-body text-sm text-muted">
+                {siteConfig.tagline}
+              </p>
+            </div>
           </div>
+
+          <Image
+            src="/logo-full.png"
+            alt={`${siteConfig.name} - ${siteConfig.tagline}`}
+            width={640}
+            height={640}
+            className="hidden h-36 w-36 shrink-0 rounded-full sm:block sm:h-44 sm:w-44 lg:h-56 lg:w-56"
+          />
         </div>
 
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
