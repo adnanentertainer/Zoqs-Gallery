@@ -101,7 +101,6 @@ export interface AdminProductInput {
 
 export interface AdminProductDetail extends AdminProductInput {
   id: string;
-  hasOrderHistory: boolean;
 }
 
 export interface AdminCategoryListItem {

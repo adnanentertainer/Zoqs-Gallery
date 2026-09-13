@@ -140,3 +140,15 @@ export async function updateOrderStatus(
   }
   return {};
 }
+
+export async function deleteOrder(id: string): Promise<{ error?: string }> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+
+  const { error } = await supabase.from("orders").delete().eq("id", id);
+  if (error) {
+    console.error("[adminOrderService.deleteOrder] failed:", error);
+    return { error: "Unable to delete this order right now." };
+  }
+  return {};
+}

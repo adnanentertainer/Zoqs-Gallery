@@ -6,4 +6,5 @@ export {
   type StatusBadgeValue,
 } from "@/components/admin/StatusBadge";
 export { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+export { DeleteOrderButton } from "@/components/admin/DeleteOrderButton";
 export { Pagination } from "@/components/admin/Pagination";

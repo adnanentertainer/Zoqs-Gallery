@@ -66,7 +66,6 @@ interface ProductFormProps {
   mode: "create" | "edit";
   productId?: string;
   initialValues?: AdminProductInput;
-  hasOrderHistory?: boolean;
   categories: AdminCategoryListItem[];
   suppliers: SupplierOption[];
 }
@@ -81,7 +80,6 @@ export function ProductForm({
   mode,
   productId,
   initialValues,
-  hasOrderHistory = false,
   categories,
   suppliers,
 }: ProductFormProps) {
@@ -676,9 +674,7 @@ export function ProductForm({
         }
         description={
           confirmAction === "delete"
-            ? hasOrderHistory
-              ? "This product has order history, so it can't be permanently deleted — deactivate it instead to hide it from the shop while keeping past orders intact."
-              : "This permanently removes the product, its images, and its variants. This cannot be undone."
+            ? "This permanently removes the product, its images, and its variants. Past orders keep their own record of it and are unaffected. This cannot be undone."
             : "This hides the product from the shop. You can reactivate it anytime by editing it again."
         }
         confirmLabel={confirmAction === "delete" ? "Delete" : "Deactivate"}

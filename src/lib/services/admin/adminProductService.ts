@@ -192,7 +192,7 @@ export async function getAdminProductById(
   }
   if (!product) return null;
 
-  const [imagesResult, variantsResult, orderItemsResult] = await Promise.all([
+  const [imagesResult, variantsResult] = await Promise.all([
     supabase
       .from("product_images")
       .select("*")
@@ -203,15 +203,10 @@ export async function getAdminProductById(
       .select("*")
       .eq("product_id", id)
       .order("created_at", { ascending: true }),
-    supabase
-      .from("order_items")
-      .select("id", { count: "exact", head: true })
-      .eq("product_id", id),
   ]);
 
   if (imagesResult.error) throw imagesResult.error;
   if (variantsResult.error) throw variantsResult.error;
-  if (orderItemsResult.error) throw orderItemsResult.error;
 
   return {
     id: product.id,
@@ -236,7 +231,6 @@ export async function getAdminProductById(
     maxStockLevel: product.max_stock_level,
     forceUnavailable: product.force_unavailable,
     primarySupplierId: product.primary_supplier_id,
-    hasOrderHistory: (orderItemsResult.count ?? 0) > 0,
     images: (imagesResult.data ?? []).map((image) => ({
       id: image.id,
       imageUrl: image.image_url,
@@ -487,19 +481,9 @@ export async function deleteProduct(id: string): Promise<{ error?: string }> {
   await requireAdmin();
   const supabase = await getSupabaseServerClient();
 
-  const { count, error: countError } = await supabase
-    .from("order_items")
-    .select("id", { count: "exact", head: true })
-    .eq("product_id", id);
-  if (countError) throw countError;
-
-  if ((count ?? 0) > 0) {
-    return {
-      error:
-        "This product has order history and can't be deleted. Deactivate it instead.",
-    };
-  }
-
+  // order_items.product_id is ON DELETE SET NULL and every fact needed to
+  // display a past order is snapshotted on the row itself, so deleting a
+  // product never loses order history.
   const { error } = await supabase.from("products").delete().eq("id", id);
   if (error) {
     console.error("[adminProductService.deleteProduct] failed:", error);

@@ -34,7 +34,6 @@ export default async function EditProductPage({
         mode="edit"
         productId={product.id}
         initialValues={product}
-        hasOrderHistory={product.hasOrderHistory}
         categories={categories}
         suppliers={suppliers}
       />

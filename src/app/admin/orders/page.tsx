@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { AdminPageHeader, Pagination, StatusBadge } from "@/components/admin";
+import {
+  AdminPageHeader,
+  DeleteOrderButton,
+  Pagination,
+  StatusBadge,
+} from "@/components/admin";
 import { Input } from "@/components/ui/Input";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Typography";
@@ -212,12 +217,18 @@ export default async function AdminOrdersPage({
                       {new Date(order.createdAt).toLocaleDateString("en-PK")}
                     </td>
                     <td className="px-5 py-3 text-right">
-                      <Link
-                        href={`/admin/orders/${order.id}`}
-                        className="font-body text-sm font-medium text-gold hover:underline"
-                      >
-                        View
-                      </Link>
+                      <div className="flex items-center justify-end gap-4">
+                        <Link
+                          href={`/admin/orders/${order.id}`}
+                          className="font-body text-sm font-medium text-gold hover:underline"
+                        >
+                          View
+                        </Link>
+                        <DeleteOrderButton
+                          orderId={order.id}
+                          orderNumber={order.orderNumber}
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}
