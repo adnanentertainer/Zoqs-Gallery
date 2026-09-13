@@ -1,5 +1,5 @@
 import { CheckCircle2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import { PAYMENT_METHODS } from "@/lib/checkout/paymentMethods";
 import type { PaymentMethod } from "@/types/order";
 
@@ -7,12 +7,14 @@ interface PaymentMethodSelectorProps {
   value: PaymentMethod | null;
   onChange: (value: PaymentMethod) => void;
   error?: string;
+  shippingCost: number;
 }
 
 export function PaymentMethodSelector({
   value,
   onChange,
   error,
+  shippingCost,
 }: PaymentMethodSelectorProps) {
   return (
     <fieldset className="flex flex-col gap-3">
@@ -39,19 +41,26 @@ export function PaymentMethodSelector({
               onChange={() => onChange(method.value)}
               className="mt-1 h-4 w-4 shrink-0 accent-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
             />
-            <span className="flex flex-1 flex-col gap-0.5">
-              <span className="flex items-center gap-2 font-body text-sm font-medium text-primary">
-                {method.label}
-                {selected && (
-                  <CheckCircle2
-                    className="h-4 w-4 text-gold"
-                    aria-hidden="true"
-                  />
-                )}
+            <span className="flex flex-1 items-center justify-between gap-3">
+              <span className="flex flex-col gap-0.5">
+                <span className="flex items-center gap-2 font-body text-sm font-medium text-primary">
+                  {method.label}
+                  {selected && (
+                    <CheckCircle2
+                      className="h-4 w-4 text-gold"
+                      aria-hidden="true"
+                    />
+                  )}
+                </span>
+                <span className="font-body text-sm text-muted">
+                  {method.description}
+                </span>
               </span>
-              <span className="font-body text-sm text-muted">
-                {method.description}
-              </span>
+              {method.showsShippingCost && (
+                <span className="whitespace-nowrap font-body text-sm font-semibold text-primary">
+                  {formatPrice(shippingCost)}
+                </span>
+              )}
             </span>
           </label>
         );

@@ -24,7 +24,10 @@ import {
   validateProvince,
   CUSTOMER_NOTES_MAX_LENGTH,
 } from "@/lib/checkout/validation";
-import type { ShippingSettings } from "@/lib/checkout/shipping";
+import {
+  calculateShippingCost,
+  type ShippingSettings,
+} from "@/lib/checkout/shipping";
 import type { PaymentMethod, ShippingAddress } from "@/types/order";
 
 interface CheckoutFormProps {
@@ -155,6 +158,7 @@ export function CheckoutForm({
               setPaymentError(undefined);
             }}
             error={paymentError}
+            shippingCost={calculateShippingCost(cart.subtotal, shippingSettings)}
           />
         </section>
 

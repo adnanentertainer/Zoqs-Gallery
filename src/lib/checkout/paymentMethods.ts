@@ -7,15 +7,18 @@ export interface PaymentMethodOption {
   description: string;
   /** Shown on the order confirmation page after the order is placed. */
   confirmationMessage: string;
+  /** When set, the selector shows the current shipping cost on this option's right side. */
+  showsShippingCost?: boolean;
 }
 
 export const PAYMENT_METHODS: PaymentMethodOption[] = [
   {
     value: "cod",
     label: "Cash on Delivery",
-    description: "Pay when your order arrives.",
+    description: "3-5 business working days",
     confirmationMessage:
       "Your order has been placed successfully. Please pay when your order arrives.",
+    showsShippingCost: true,
   },
   {
     value: "bank_transfer",
