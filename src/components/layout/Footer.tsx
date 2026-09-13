@@ -15,6 +15,8 @@ interface SocialLink {
   label: string;
   href: string;
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
+  /** The original handle text shown under each icon on the official logo badge. */
+  handle?: string;
 }
 
 const socialLinks: SocialLink[] = [
@@ -22,17 +24,20 @@ const socialLinks: SocialLink[] = [
     label: "Instagram",
     href: siteConfig.socialLinks.instagram,
     Icon: InstagramIcon,
+    handle: "@zoqsgallery",
   },
   {
     label: "Facebook",
     href: siteConfig.socialLinks.facebook,
     Icon: FacebookIcon,
+    handle: siteConfig.name,
   },
   { label: "TikTok", href: siteConfig.socialLinks.tiktok, Icon: TikTokIcon },
   {
     label: "WhatsApp",
     href: siteConfig.socialLinks.whatsapp,
     Icon: WhatsAppIcon,
+    handle: siteConfig.mobileWalletNumber,
   },
 ];
 
@@ -77,17 +82,24 @@ export function Footer() {
             <p className="mt-1 whitespace-nowrap font-body text-sm text-muted">
               {siteConfig.tagline}
             </p>
-            <div className="mt-4 flex items-center gap-3">
-              {socialLinks.map(({ label, href, Icon }) => (
+            <div className="mt-4 flex items-start gap-4">
+              {socialLinks.map(({ label, href, Icon, handle }) => (
                 <a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-beige text-primary transition-colors hover:border-gold hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                  className="group flex flex-col items-center gap-1.5 focus-visible:outline-none"
                 >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-beige text-primary transition-colors group-hover:border-gold group-hover:text-gold group-focus-visible:ring-2 group-focus-visible:ring-gold">
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  {handle && (
+                    <span className="font-body text-xs text-muted transition-colors group-hover:text-gold">
+                      {handle}
+                    </span>
+                  )}
                 </a>
               ))}
             </div>
