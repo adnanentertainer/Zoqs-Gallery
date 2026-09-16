@@ -1,17 +1,10 @@
 import { getResendClient } from "@/lib/email/resendClient";
+import { escapeHtml } from "@/lib/email/orderNotification";
 import { siteConfig } from "@/constants/site";
 import { formatPrice } from "@/lib/utils";
 import type { Order } from "@/types/order";
 
-export function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function renderOrderEmailHtml(order: Order): string {
+function renderCustomerOrderEmailHtml(order: Order): string {
   const itemRows = order.items
     .map(
       (item) => `
@@ -29,8 +22,10 @@ function renderOrderEmailHtml(order: Order): string {
 
   return `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#222;">
-      <h2 style="margin-bottom:4px;">New order received — ${escapeHtml(order.orderNumber)}</h2>
-      <p style="color:#666;margin-top:0;">${new Date(order.createdAt).toLocaleString("en-PK")}</p>
+      <h2 style="margin-bottom:4px;">Thank you for your order, ${escapeHtml(address.fullName)}!</h2>
+      <p style="color:#666;margin-top:0;">
+        Your order <strong>${escapeHtml(order.orderNumber)}</strong> has been received and is being processed.
+      </p>
 
       <table style="width:100%;border-collapse:collapse;margin:16px 0;">
         <thead>
@@ -51,38 +46,51 @@ function renderOrderEmailHtml(order: Order): string {
 
       <p><strong>Payment method:</strong> ${escapeHtml(order.paymentMethod)}</p>
 
-      <h3 style="margin-bottom:4px;">Customer</h3>
+      <h3 style="margin-bottom:4px;">Delivery Address</h3>
       <p style="margin:0;">
         ${escapeHtml(address.fullName)}<br/>
-        ${escapeHtml(address.phone)} · ${escapeHtml(address.email)}<br/>
+        ${escapeHtml(address.phone)}<br/>
         ${escapeHtml(address.addressLine1)}${address.addressLine2 ? `, ${escapeHtml(address.addressLine2)}` : ""}<br/>
         ${escapeHtml(address.city)}, ${escapeHtml(address.province)} ${escapeHtml(address.postalCode)}<br/>
         ${escapeHtml(address.country)}
       </p>
 
-      ${order.customerNotes ? `<h3 style="margin-bottom:4px;">Notes</h3><p style="margin:0;">${escapeHtml(order.customerNotes)}</p>` : ""}
+      <p style="color:#666;margin-top:24px;">
+        Questions about your order? Just reply to this email or reach us on WhatsApp at ${escapeHtml(siteConfig.mobileWalletNumber)}.
+      </p>
+      <p style="margin-top:24px;">— ${escapeHtml(siteConfig.name)}</p>
     </div>
   `;
 }
 
 /**
- * Fire-and-forget admin notification for a newly placed order. Deliberately
- * swallows every error itself — a failed email must never fail checkout for
- * the customer, since the order is already committed by the time this runs.
+ * Fire-and-forget order confirmation sent to the customer's own email,
+ * separate from the admin notification in orderNotification.ts.
+ * Deliberately swallows every error itself -- a failed email must never
+ * fail checkout for the customer, since the order is already committed by
+ * the time this runs.
  */
-export async function sendNewOrderNotificationEmail(order: Order): Promise<void> {
+export async function sendCustomerOrderConfirmationEmail(
+  order: Order,
+): Promise<void> {
   try {
     const resend = getResendClient();
     const { error } = await resend.emails.send({
       from: siteConfig.orderNotificationFromEmail,
-      to: siteConfig.orderNotificationToEmail,
-      subject: `New order ${order.orderNumber} — ${formatPrice(order.total)}`,
-      html: renderOrderEmailHtml(order),
+      to: order.shippingAddress.email,
+      subject: `Your ${siteConfig.name} order ${order.orderNumber} is confirmed`,
+      html: renderCustomerOrderEmailHtml(order),
     });
     if (error) {
-      console.error("[orderNotification.sendNewOrderNotificationEmail] Resend error:", error);
+      console.error(
+        "[customerOrderConfirmation.sendCustomerOrderConfirmationEmail] Resend error:",
+        error,
+      );
     }
   } catch (error) {
-    console.error("[orderNotification.sendNewOrderNotificationEmail] failed:", error);
+    console.error(
+      "[customerOrderConfirmation.sendCustomerOrderConfirmationEmail] failed:",
+      error,
+    );
   }
 }

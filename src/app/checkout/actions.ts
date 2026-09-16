@@ -6,6 +6,7 @@ import {
   getOrderByOrderNumber,
 } from "@/lib/services/orderService";
 import { sendNewOrderNotificationEmail } from "@/lib/email/orderNotification";
+import { sendCustomerOrderConfirmationEmail } from "@/lib/email/customerOrderConfirmation";
 import { sendNewOrderNotificationWhatsApp } from "@/lib/whatsapp/orderNotification";
 import {
   validateAddressLine1,
@@ -115,6 +116,7 @@ export async function placeOrder(
         await Promise.all([
           sendNewOrderNotificationEmail(order),
           sendNewOrderNotificationWhatsApp(order),
+          sendCustomerOrderConfirmationEmail(order),
         ]);
       }
     } catch (notificationError) {
