@@ -6,6 +6,7 @@ import {
   getOrderByOrderNumber,
 } from "@/lib/services/orderService";
 import { sendNewOrderNotificationEmail } from "@/lib/email/orderNotification";
+import { sendNewOrderNotificationWhatsApp } from "@/lib/whatsapp/orderNotification";
 import {
   validateAddressLine1,
   validateCity,
@@ -110,7 +111,12 @@ export async function placeOrder(
       const order = result.guestToken
         ? await getGuestOrderByOrderNumber(result.orderNumber, result.guestToken)
         : await getOrderByOrderNumber(result.orderNumber);
-      if (order) await sendNewOrderNotificationEmail(order);
+      if (order) {
+        await Promise.all([
+          sendNewOrderNotificationEmail(order),
+          sendNewOrderNotificationWhatsApp(order),
+        ]);
+      }
     } catch (notificationError) {
       console.error(
         "[checkout.placeOrder] order notification failed:",
