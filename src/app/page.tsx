@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { HeroSection } from "@/components/home/HeroSection";
 import { CategorySection } from "@/components/home/CategorySection";
 import { ProductSection } from "@/components/home/ProductSection";
-import { PromotionalBanner } from "@/components/home/PromotionalBanner";
 import { BridalSection } from "@/components/home/BridalSection";
 import { BenefitsSection } from "@/components/home/BenefitsSection";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
@@ -11,7 +10,6 @@ import { SocialGallery } from "@/components/home/SocialGallery";
 import { getCategories } from "@/lib/services/categoryService";
 import { getBestSellers, getNewArrivals } from "@/lib/services/productService";
 import { getSocialPosts } from "@/lib/services/socialPostService";
-import { promoBannerImage } from "@/constants/images";
 
 export const metadata: Metadata = {
   title: "ZOQ's Gallery | Premium Artificial Jewellery in Pakistan",
@@ -42,14 +40,6 @@ export default async function Home() {
         products={newArrivals}
         viewAllLabel="View All New Arrivals"
         viewAllHref="/new-arrivals"
-      />
-      <PromotionalBanner
-        title="The Everyday Elegance Collection"
-        description="Timeless pieces designed to add a touch of beauty to your everyday style."
-        ctaLabel="Explore Collection"
-        ctaHref="/shop"
-        image={promoBannerImage}
-        imageAlt="Model styled in a delicate gold pendant necklace"
       />
       <ProductSection
         title="Best Sellers"
