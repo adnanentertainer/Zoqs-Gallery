@@ -7,6 +7,7 @@ import { CheckoutItem } from "@/components/checkout/CheckoutItem";
 import { CheckoutTotals } from "@/components/checkout/CheckoutTotals";
 import { WhatsAppIcon } from "@/components/icons/social-icons";
 import { PAYMENT_METHODS } from "@/lib/checkout/paymentMethods";
+import { orderStatusLabel, paymentStatusLabel } from "@/lib/checkout/orderLabels";
 import { formatPrice } from "@/lib/utils";
 import { siteConfig } from "@/constants/site";
 import type { Order } from "@/types/order";
@@ -16,22 +17,6 @@ const RECEIPT_PAYMENT_METHODS: Order["paymentMethod"][] = [
   "jazzcash",
   "bank_transfer",
 ];
-
-const orderStatusLabel: Record<Order["status"], string> = {
-  pending: "Pending",
-  confirmed: "Confirmed",
-  processing: "Processing",
-  shipped: "Shipped",
-  delivered: "Delivered",
-  cancelled: "Cancelled",
-};
-
-const paymentStatusLabel: Record<Order["paymentStatus"], string> = {
-  pending: "Pending",
-  paid: "Paid",
-  failed: "Failed",
-  refunded: "Refunded",
-};
 
 export function OrderConfirmation({
   order,

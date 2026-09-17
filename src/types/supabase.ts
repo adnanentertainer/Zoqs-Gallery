@@ -458,6 +458,13 @@ export interface Database {
         };
         Returns: unknown;
       };
+      get_order_for_tracking: {
+        Args: {
+          p_order_number: string;
+          p_contact: string;
+        };
+        Returns: unknown;
+      };
       record_stock_movement: {
         Args: {
           p_product_id: string | null;

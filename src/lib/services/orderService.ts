@@ -153,3 +153,34 @@ export async function getGuestOrderByOrderNumber(
   };
   return mapOrderRow(result.order, result.items);
 }
+
+/**
+ * Public order-tracking lookup: requires the order number AND either the
+ * email or phone number on the order, both verified server-side inside the
+ * get_order_for_tracking() RPC (never trust a client-side match). Works for
+ * guest and logged-in orders alike, unlike getGuestOrderByOrderNumber()
+ * above, which only ever matches a guest_token.
+ */
+export async function getOrderForTracking(
+  orderNumber: string,
+  contact: string,
+): Promise<Order | null> {
+  const supabase = await getSupabaseServerClient();
+
+  const { data, error } = await supabase.rpc("get_order_for_tracking", {
+    p_order_number: orderNumber,
+    p_contact: contact,
+  });
+
+  if (error) {
+    console.error("[orderService.getOrderForTracking] RPC failed:", error);
+    throw new Error("Unable to look up this order right now.");
+  }
+  if (!data) return null;
+
+  const result = data as unknown as {
+    order: Parameters<typeof mapOrderRow>[0];
+    items: Parameters<typeof mapOrderRow>[1];
+  };
+  return mapOrderRow(result.order, result.items);
+}

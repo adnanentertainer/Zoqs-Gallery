@@ -23,7 +23,7 @@ export const footerColumns: FooterColumn[] = [
       { label: "Contact Us", href: "/contact" },
       { label: "Delivery Information", href: "#delivery-information" },
       { label: "Returns & Exchanges", href: "#returns-exchanges" },
-      { label: "Track Order", href: "#track-order" },
+      { label: "Track Order", href: "/track-order" },
       { label: "FAQs", href: "/faqs" },
     ],
   },
