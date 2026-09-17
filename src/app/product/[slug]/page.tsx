@@ -190,7 +190,7 @@ export default async function ProductPage({
             )}
 
             {product.shortDescription && (
-              <Text variant="body" className="text-muted">
+              <Text variant="body" className="whitespace-pre-line text-muted">
                 {product.shortDescription}
               </Text>
             )}

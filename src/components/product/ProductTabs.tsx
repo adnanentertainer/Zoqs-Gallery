@@ -28,7 +28,7 @@ export function ProductTabs({ product }: ProductTabsProps) {
 
   const panels: Record<TabId, ReactNode> = {
     description: (
-      <Text variant="body" className="text-muted">
+      <Text variant="body" className="whitespace-pre-line text-muted">
         {product.description}
       </Text>
     ),
