@@ -193,6 +193,28 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["reviews"]["Insert"]>;
         Relationships: [];
       };
+      social_posts: {
+        Row: {
+          id: string;
+          image_url: string;
+          alt: string;
+          href: string | null;
+          is_active: boolean;
+          display_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          image_url: string;
+          alt: string;
+          href?: string | null;
+          is_active?: boolean;
+          display_order?: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["social_posts"]["Insert"]>;
+        Relationships: [];
+      };
       site_settings: {
         Row: {
           id: string;

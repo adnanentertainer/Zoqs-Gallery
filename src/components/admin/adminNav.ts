@@ -10,6 +10,7 @@ import {
   ClipboardList,
   FileBarChart,
   Star,
+  Images,
   type LucideIcon,
 } from "lucide-react";
 
@@ -29,6 +30,7 @@ export const adminNavItems: AdminNavItem[] = [
   { label: "Reports", href: "/admin/reports", icon: FileBarChart },
   { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
   { label: "Reviews", href: "/admin/reviews", icon: Star },
+  { label: "Follow Our Style", href: "/admin/social-posts", icon: Images },
   { label: "Customers", href: "/admin/customers", icon: Users },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];

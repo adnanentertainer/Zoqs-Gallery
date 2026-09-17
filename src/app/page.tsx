@@ -10,6 +10,7 @@ import { NewsletterSection } from "@/components/home/NewsletterSection";
 import { SocialGallery } from "@/components/home/SocialGallery";
 import { getCategories } from "@/lib/services/categoryService";
 import { getBestSellers, getNewArrivals } from "@/lib/services/productService";
+import { getSocialPosts } from "@/lib/services/socialPostService";
 import { promoBannerImage } from "@/constants/images";
 
 export const metadata: Metadata = {
@@ -22,11 +23,13 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const [categories, newArrivals, bestSellers] = await Promise.all([
-    getCategories(),
-    getNewArrivals(),
-    getBestSellers(),
-  ]);
+  const [categories, newArrivals, bestSellers, socialPosts] =
+    await Promise.all([
+      getCategories(),
+      getNewArrivals(),
+      getBestSellers(),
+      getSocialPosts(),
+    ]);
 
   return (
     <>
@@ -60,7 +63,7 @@ export default async function Home() {
       <BenefitsSection />
       <ReviewsSection />
       <NewsletterSection />
-      <SocialGallery />
+      <SocialGallery posts={socialPosts} />
     </>
   );
 }

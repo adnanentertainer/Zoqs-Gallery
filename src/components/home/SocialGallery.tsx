@@ -1,16 +1,22 @@
 import Image from "next/image";
 import { InstagramIcon } from "@/components/icons/social-icons";
 import { Section } from "@/components/ui/Section";
-import { socialPosts } from "@/data/social";
+import type { SocialPost } from "@/types";
 
-export function SocialGallery() {
+interface SocialGalleryProps {
+  posts: SocialPost[];
+}
+
+export function SocialGallery({ posts }: SocialGalleryProps) {
+  if (posts.length === 0) return null;
+
   return (
     <Section
       title="Follow Our Style"
       subtitle="Follow ZOQ's Gallery for daily inspiration and new arrivals."
     >
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6">
-        {socialPosts.map((post) => (
+        {posts.map((post) => (
           <a
             key={post.id}
             href={post.href}

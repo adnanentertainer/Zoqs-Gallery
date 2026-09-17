@@ -402,6 +402,27 @@ export type ReportType =
   | "sales"
   | "inventory-value";
 
+// ============================================================================
+// Social posts ("Follow Our Style")
+// ============================================================================
+
+export interface AdminSocialPostListItem {
+  id: string;
+  imageUrl: string;
+  alt: string;
+  href: string | null;
+  isActive: boolean;
+  displayOrder: number;
+}
+
+export interface AdminSocialPostInput {
+  imageUrl: string;
+  alt: string;
+  href: string;
+  isActive: boolean;
+  displayOrder: number;
+}
+
 export interface AdminReviewListItem {
   id: string;
   productId: string;

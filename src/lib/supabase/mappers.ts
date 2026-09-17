@@ -1,3 +1,4 @@
+import { siteConfig } from "@/constants/site";
 import type {
   Category,
   Product,
@@ -7,6 +8,7 @@ import type {
   ProductVariantGroup,
   Profile,
   Review,
+  SocialPost,
 } from "@/types";
 import type { Order, OrderItem } from "@/types/order";
 import type { Database } from "@/types/supabase";
@@ -20,6 +22,7 @@ type ReviewRow = Database["public"]["Tables"]["reviews"]["Row"];
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 type OrderRow = Database["public"]["Tables"]["orders"]["Row"];
 type OrderItemRow = Database["public"]["Tables"]["order_items"]["Row"];
+type SocialPostRow = Database["public"]["Tables"]["social_posts"]["Row"];
 
 export function mapProfileRow(row: ProfileRow): Profile {
   return {
@@ -223,6 +226,15 @@ export function mapProductRow(
     dimensions: row.dimensions ?? undefined,
     careInstructions: row.care_instructions ?? undefined,
     variants: variantGroups.length > 0 ? variantGroups : undefined,
+  };
+}
+
+export function mapSocialPostRow(row: SocialPostRow): SocialPost {
+  return {
+    id: row.id,
+    image: row.image_url,
+    alt: row.alt,
+    href: row.href || siteConfig.socialLinks.instagram,
   };
 }
 
