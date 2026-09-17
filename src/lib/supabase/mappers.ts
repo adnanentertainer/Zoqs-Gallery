@@ -58,6 +58,14 @@ const COLOR_SWATCHES: Partial<Record<ProductColor, string>> = {
   Black: "#1F1F1F",
 };
 
+// Common variant-option spellings admins type in that aren't valid
+// `ProductColor` values (so they can't live in COLOR_SWATCHES above) and
+// aren't close enough to a CSS3 keyword for the fuzzy match below to catch
+// (e.g. "Golden" is 2 letters from "gold" and 3 from "goldenrod").
+const COLOR_ALIASES: Record<string, string> = {
+  golden: "#B08D57",
+};
+
 // Standard CSS3 named colors. Any color variant typed in by the admin that
 // isn't one of the curated brand names above (e.g. "Maroon", "Pink") still
 // gets a real swatch as long as it's a recognized color word or hex code,
@@ -140,6 +148,9 @@ function resolveColorSwatch(value: string): string | undefined {
   const curated = COLOR_SWATCHES[value.trim() as ProductColor];
   if (curated) return curated;
 
+  const aliased = COLOR_ALIASES[normalized];
+  if (aliased) return aliased;
+
   const trimmed = value.trim();
   if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(trimmed)) return trimmed;
 
@@ -209,6 +220,7 @@ export function mapProductRow(
     name: row.name,
     categorySlug,
     description: row.description,
+    shortDescription: row.short_description ?? undefined,
     price: row.price,
     originalPrice: row.original_price ?? undefined,
     rating: aggregate.rating,

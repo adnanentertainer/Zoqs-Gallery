@@ -187,9 +187,11 @@ export default async function ProductPage({
               </span>
             )}
 
-            <Text variant="body" className="text-muted">
-              {product.description}
-            </Text>
+            {product.shortDescription && (
+              <Text variant="body" className="text-muted">
+                {product.shortDescription}
+              </Text>
+            )}
 
             <ProductActions product={product} />
           </div>

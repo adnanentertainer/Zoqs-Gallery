@@ -45,6 +45,7 @@ export interface Product {
   name: string;
   categorySlug: string;
   description: string;
+  shortDescription?: string;
   price: number;
   originalPrice?: number;
   rating: number;
