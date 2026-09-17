@@ -11,6 +11,7 @@ import {
   ProductPrice,
   ProductReviews,
   ProductTabs,
+  ProductWhatsAppButton,
   RecentlyViewedSection,
   RecentlyViewedTracker,
   ReviewForm,
@@ -123,6 +124,7 @@ export default async function ProductPage({
         dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
       <RecentlyViewedTracker slug={product.slug} />
+      <ProductWhatsAppButton product={product} />
 
       <Container className="flex flex-col gap-3 pt-6 pb-4">
         <Breadcrumb

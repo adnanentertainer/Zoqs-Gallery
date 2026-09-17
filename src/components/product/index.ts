@@ -10,6 +10,7 @@ export { ProductPrice } from "@/components/product/ProductPrice";
 export { VariantSelector } from "@/components/product/VariantSelector";
 export { QuantitySelector } from "@/components/product/QuantitySelector";
 export { ProductActions } from "@/components/product/ProductActions";
+export { ProductWhatsAppButton } from "@/components/product/ProductWhatsAppButton";
 export { DeliveryInfo } from "@/components/product/DeliveryInfo";
 export { ProductSpecifications } from "@/components/product/ProductSpecifications";
 export { CareInstructions } from "@/components/product/CareInstructions";
