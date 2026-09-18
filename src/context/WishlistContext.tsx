@@ -4,11 +4,12 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { getCachedProduct } from "@/lib/productCache";
+import { ensureProductsCached, getCachedProduct } from "@/lib/productCache";
 import { createLocalStorageStore } from "@/lib/localStorageStore";
 import { useToast } from "@/context/ToastContext";
 
@@ -54,6 +55,24 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     wishlistStore.getServerSnapshot,
   );
   const { showToast } = useToast();
+
+  // The header badge shows items.length, so a wishlisted product that's
+  // since been deleted or deactivated would otherwise count forever without
+  // ever appearing on /wishlist. Confirm each slug still resolves to a real
+  // product and drop the ones that don't.
+  useEffect(() => {
+    let cancelled = false;
+    ensureProductsCached(items).then((missingSlugs) => {
+      if (cancelled || missingSlugs.length === 0) return;
+      const current = wishlistStore.getSnapshot();
+      wishlistStore.set(
+        current.filter((slug) => !missingSlugs.includes(slug)),
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [items]);
 
   const isWishlisted = useCallback(
     (productSlug: string) => items.includes(productSlug),

@@ -41,22 +41,29 @@ export function subscribeToProductCache(listener: Listener): () => void {
   return () => listeners.delete(listener);
 }
 
-export async function ensureProductsCached(slugs: string[]): Promise<void> {
+// Returns the subset of `slugs` that are confirmed gone (the lookup ran and
+// found no matching active product) — as opposed to merely not-yet-fetched.
+// Callers (e.g. WishlistContext) use this to prune dead references instead
+// of leaving them stuck in storage forever.
+export async function ensureProductsCached(slugs: string[]): Promise<string[]> {
   const missing = [...new Set(slugs)].filter(
     (slug) => !cache.has(slug) && !pendingFetches.has(slug),
   );
-  if (missing.length === 0) return;
+  if (missing.length === 0) return [];
 
   missing.forEach((slug) => pendingFetches.add(slug));
   try {
     const params = new URLSearchParams({ slugs: missing.join(",") });
     const response = await fetch(`/api/products/lookup?${params.toString()}`);
-    if (!response.ok) return;
+    if (!response.ok) return [];
     const products = (await response.json()) as Product[];
     registerProducts(products);
+    const foundSlugs = new Set(products.map((product) => product.slug));
+    return missing.filter((slug) => !foundSlugs.has(slug));
   } catch {
-    // Network error — the missing items just won't resolve until the next
-    // attempt (e.g. re-opening the cart); not worth surfacing as a hard error.
+    // Network error — treat as unresolved rather than confirmed-missing, so
+    // a dropped connection doesn't get an item wrongly pruned.
+    return [];
   } finally {
     missing.forEach((slug) => pendingFetches.delete(slug));
   }
