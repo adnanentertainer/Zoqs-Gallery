@@ -4,14 +4,19 @@ import { Container } from "@/components/ui/Container";
 import { Heading, Text } from "@/components/ui/Typography";
 import { ProductCard, EmptyState } from "@/components/product";
 import { getBestSellers } from "@/lib/services/productService";
+import { buildOpenGraph } from "@/lib/utils";
+
+const title = "Best Sellers | ZOQ's Gallery";
+const description =
+  "Loved and worn again and again by ZOQ's Gallery customers -- shop our best-selling artificial jewellery.";
 
 export const metadata: Metadata = {
-  title: "Best Sellers | ZOQ's Gallery",
-  description:
-    "Loved and worn again and again by ZOQ's Gallery customers -- shop our best-selling artificial jewellery.",
+  title,
+  description,
   alternates: {
     canonical: "/best-sellers",
   },
+  openGraph: buildOpenGraph({ path: "/best-sellers", title, description }),
 };
 
 export default async function BestSellersPage() {

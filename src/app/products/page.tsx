@@ -4,14 +4,19 @@ import { Container } from "@/components/ui/Container";
 import { Heading, Text } from "@/components/ui/Typography";
 import { CategoryCard } from "@/components/home/CategoryCard";
 import { getCategories } from "@/lib/services/categoryService";
+import { buildOpenGraph } from "@/lib/utils";
+
+const title = "Products | ZOQ's Gallery";
+const description =
+  "Browse our jewellery by category -- earrings, necklaces, bracelets, rings, and more.";
 
 export const metadata: Metadata = {
-  title: "Products | ZOQ's Gallery",
-  description:
-    "Browse our jewellery by category -- earrings, necklaces, bracelets, rings, and more.",
+  title,
+  description,
   alternates: {
     canonical: "/products",
   },
+  openGraph: buildOpenGraph({ path: "/products", title, description }),
 };
 
 export default async function ProductsPage() {

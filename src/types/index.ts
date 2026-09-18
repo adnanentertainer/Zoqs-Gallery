@@ -63,6 +63,7 @@ export interface Product {
   dimensions?: string;
   careInstructions?: string[];
   variants?: ProductVariantGroup[];
+  updatedAt?: string;
 }
 
 export interface Category {
@@ -72,6 +73,7 @@ export interface Category {
   image: string;
   productCount: number;
   description: string;
+  updatedAt?: string;
 }
 
 export interface Review {

@@ -6,11 +6,16 @@ import { Heading, Text } from "@/components/ui/Typography";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { InstagramIcon, FacebookIcon } from "@/components/icons/social-icons";
 import { siteConfig } from "@/constants/site";
+import { buildOpenGraph } from "@/lib/utils";
+
+const title = "Contact Us | ZOQ's Gallery";
+const description =
+  "Get in touch with ZOQ's Gallery over WhatsApp, Instagram, or Facebook.";
 
 export const metadata: Metadata = {
-  title: "Contact Us | ZOQ's Gallery",
-  description:
-    "Get in touch with ZOQ's Gallery over WhatsApp, Instagram, or Facebook.",
+  title,
+  description,
+  openGraph: buildOpenGraph({ path: "/contact", title, description }),
 };
 
 const contactChannels = [

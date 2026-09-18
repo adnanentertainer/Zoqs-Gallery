@@ -4,12 +4,16 @@ import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { Container } from "@/components/ui/Container";
 import { Heading, Text } from "@/components/ui/Typography";
 import { siteConfig } from "@/constants/site";
-import { safeJsonLd } from "@/lib/utils";
+import { buildOpenGraph, safeJsonLd } from "@/lib/utils";
+
+const title = "FAQs | ZOQ's Gallery";
+const description =
+  "Answers to common questions about ordering, payment, shipping, and returns at ZOQ's Gallery.";
 
 export const metadata: Metadata = {
-  title: "FAQs | ZOQ's Gallery",
-  description:
-    "Answers to common questions about ordering, payment, shipping, and returns at ZOQ's Gallery.",
+  title,
+  description,
+  openGraph: buildOpenGraph({ path: "/faqs", title, description }),
 };
 
 interface Faq {

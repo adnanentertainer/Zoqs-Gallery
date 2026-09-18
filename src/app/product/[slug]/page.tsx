@@ -28,7 +28,7 @@ import {
 } from "@/lib/services/productService";
 import { getProductReviews } from "@/lib/services/reviewService";
 import { getAverageRating, getReviewBreakdown } from "@/lib/reviews";
-import { categoryLabel, safeJsonLd } from "@/lib/utils";
+import { buildMetaDescription, categoryLabel, safeJsonLd } from "@/lib/utils";
 import type { ProductBadge as ProductBadgeType } from "@/types";
 
 const badgeVariant: Record<
@@ -57,16 +57,36 @@ export async function generateMetadata({
     return { title: "Product Not Found | ZOQ's Gallery" };
   }
 
+  const title = `${product.name} | ZOQ's Gallery`;
+  const description = buildMetaDescription(
+    product.shortDescription?.trim() || product.description,
+  );
+  const canonicalPath = `/product/${product.slug}`;
+  const images = product.images[0] ? [{ url: product.images[0] }] : undefined;
+
   return {
-    title: `${product.name} | ZOQ's Gallery`,
-    description: `Shop ${product.name} from ZOQ's Gallery. Elegant artificial jewellery designed for everyday style and special occasions.`,
+    title,
+    description,
     alternates: {
-      canonical: `/product/${product.slug}`,
+      canonical: canonicalPath,
     },
+    // openGraph/twitter here fully replace (not merge with) the root
+    // layout's defaults, so every field that should differ per product —
+    // including type/siteName/url, which the root layout also sets — has
+    // to be repeated, or it silently disappears from the rendered tags.
     openGraph: {
-      title: `${product.name} | ZOQ's Gallery`,
-      description: product.description,
-      images: product.images[0] ? [{ url: product.images[0] }] : undefined,
+      type: "website",
+      siteName: siteConfig.name,
+      url: canonicalPath,
+      title,
+      description,
+      images,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: images?.map((image) => image.url),
     },
   };
 }
@@ -91,6 +111,16 @@ export default async function ProductPage({
   const relatedProducts = await getRelatedProducts(product, 4);
   const inStock = isInStock(product);
 
+  // Google won't consider a Product eligible for price/availability rich
+  // results without priceValidUntil, hasMerchantReturnPolicy, and
+  // shippingDetails on the Offer. Keep the return-policy numbers here in
+  // sync with /returns-and-refunds and the FAQs "Returns & Exchanges"
+  // section — this doesn't read from those pages, it just restates them
+  // for Google.
+  const oneYearFromNow = new Date();
+  oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+  const priceValidUntil = oneYearFromNow.toISOString().slice(0, 10);
+
   const jsonLd = {
     "@context": "https://schema.org/",
     "@type": "Product",
@@ -103,9 +133,49 @@ export default async function ProductPage({
       "@type": "Offer",
       priceCurrency: siteConfig.currency,
       price: product.price,
+      priceValidUntil,
       availability: inStock
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "PK",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 7,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/ReturnShippingFees",
+      },
+      shippingDetails: [
+        {
+          "@type": "OfferShippingDetails",
+          shippingRate: {
+            "@type": "MonetaryAmount",
+            value: siteConfig.flatShippingCost,
+            currency: siteConfig.currency,
+          },
+          shippingDestination: {
+            "@type": "DefinedRegion",
+            addressCountry: "PK",
+          },
+        },
+        {
+          "@type": "OfferShippingDetails",
+          shippingRate: {
+            "@type": "MonetaryAmount",
+            value: 0,
+            currency: siteConfig.currency,
+          },
+          shippingDestination: {
+            "@type": "DefinedRegion",
+            addressCountry: "PK",
+          },
+          eligibleTransactionVolume: {
+            "@type": "PriceSpecification",
+            minPrice: siteConfig.freeShippingThreshold,
+            priceCurrency: siteConfig.currency,
+          },
+        },
+      ],
     },
     aggregateRating:
       reviewsCount > 0

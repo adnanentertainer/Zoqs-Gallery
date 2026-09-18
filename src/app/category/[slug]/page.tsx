@@ -19,6 +19,7 @@ import {
   parseSortKey,
   sortProducts,
 } from "@/lib/products";
+import { buildOpenGraph } from "@/lib/utils";
 
 function toSearchParams(
   raw: Record<string, string | string[] | undefined>,
@@ -42,12 +43,17 @@ export async function generateMetadata({
     return { title: "Category Not Found | ZOQ's Gallery" };
   }
 
+  const title = `${category.name} | ZOQ's Gallery`;
+  const description = category.description;
+  const path = `/category/${category.slug}`;
+
   return {
-    title: `${category.name} | ZOQ's Gallery`,
-    description: category.description,
+    title,
+    description,
     alternates: {
-      canonical: `/category/${category.slug}`,
+      canonical: path,
     },
+    openGraph: buildOpenGraph({ path, title, description }),
   };
 }
 

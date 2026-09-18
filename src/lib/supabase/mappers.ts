@@ -44,6 +44,7 @@ export function mapCategoryRow(row: CategoryRow): Category {
     image: row.image_url ?? "",
     productCount: row.product_count,
     description: row.description ?? "",
+    updatedAt: row.updated_at,
   };
 }
 
@@ -238,6 +239,7 @@ export function mapProductRow(
     dimensions: row.dimensions ?? undefined,
     careInstructions: row.care_instructions ?? undefined,
     variants: variantGroups.length > 0 ? variantGroups : undefined,
+    updatedAt: row.updated_at,
   };
 }
 

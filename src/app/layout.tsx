@@ -28,6 +28,20 @@ const organizationJsonLd = {
   ],
 };
 
+// Lets Google show a sitelinks search box directly in search results,
+// submitting to the real /search?q= route the app already serves.
+const websiteJsonLd = {
+  "@context": "https://schema.org/",
+  "@type": "WebSite",
+  name: siteConfig.name,
+  url: baseUrl,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${baseUrl}/search?q={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
+};
+
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
@@ -51,6 +65,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: siteConfig.name,
+    url: "/",
     title: siteConfig.name,
     description: siteConfig.description,
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
@@ -89,6 +104,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: safeJsonLd(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(websiteJsonLd) }}
         />
         <ToastProvider>
           <AuthProvider initialUser={initialUser}>

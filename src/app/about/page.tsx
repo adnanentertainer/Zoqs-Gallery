@@ -10,11 +10,16 @@ import { Heading, Text } from "@/components/ui/Typography";
 import { buttonVariants } from "@/components/ui/Button";
 import { galleryImages } from "@/constants/images";
 import { siteConfig } from "@/constants/site";
+import { buildOpenGraph } from "@/lib/utils";
+
+const title = "About Us | ZOQ's Gallery";
+const description =
+  "ZOQ's Gallery brings premium artificial jewellery and fashion accessories to women across Pakistan, at prices that make elegance an everyday thing.";
 
 export const metadata: Metadata = {
-  title: "About Us | ZOQ's Gallery",
-  description:
-    "ZOQ's Gallery brings premium artificial jewellery and fashion accessories to women across Pakistan, at prices that make elegance an everyday thing.",
+  title,
+  description,
+  openGraph: buildOpenGraph({ path: "/about", title, description }),
 };
 
 interface Pillar {

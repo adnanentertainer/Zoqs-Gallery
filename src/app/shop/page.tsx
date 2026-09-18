@@ -16,17 +16,22 @@ import {
   parseSortKey,
   sortProducts,
 } from "@/lib/products";
+import { buildOpenGraph } from "@/lib/utils";
+
+const title = "Shop All Jewellery | ZOQ's Gallery";
+const description =
+  "Discover elegant artificial jewellery and fashion accessories designed for every occasion.";
 
 export const metadata: Metadata = {
-  title: "Shop All Jewellery | ZOQ's Gallery",
-  description:
-    "Discover elegant artificial jewellery and fashion accessories designed for every occasion.",
+  title,
+  description,
   alternates: {
     // Every ?special=/?category=/?sort= filter combination renders this
     // same route — without this, each becomes a separate indexable "page"
     // in Google's eyes with near-identical content.
     canonical: "/shop",
   },
+  openGraph: buildOpenGraph({ path: "/shop", title, description }),
 };
 
 function toSearchParams(
