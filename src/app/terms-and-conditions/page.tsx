@@ -90,13 +90,13 @@ export default function TermsAndConditionsPage() {
           <Text variant="body" className="text-muted">
             See our{" "}
             <Link
-              href="/faqs"
+              href="/returns-and-refunds"
               className="text-primary underline underline-offset-2 hover:text-gold"
             >
-              FAQs
+              Returns &amp; Refunds
             </Link>{" "}
-            page for our current returns and exchange policy. To start a
-            return, message us on WhatsApp with your order number.
+            page for our current returns, exchange, and refund policy. To
+            start a return, message us on WhatsApp with your order number.
           </Text>
         </Section>
 
