@@ -8,6 +8,7 @@ import {
   saveSocialMediaSettings,
   retryProductSocialPost,
   getFacebookAccessTokenForServerUse,
+  syncProductFeed,
 } from "@/lib/services/admin/socialPostingService";
 import type { SocialMediaSettingsInput } from "@/types/socialMedia";
 
@@ -98,6 +99,16 @@ export async function testInstagramConnectionAction(): Promise<{
         "Could not connect to this Instagram account — check the Business Account ID and access token.",
     };
   }
+}
+
+export async function syncProductFeedAction(): Promise<{
+  success?: string;
+  error?: string;
+}> {
+  await requireAdmin();
+  const result = await syncProductFeed();
+  if (result.error) return result;
+  return { success: "Feed sync requested." };
 }
 
 export async function retrySocialPostAction(

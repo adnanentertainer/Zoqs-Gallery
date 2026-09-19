@@ -4,6 +4,10 @@ import { publishFacebookPhotoPost } from "@/lib/meta/facebookPublisher";
 import { publishInstagramPost } from "@/lib/meta/instagramPublisher";
 import { getPageAccessToken } from "@/lib/meta/graphClient";
 import {
+  findCatalogProductId,
+  triggerCatalogFeedSync,
+} from "@/lib/meta/catalogClient";
+import {
   buildFacebookCaption,
   buildInstagramCaption,
 } from "@/lib/meta/captionBuilder";
@@ -27,6 +31,7 @@ interface PlatformResult {
 
 interface ProductRow {
   id: string;
+  sku: string | null;
   name: string;
   slug: string;
   short_description: string | null;
@@ -40,6 +45,7 @@ async function runFacebook(
   settings: { facebook_page_id: string | null; facebook_access_token: string | null },
   imageUrl: string,
   caption: string,
+  productId: string | undefined,
 ): Promise<PlatformResult> {
   if (!settings.facebook_page_id || !settings.facebook_access_token) {
     return { status: "skipped" };
@@ -54,6 +60,7 @@ async function runFacebook(
       accessToken: pageAccessToken,
       imageUrl,
       caption,
+      productId,
     });
     return { status: "success", id: postId };
   } catch (error) {
@@ -72,6 +79,7 @@ async function runInstagram(
   },
   imageUrl: string,
   caption: string,
+  productId: string | undefined,
 ): Promise<PlatformResult> {
   if (!settings.instagram_business_account_id || !settings.facebook_access_token) {
     return { status: "skipped" };
@@ -82,6 +90,7 @@ async function runInstagram(
       accessToken: settings.facebook_access_token,
       imageUrl,
       caption,
+      productId,
     });
     return { status: "success", id: mediaId };
   } catch (error) {
@@ -144,7 +153,7 @@ export async function publishProductToSocialMedia(
     const { data: product } = await supabase
       .from("products")
       .select(
-        "id, name, slug, short_description, price, categories(name), product_images(image_url, display_order), product_variants(option_type, option_value, is_active)",
+        "id, sku, name, slug, short_description, price, categories(name), product_images(image_url, display_order), product_variants(option_type, option_value, is_active)",
       )
       .eq("id", productId)
       .maybeSingle();
@@ -176,12 +185,42 @@ export async function publishProductToSocialMedia(
       colorOptions,
     };
 
+    // Best-effort catalog lookup, shared by both platforms since they use
+    // the same catalog. Meta only re-fetches the product feed on its own
+    // schedule, so a just-created product may not be in the catalog yet --
+    // that's a normal "not tagged this time" outcome, not a failure, and
+    // "Post Again" will naturally pick up the tag once it syncs.
+    let catalogProductId: string | undefined;
+    if (
+      settings.product_tagging_enabled &&
+      settings.facebook_catalog_id &&
+      settings.facebook_access_token &&
+      typedProduct.sku
+    ) {
+      catalogProductId =
+        (await findCatalogProductId(
+          settings.facebook_catalog_id,
+          typedProduct.sku,
+          settings.facebook_access_token,
+        )) ?? undefined;
+    }
+
     const [facebookResult, instagramResult] = await Promise.all([
       settings.facebook_enabled
-        ? runFacebook(settings, image.image_url, buildFacebookCaption(captionInput))
+        ? runFacebook(
+            settings,
+            image.image_url,
+            buildFacebookCaption(captionInput),
+            catalogProductId,
+          )
         : Promise.resolve<PlatformResult>({ status: "skipped" }),
       settings.instagram_enabled
-        ? runInstagram(settings, image.image_url, buildInstagramCaption(captionInput))
+        ? runInstagram(
+            settings,
+            image.image_url,
+            buildInstagramCaption(captionInput),
+            catalogProductId,
+          )
         : Promise.resolve<PlatformResult>({ status: "skipped" }),
     ]);
 
@@ -246,6 +285,9 @@ export async function getSocialMediaSettings(): Promise<SocialMediaSettings> {
     autoPostEnabled: data?.auto_post_enabled ?? false,
     facebookConnectedAt: data?.facebook_connected_at ?? null,
     instagramConnectedAt: data?.instagram_connected_at ?? null,
+    facebookCatalogId: data?.facebook_catalog_id ?? "",
+    facebookProductFeedId: data?.facebook_product_feed_id ?? "",
+    productTaggingEnabled: data?.product_tagging_enabled ?? false,
   };
 }
 
@@ -298,6 +340,9 @@ export async function saveSocialMediaSettings(
     instagram_connected_at: igAccountId
       ? (existing?.instagram_connected_at ?? new Date().toISOString())
       : null,
+    facebook_catalog_id: input.facebookCatalogId.trim() || null,
+    facebook_product_feed_id: input.facebookProductFeedId.trim() || null,
+    product_tagging_enabled: input.productTaggingEnabled,
   };
 
   const { error } = existing
@@ -312,6 +357,26 @@ export async function saveSocialMediaSettings(
     return { error: "Unable to save social media settings right now." };
   }
   return {};
+}
+
+export async function syncProductFeed(): Promise<{ error?: string }> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+  const { data } = await supabase
+    .from("social_media_settings")
+    .select("facebook_product_feed_id, facebook_access_token")
+    .limit(1)
+    .maybeSingle();
+
+  if (!data?.facebook_product_feed_id || !data.facebook_access_token) {
+    return { error: "Save a Product Feed ID and access token first." };
+  }
+
+  return triggerCatalogFeedSync(
+    data.facebook_product_feed_id,
+    `${baseUrl}/product-feed.xml`,
+    data.facebook_access_token,
+  );
 }
 
 interface ProductSocialPostRow {

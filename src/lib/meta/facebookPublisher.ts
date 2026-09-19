@@ -5,6 +5,8 @@ interface PublishFacebookPhotoPostInput {
   accessToken: string;
   imageUrl: string;
   caption: string;
+  /** Meta catalog product id (not the SKU) -- tags the post so it shows a tappable "Shop now" product tag. */
+  productId?: string;
 }
 
 interface FacebookIdResponse {
@@ -24,6 +26,7 @@ export async function publishFacebookPhotoPost({
   accessToken,
   imageUrl,
   caption,
+  productId,
 }: PublishFacebookPhotoPostInput): Promise<{ postId: string }> {
   const photo = await graphApiPost<FacebookIdResponse>(
     `${pageId}/photos`,
@@ -35,10 +38,21 @@ export async function publishFacebookPhotoPost({
   // keys (attached_media[0], attached_media[1], ...) each holding a JSON
   // object -- a single "attached_media" key holding a JSON array is
   // silently ignored, producing a text-only post with no photo attached.
-  const post = await graphApiPost<FacebookIdResponse>(`${pageId}/feed`, accessToken, {
+  // product_tags uses the same indexed-key style, by analogy -- verify
+  // live the same way attached_media's format had to be corrected.
+  const body: Record<string, string> = {
     message: caption,
     "attached_media[0]": JSON.stringify({ media_fbid: photo.id }),
-  });
+  };
+  if (productId) {
+    body["product_tags[0]"] = JSON.stringify({ product_id: productId });
+  }
+
+  const post = await graphApiPost<FacebookIdResponse>(
+    `${pageId}/feed`,
+    accessToken,
+    body,
+  );
 
   return { postId: post.id };
 }

@@ -226,6 +226,9 @@ export interface Database {
           auto_post_enabled: boolean;
           facebook_connected_at: string | null;
           instagram_connected_at: string | null;
+          facebook_catalog_id: string | null;
+          facebook_product_feed_id: string | null;
+          product_tagging_enabled: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -239,6 +242,9 @@ export interface Database {
           auto_post_enabled?: boolean;
           facebook_connected_at?: string | null;
           instagram_connected_at?: string | null;
+          facebook_catalog_id?: string | null;
+          facebook_product_feed_id?: string | null;
+          product_tagging_enabled?: boolean;
         };
         Update: Partial<
           Database["public"]["Tables"]["social_media_settings"]["Insert"]

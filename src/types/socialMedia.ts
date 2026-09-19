@@ -11,6 +11,9 @@ export interface SocialMediaSettings {
   autoPostEnabled: boolean;
   facebookConnectedAt: string | null;
   instagramConnectedAt: string | null;
+  facebookCatalogId: string;
+  facebookProductFeedId: string;
+  productTaggingEnabled: boolean;
 }
 
 export interface SocialMediaSettingsInput {
@@ -21,6 +24,9 @@ export interface SocialMediaSettingsInput {
   instagramBusinessAccountId: string;
   instagramEnabled: boolean;
   autoPostEnabled: boolean;
+  facebookCatalogId: string;
+  facebookProductFeedId: string;
+  productTaggingEnabled: boolean;
 }
 
 export interface ProductSocialPostRecord {

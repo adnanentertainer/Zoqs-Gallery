@@ -5,6 +5,8 @@ interface PublishInstagramPostInput {
   accessToken: string;
   imageUrl: string;
   caption: string;
+  /** Meta catalog product id (not the SKU) -- tags the media so it's shoppable. */
+  productId?: string;
 }
 
 interface MediaContainerResponse {
@@ -35,11 +37,23 @@ export async function publishInstagramPost({
   accessToken,
   imageUrl,
   caption,
+  productId,
 }: PublishInstagramPostInput): Promise<{ mediaId: string }> {
+  const mediaBody: Record<string, string> = { image_url: imageUrl, caption };
+  if (productId) {
+    // Instagram's documented format for /media is a single JSON-array
+    // param (unlike Facebook's /feed, which needed indexed keys for the
+    // analogous attached_media param) -- worth a live check given that
+    // mismatch already happened once on the Facebook side this session.
+    mediaBody.product_tags = JSON.stringify([
+      { product_id: productId, x: 0.5, y: 0.5 },
+    ]);
+  }
+
   const container = await graphApiPost<MediaContainerResponse>(
     `${igUserId}/media`,
     accessToken,
-    { image_url: imageUrl, caption },
+    mediaBody,
   );
   const creationId = container.id;
 
