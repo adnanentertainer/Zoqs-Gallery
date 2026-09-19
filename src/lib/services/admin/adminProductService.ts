@@ -1,5 +1,6 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
+import { publishProductToSocialMedia } from "@/lib/services/admin/socialPostingService";
 import type {
   AdminProductDetail,
   AdminProductFilters,
@@ -335,6 +336,18 @@ export async function createProduct(
         "Product created, but its images or variants couldn't be saved. Edit the product to try again.",
     };
   }
+
+  if (input.isActive) {
+    try {
+      await publishProductToSocialMedia(product.id);
+    } catch (socialError) {
+      console.error(
+        "[adminProductService.createProduct] social media posting failed:",
+        socialError,
+      );
+    }
+  }
+
   return { id: product.id };
 }
 
@@ -400,6 +413,18 @@ export async function updateProduct(
         "Product details were saved, but its images or variants couldn't be updated. Please try again.",
     };
   }
+
+  if (input.isActive) {
+    try {
+      await publishProductToSocialMedia(id);
+    } catch (socialError) {
+      console.error(
+        "[adminProductService.updateProduct] social media posting failed:",
+        socialError,
+      );
+    }
+  }
+
   return {};
 }
 
@@ -474,6 +499,18 @@ export async function setProductActive(
     console.error("[adminProductService.setProductActive] failed:", error);
     return { error: "Unable to update this product right now." };
   }
+
+  if (isActive) {
+    try {
+      await publishProductToSocialMedia(id);
+    } catch (socialError) {
+      console.error(
+        "[adminProductService.setProductActive] social media posting failed:",
+        socialError,
+      );
+    }
+  }
+
   return {};
 }
 

@@ -215,6 +215,68 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["social_posts"]["Insert"]>;
         Relationships: [];
       };
+      social_media_settings: {
+        Row: {
+          id: string;
+          facebook_page_id: string | null;
+          facebook_access_token: string | null;
+          facebook_enabled: boolean;
+          instagram_business_account_id: string | null;
+          instagram_enabled: boolean;
+          auto_post_enabled: boolean;
+          facebook_connected_at: string | null;
+          instagram_connected_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          facebook_page_id?: string | null;
+          facebook_access_token?: string | null;
+          facebook_enabled?: boolean;
+          instagram_business_account_id?: string | null;
+          instagram_enabled?: boolean;
+          auto_post_enabled?: boolean;
+          facebook_connected_at?: string | null;
+          instagram_connected_at?: string | null;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["social_media_settings"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      product_social_posts: {
+        Row: {
+          id: string;
+          product_id: string;
+          facebook_post_id: string | null;
+          instagram_media_id: string | null;
+          facebook_status: "pending" | "success" | "failed" | "skipped";
+          instagram_status: "pending" | "success" | "failed" | "skipped";
+          facebook_error: string | null;
+          instagram_error: string | null;
+          posted_at: string | null;
+          retry_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          product_id: string;
+          facebook_post_id?: string | null;
+          instagram_media_id?: string | null;
+          facebook_status?: "pending" | "success" | "failed" | "skipped";
+          instagram_status?: "pending" | "success" | "failed" | "skipped";
+          facebook_error?: string | null;
+          instagram_error?: string | null;
+          posted_at?: string | null;
+          retry_count?: number;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["product_social_posts"]["Insert"]
+        >;
+        Relationships: [];
+      };
       site_settings: {
         Row: {
           id: string;
