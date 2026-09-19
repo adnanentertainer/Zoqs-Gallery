@@ -116,10 +116,29 @@ export default async function ProductPage({
   // shippingDetails on the Offer. Keep the return-policy numbers here in
   // sync with /returns-and-refunds and the FAQs "Returns & Exchanges"
   // section — this doesn't read from those pages, it just restates them
-  // for Google.
+  // for Google. deliveryTime's handlingTime/transitTime are estimates
+  // (1-2 days to dispatch, 2-5 days in transit) since the site copy only
+  // promises "a few business days" without a fixed range.
   const oneYearFromNow = new Date();
   oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
   const priceValidUntil = oneYearFromNow.toISOString().slice(0, 10);
+  const validFrom = new Date().toISOString().slice(0, 10);
+
+  const deliveryTime = {
+    "@type": "ShippingDeliveryTime",
+    handlingTime: {
+      "@type": "QuantitativeValue",
+      minValue: 1,
+      maxValue: 2,
+      unitCode: "d",
+    },
+    transitTime: {
+      "@type": "QuantitativeValue",
+      minValue: 2,
+      maxValue: 5,
+      unitCode: "d",
+    },
+  };
 
   const jsonLd = {
     "@context": "https://schema.org/",
@@ -134,6 +153,7 @@ export default async function ProductPage({
       priceCurrency: siteConfig.currency,
       price: product.price,
       priceValidUntil,
+      validFrom,
       availability: inStock
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
@@ -144,6 +164,11 @@ export default async function ProductPage({
         merchantReturnDays: 7,
         returnMethod: "https://schema.org/ReturnByMail",
         returnFees: "https://schema.org/ReturnShippingFees",
+        returnShippingFeesAmount: {
+          "@type": "MonetaryAmount",
+          value: siteConfig.flatShippingCost,
+          currency: siteConfig.currency,
+        },
       },
       shippingDetails: [
         {
@@ -157,6 +182,7 @@ export default async function ProductPage({
             "@type": "DefinedRegion",
             addressCountry: "PK",
           },
+          deliveryTime,
         },
         {
           "@type": "OfferShippingDetails",
@@ -174,6 +200,7 @@ export default async function ProductPage({
             minPrice: siteConfig.freeShippingThreshold,
             priceCurrency: siteConfig.currency,
           },
+          deliveryTime,
         },
       ],
     },
