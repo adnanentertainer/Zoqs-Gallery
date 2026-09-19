@@ -1,6 +1,7 @@
 import { siteConfig } from "@/constants/site";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { DEFAULT_FESTIVAL_BANNER } from "@/types/festivalBanner";
 
 // Mirrors the site_settings rows seeded by scripts/seed.ts. Used as the mock
 // fallback so getSiteSetting() behaves identically whether or not Supabase is
@@ -16,6 +17,7 @@ const MOCK_SETTINGS: Record<string, unknown> = {
   currency: siteConfig.currency,
   country: siteConfig.country,
   social_links: siteConfig.socialLinks,
+  festival_banner: DEFAULT_FESTIVAL_BANNER,
 };
 
 export async function getSiteSetting<T = unknown>(

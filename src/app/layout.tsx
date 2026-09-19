@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { siteConfig } from "@/constants/site";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
+import { FestivalCountdownBanner } from "@/components/layout/FestivalCountdownBanner";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ToastProvider } from "@/context/ToastContext";
@@ -113,6 +114,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <AuthProvider initialUser={initialUser}>
             <WishlistProvider>
               <CartProvider>
+                <FestivalCountdownBanner />
                 <AnnouncementBar />
                 <Header />
                 <main className="flex flex-1 flex-col">{children}</main>
