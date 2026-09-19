@@ -56,3 +56,70 @@ export async function publishFacebookPhotoPost({
 
   return { postId: post.id };
 }
+
+interface PublishFacebookReelInput {
+  pageId: string;
+  accessToken: string;
+  videoUrl: string;
+  caption: string;
+  /** Meta catalog product id (not the SKU) -- tags the reel so it shows a tappable product tag. */
+  productId?: string;
+}
+
+interface FacebookReelStartResponse {
+  video_id: string;
+  upload_url: string;
+}
+
+/**
+ * Facebook Reels use a three-step "Reels Publishing API" flow, unlike the
+ * single-call photo upload above: start an upload session, hand Meta the
+ * already-hosted video via the file_url header (so this never has to
+ * stream the bytes itself), then finish/publish. video_state=PUBLISHED
+ * makes the finish call publish immediately rather than leave it as a draft.
+ * As with attached_media on the photo flow, the exact finish-call param
+ * shape (particularly product_tags) is what's documented, not yet verified
+ * against a live response -- check the same way the photo flow's format had
+ * to be corrected.
+ */
+export async function publishFacebookReel({
+  pageId,
+  accessToken,
+  videoUrl,
+  caption,
+  productId,
+}: PublishFacebookReelInput): Promise<{ videoId: string }> {
+  const start = await graphApiPost<FacebookReelStartResponse>(
+    `${pageId}/video_reels`,
+    accessToken,
+    { upload_phase: "start" },
+  );
+
+  const uploadResponse = await fetch(start.upload_url, {
+    method: "POST",
+    headers: {
+      Authorization: `OAuth ${accessToken}`,
+      file_url: videoUrl,
+    },
+  });
+  if (!uploadResponse.ok) {
+    const body = await uploadResponse.text();
+    throw new Error(
+      `Facebook Reel upload failed (${uploadResponse.status}): ${body}`,
+    );
+  }
+
+  const finishBody: Record<string, string> = {
+    upload_phase: "finish",
+    video_id: start.video_id,
+    video_state: "PUBLISHED",
+    description: caption,
+  };
+  if (productId) {
+    finishBody["product_tags[0]"] = JSON.stringify({ product_id: productId });
+  }
+
+  await graphApiPost(`${pageId}/video_reels`, accessToken, finishBody);
+
+  return { videoId: start.video_id };
+}

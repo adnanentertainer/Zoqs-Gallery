@@ -283,6 +283,40 @@ export interface Database {
         >;
         Relationships: [];
       };
+      product_reels: {
+        Row: {
+          id: string;
+          product_id: string;
+          video_url: string;
+          caption: string;
+          facebook_video_id: string | null;
+          instagram_media_id: string | null;
+          facebook_status: "pending" | "success" | "failed" | "skipped";
+          instagram_status: "pending" | "success" | "failed" | "skipped";
+          facebook_error: string | null;
+          instagram_error: string | null;
+          posted_at: string | null;
+          retry_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          product_id: string;
+          video_url: string;
+          caption: string;
+          facebook_video_id?: string | null;
+          instagram_media_id?: string | null;
+          facebook_status?: "pending" | "success" | "failed" | "skipped";
+          instagram_status?: "pending" | "success" | "failed" | "skipped";
+          facebook_error?: string | null;
+          instagram_error?: string | null;
+          posted_at?: string | null;
+          retry_count?: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["product_reels"]["Insert"]>;
+        Relationships: [];
+      };
       site_settings: {
         Row: {
           id: string;

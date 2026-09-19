@@ -44,3 +44,27 @@ export interface ProductSocialPostRecord {
   retryCount: number;
   createdAt: string;
 }
+
+export interface ProductReelInput {
+  productId: string;
+  videoUrl: string;
+  caption: string;
+}
+
+export interface ProductReelRecord {
+  id: string;
+  productId: string;
+  productName: string | null;
+  productSlug: string | null;
+  videoUrl: string;
+  caption: string;
+  facebookVideoId: string | null;
+  instagramMediaId: string | null;
+  facebookStatus: SocialPlatformStatus;
+  instagramStatus: SocialPlatformStatus;
+  facebookError: string | null;
+  instagramError: string | null;
+  postedAt: string | null;
+  retryCount: number;
+  createdAt: string;
+}
