@@ -22,6 +22,25 @@ export async function graphApiGet<T>(
   return parseGraphResponse<T>(response);
 }
 
+/**
+ * Facebook's Page endpoints (e.g. /{page-id}/photos) reject a raw System
+ * User / Business token with a misleading "publish_actions deprecated"
+ * error -- they require a genuine Page-scoped access token instead. This
+ * exchanges the System User token for one, the same way Instagram's
+ * publishing already works with the System User token directly (Instagram
+ * doesn't have this requirement).
+ */
+export async function getPageAccessToken(
+  pageId: string,
+  systemUserAccessToken: string,
+): Promise<string> {
+  const { access_token } = await graphApiGet<{ access_token: string }>(
+    `${pageId}?fields=access_token`,
+    systemUserAccessToken,
+  );
+  return access_token;
+}
+
 export async function graphApiPost<T>(
   path: string,
   accessToken: string,

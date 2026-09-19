@@ -2,6 +2,7 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { publishFacebookPhotoPost } from "@/lib/meta/facebookPublisher";
 import { publishInstagramPost } from "@/lib/meta/instagramPublisher";
+import { getPageAccessToken } from "@/lib/meta/graphClient";
 import {
   buildFacebookCaption,
   buildInstagramCaption,
@@ -44,9 +45,13 @@ async function runFacebook(
     return { status: "skipped" };
   }
   try {
+    const pageAccessToken = await getPageAccessToken(
+      settings.facebook_page_id,
+      settings.facebook_access_token,
+    );
     const { postId } = await publishFacebookPhotoPost({
       pageId: settings.facebook_page_id,
-      accessToken: settings.facebook_access_token,
+      accessToken: pageAccessToken,
       imageUrl,
       caption,
     });
