@@ -7,24 +7,34 @@ interface PublishFacebookPhotoPostInput {
   caption: string;
 }
 
-interface FacebookPhotoResponse {
+interface FacebookIdResponse {
   id: string;
-  post_id?: string;
 }
 
+/**
+ * A single POST /{page-id}/photos?published=true uploads a Photo object,
+ * but Facebook doesn't reliably surface that as a real Timeline post -- it
+ * only shows up under the Page's Photos tab, not its Posts feed (confirmed:
+ * the post_id that call returns 404s on facebook.com/{page}/posts/{id}).
+ * The documented fix is two calls: upload the photo unpublished, then
+ * create a genuine feed post that attaches it via attached_media.
+ */
 export async function publishFacebookPhotoPost({
   pageId,
   accessToken,
   imageUrl,
   caption,
 }: PublishFacebookPhotoPostInput): Promise<{ postId: string }> {
-  const response = await graphApiPost<FacebookPhotoResponse>(
+  const photo = await graphApiPost<FacebookIdResponse>(
     `${pageId}/photos`,
     accessToken,
-    { url: imageUrl, caption, published: "true" },
+    { url: imageUrl, published: "false" },
   );
 
-  // published=true also returns post_id (the Page post, "{page-id}_{post-id}") --
-  // that's the one worth storing/linking to, not the bare photo id.
-  return { postId: response.post_id ?? response.id };
+  const post = await graphApiPost<FacebookIdResponse>(`${pageId}/feed`, accessToken, {
+    message: caption,
+    attached_media: JSON.stringify([{ media_fbid: photo.id }]),
+  });
+
+  return { postId: post.id };
 }
