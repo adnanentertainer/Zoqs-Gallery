@@ -46,6 +46,7 @@ export interface Order {
   currency: string;
   shippingAddress: ShippingAddress;
   customerNotes: string | null;
+  whatsappConfirmedAt: string | null;
   createdAt: string;
   items: OrderItem[];
 }

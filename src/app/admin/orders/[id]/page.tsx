@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin";
 import { OrderStatusForm } from "@/components/admin/OrderStatusForm";
+import { WhatsAppConfirmationCard } from "@/components/admin/WhatsAppConfirmationCard";
 import { CheckoutItem, CheckoutTotals } from "@/components/checkout";
 import { Heading, Text } from "@/components/ui/Typography";
 import { getAdminOrderById } from "@/lib/services/admin/adminOrderService";
@@ -41,6 +42,17 @@ export default async function AdminOrderDetailPage({
             status={order.status}
             paymentStatus={order.paymentStatus}
           />
+
+          {order.paymentMethod === "cod" && (
+            <WhatsAppConfirmationCard
+              orderId={order.id}
+              orderNumber={order.orderNumber}
+              total={order.total}
+              customerName={order.shippingAddress.fullName}
+              customerPhone={order.shippingAddress.phone}
+              whatsappConfirmedAt={order.whatsappConfirmedAt}
+            />
+          )}
 
           <div className="rounded-sm border border-beige bg-white p-6">
             <Heading variant="h3" as="h2" className="mb-3">

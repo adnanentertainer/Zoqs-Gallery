@@ -289,6 +289,7 @@ export function mapOrderRow(row: OrderRow, items: OrderItemRow[]): Order {
       country: row.shipping_country,
     },
     customerNotes: row.customer_notes,
+    whatsappConfirmedAt: row.whatsapp_confirmed_at,
     createdAt: row.created_at,
     items: items.map(mapOrderItemRow),
   };

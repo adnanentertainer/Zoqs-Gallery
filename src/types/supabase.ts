@@ -393,15 +393,18 @@ export interface Database {
           shipping_postal_code: string | null;
           shipping_country: string;
           customer_notes: string | null;
+          whatsapp_confirmed_at: string | null;
           created_at: string;
           updated_at: string;
         };
         Insert: never;
         // The only client-writable columns — enforced by a column-level
-        // GRANT in the Phase 10 migration, not merely by this type.
+        // GRANT in the Phase 10 migration (plus the COD WhatsApp
+        // confirmation migration), not merely by this type.
         Update: Partial<{
           status: string;
           payment_status: string;
+          whatsapp_confirmed_at: string;
         }>;
         Relationships: [];
       };

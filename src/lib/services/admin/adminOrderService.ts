@@ -135,8 +135,35 @@ export async function updateOrderStatus(
   const { error } = await supabase.from("orders").update(updates).eq("id", id);
 
   if (error) {
+    // 23514 = Postgres check_violation -- the
+    // orders_cod_requires_whatsapp_confirmation constraint, since that's the
+    // only check constraint an admin update can hit.
+    if (error.code === "23514") {
+      return {
+        error:
+          "This is a Cash on Delivery order that hasn't been confirmed via WhatsApp yet. Confirm with the customer first.",
+      };
+    }
     console.error("[adminOrderService.updateOrderStatus] failed:", error);
     return { error: "Unable to update this order right now." };
+  }
+  return {};
+}
+
+export async function confirmOrderWhatsApp(
+  id: string,
+): Promise<{ error?: string }> {
+  await requireAdmin();
+
+  const supabase = await getSupabaseServerClient();
+  const { error } = await supabase
+    .from("orders")
+    .update({ whatsapp_confirmed_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) {
+    console.error("[adminOrderService.confirmOrderWhatsApp] failed:", error);
+    return { error: "Unable to save the confirmation right now." };
   }
   return {};
 }

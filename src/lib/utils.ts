@@ -11,6 +11,16 @@ export function formatPrice(amount: number): string {
   return `Rs. ${amount.toLocaleString("en-PK")}`;
 }
 
+/**
+ * Converts a Pakistani phone number as stored on an order (e.g.
+ * "0331 6668233" or "+923316668233") into the digits-only, country-code-first
+ * form wa.me click-to-chat links require (e.g. "923316668233").
+ */
+export function toWhatsAppPhoneNumber(phone: string): string {
+  const digitsOnly = phone.replace(/[\s-]/g, "").replace(/^\+/, "");
+  return digitsOnly.startsWith("0") ? `92${digitsOnly.slice(1)}` : digitsOnly;
+}
+
 export function categoryLabel(slug: string): string {
   return slug
     .split("-")

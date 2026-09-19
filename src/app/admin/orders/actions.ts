@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import {
+  confirmOrderWhatsApp,
   deleteOrder,
   updateOrderStatus,
 } from "@/lib/services/admin/adminOrderService";
@@ -17,6 +18,17 @@ export async function updateOrderStatusAction(
     revalidatePath(`/admin/orders/${id}`);
     revalidatePath("/admin/orders");
     revalidatePath("/admin");
+  }
+  return result;
+}
+
+export async function confirmOrderWhatsAppAction(
+  id: string,
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const result = await confirmOrderWhatsApp(id);
+  if (!result.error) {
+    revalidatePath(`/admin/orders/${id}`);
   }
   return result;
 }
