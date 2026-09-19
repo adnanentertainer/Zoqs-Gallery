@@ -31,9 +31,13 @@ export async function publishFacebookPhotoPost({
     { url: imageUrl, published: "false" },
   );
 
+  // Meta's documented format for attached_media on /feed uses indexed
+  // keys (attached_media[0], attached_media[1], ...) each holding a JSON
+  // object -- a single "attached_media" key holding a JSON array is
+  // silently ignored, producing a text-only post with no photo attached.
   const post = await graphApiPost<FacebookIdResponse>(`${pageId}/feed`, accessToken, {
     message: caption,
-    attached_media: JSON.stringify([{ media_fbid: photo.id }]),
+    "attached_media[0]": JSON.stringify({ media_fbid: photo.id }),
   });
 
   return { postId: post.id };
