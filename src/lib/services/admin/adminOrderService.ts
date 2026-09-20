@@ -1,6 +1,7 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { mapOrderRow } from "@/lib/supabase/mappers";
+import { sendOrderConfirmationRequestWhatsApp } from "@/lib/whatsapp/orderConfirmation";
 import type { AdminOrderFilters, AdminOrderListItem } from "@/types/admin";
 import type { PaginationResult } from "@/types/admin";
 import type { Order, OrderStatus, PaymentStatus } from "@/types/order";
@@ -148,6 +149,20 @@ export async function updateOrderStatus(
     return { error: "Unable to update this order right now." };
   }
   return {};
+}
+
+export async function resendOrderConfirmationWhatsApp(
+  id: string,
+): Promise<{ error?: string }> {
+  await requireAdmin();
+
+  const order = await getAdminOrderById(id);
+  if (!order) return { error: "This order no longer exists." };
+  if (order.paymentMethod !== "cod") {
+    return { error: "This isn't a Cash on Delivery order." };
+  }
+
+  return sendOrderConfirmationRequestWhatsApp(order);
 }
 
 export async function confirmOrderWhatsApp(

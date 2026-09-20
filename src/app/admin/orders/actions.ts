@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth/requireAdmin";
 import {
   confirmOrderWhatsApp,
   deleteOrder,
+  resendOrderConfirmationWhatsApp,
   updateOrderStatus,
 } from "@/lib/services/admin/adminOrderService";
 
@@ -31,6 +32,13 @@ export async function confirmOrderWhatsAppAction(
     revalidatePath(`/admin/orders/${id}`);
   }
   return result;
+}
+
+export async function resendOrderConfirmationWhatsAppAction(
+  id: string,
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  return resendOrderConfirmationWhatsApp(id);
 }
 
 export async function deleteOrderAction(
