@@ -7,6 +7,7 @@ import { Eye, ShoppingBag } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { RatingStars } from "@/components/shared/RatingStars";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
+import { QuickViewModal } from "@/components/product/QuickViewModal";
 import { categoryLabel, cn, formatPrice } from "@/lib/utils";
 import { getDefaultVariantSelections } from "@/lib/cart";
 import {
@@ -51,6 +52,7 @@ export function ProductCard({ product }: ProductCardProps) {
   // only — touch taps don't fire mouseenter) means grids full of cards don't
   // download a second full image per product that most visitors never see.
   const [hasHoveredOnce, setHasHoveredOnce] = useState(false);
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
 
   useEffect(() => {
     registerProduct(product);
@@ -60,6 +62,11 @@ export function ProductCard({ product }: ProductCardProps) {
     preventCardNavigation(event);
     if (!inStock) return;
     cart.addItem(product, 1, getDefaultVariantSelections(product));
+  }
+
+  function handleQuickView(event: MouseEvent) {
+    preventCardNavigation(event);
+    setQuickViewOpen(true);
   }
 
   return (
@@ -113,7 +120,7 @@ export function ProductCard({ product }: ProductCardProps) {
           />
           <button
             type="button"
-            onClick={preventCardNavigation}
+            onClick={handleQuickView}
             aria-label={`Quick view ${product.name}`}
             className={iconButtonStyles}
           >
@@ -167,6 +174,13 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
       </div>
+
+      {quickViewOpen && (
+        <QuickViewModal
+          product={product}
+          onClose={() => setQuickViewOpen(false)}
+        />
+      )}
     </article>
   );
 }
