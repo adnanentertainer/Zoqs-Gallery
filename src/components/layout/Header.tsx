@@ -100,7 +100,7 @@ export function Header() {
                   ? `Wishlist, ${wishlist.count} saved item${wishlist.count === 1 ? "" : "s"}`
                   : "Wishlist"
               }
-              className={cn("hidden lg:inline-flex", iconButtonStyles)}
+              className={cn("inline-flex", iconButtonStyles)}
             >
               <Heart className="h-5 w-5" aria-hidden="true" />
               {wishlist.count > 0 && (
