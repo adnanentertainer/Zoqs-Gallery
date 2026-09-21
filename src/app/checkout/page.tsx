@@ -7,7 +7,6 @@ import { getServerUser } from "@/lib/auth/getServerUser";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { mapProfileRow } from "@/lib/supabase/mappers";
 import { getShippingSettings } from "@/lib/checkout/getShippingSettings";
-import type { ShippingSettings } from "@/lib/checkout/shipping";
 
 export const metadata: Metadata = {
   title: "Checkout | ZOQ's Gallery",
@@ -18,20 +17,24 @@ export const metadata: Metadata = {
 export default async function CheckoutPage() {
   // Guest checkout is allowed — /checkout/start offers Log In / Create
   // Account / Continue as Guest, and this page itself works for either.
-  const user = await getServerUser();
+  // shippingSettings never depends on the user, so it starts alongside the
+  // auth check instead of waiting on it — for a signed-in visitor this takes
+  // it off the critical path entirely (only the profile lookup still has to
+  // wait on `user`).
+  const [user, shippingSettings] = await Promise.all([
+    getServerUser(),
+    getShippingSettings(),
+  ]);
 
   let profile = null;
-  let shippingSettings: ShippingSettings;
   if (user) {
     const supabase = await getSupabaseServerClient();
-    const [{ data: profileRow }, settings] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-      getShippingSettings(),
-    ]);
+    const { data: profileRow } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle();
     profile = profileRow ? mapProfileRow(profileRow) : null;
-    shippingSettings = settings;
-  } else {
-    shippingSettings = await getShippingSettings();
   }
 
   return (
