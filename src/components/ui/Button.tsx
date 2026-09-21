@@ -8,12 +8,13 @@ export type ButtonVariant =
 export type ButtonSize = "sm" | "md" | "lg";
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: "bg-primary text-white hover:bg-primary/90",
-  secondary: "border border-beige bg-secondary text-primary hover:bg-beige",
+  primary: "bg-primary text-white shadow-sm hover:bg-primary/90 hover:shadow-md",
+  secondary:
+    "border border-beige bg-secondary text-primary hover:border-gold/50 hover:bg-beige",
   outline:
     "border border-primary text-primary hover:bg-primary hover:text-white",
   ghost: "text-primary hover:bg-beige",
-  gold: "bg-gold text-white hover:bg-gold/90",
+  gold: "bg-gold text-white shadow-sm hover:bg-gold/90 hover:shadow-md",
   danger: "bg-error text-white hover:bg-error/90",
 };
 
@@ -34,7 +35,7 @@ export function buttonVariants(
   className?: string,
 ) {
   return cn(
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm font-body font-medium tracking-wide transition-colors duration-200",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm font-body font-semibold uppercase tracking-[0.08em] transition-all duration-200",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
     "disabled:pointer-events-none disabled:opacity-50",
     variantStyles[variant],

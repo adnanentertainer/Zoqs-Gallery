@@ -67,7 +67,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <Link
         href={`/product/${product.slug}`}
         onMouseEnter={() => setHasHoveredOnce(true)}
-        className="relative block aspect-[3/4] w-full overflow-hidden rounded-sm bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+        className="relative block aspect-[3/4] w-full overflow-hidden rounded-sm bg-beige shadow-sm transition-shadow duration-300 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
       >
         <Image
           src={primaryImage}

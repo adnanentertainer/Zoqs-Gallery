@@ -76,9 +76,13 @@ export function Header() {
                   key={link.label}
                   href={link.href}
                   onClick={(event) => handleNavLinkClick(event, link.href)}
-                  className="rounded-sm font-body text-sm font-medium tracking-wide text-primary transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                  className="group/navlink relative rounded-sm py-2 font-body text-xs font-semibold uppercase tracking-[0.14em] text-primary transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                 >
                   {link.label}
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-0 -bottom-0.5 h-px origin-center scale-x-0 bg-gold transition-transform duration-300 group-hover/navlink:scale-x-100"
+                  />
                 </Link>
               ))}
             </nav>

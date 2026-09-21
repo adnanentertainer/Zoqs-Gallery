@@ -41,7 +41,7 @@ export function BenefitsSection() {
             key={title}
             className="flex flex-col items-center gap-3 text-center"
           >
-            <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-white text-gold">
+            <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-white text-gold shadow-sm ring-1 ring-gold/30">
               <Icon className="h-6 w-6" aria-hidden="true" />
             </span>
             <Heading variant="h3" as="h3" className="text-lg">

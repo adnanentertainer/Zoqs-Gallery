@@ -12,7 +12,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
       href={`/category/${category.slug}`}
       className="group flex flex-col rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
     >
-      <div className="relative aspect-square w-full overflow-hidden rounded-sm bg-beige">
+      <div className="relative aspect-square w-full overflow-hidden rounded-sm bg-beige shadow-sm ring-1 ring-transparent transition-all duration-300 group-hover:shadow-lg group-hover:ring-gold/30">
         <Image
           src={category.image}
           alt={category.name}

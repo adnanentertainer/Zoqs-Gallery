@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --color-charcoal: #1f1f1f;
-  --color-cream: #f8f5f0;
-  --color-gold: #e6a421;
-  --color-beige: #ede7dd;
-  --color-muted: #6b6b6b;
+  --color-charcoal: #1c1a17;
+  --color-cream: #faf6ef;
+  --color-gold: #c79a3d;
+  --color-beige: #ece3d3;
+  --color-muted: #6f6a61;
   --color-success: #2e7d32;
   --color-error: #c62828;
 }
@@ -29,6 +29,8 @@ html {
 body {
   background-color: #ffffff;
   color: var(--color-charcoal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {

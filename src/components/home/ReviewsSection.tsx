@@ -13,7 +13,7 @@ export function ReviewsSection() {
         {featuredReviews.map((review) => (
           <figure
             key={review.id}
-            className="flex flex-col gap-4 rounded-sm border border-beige bg-white p-6"
+            className="flex flex-col gap-4 rounded-sm border border-beige bg-white p-6 transition-shadow duration-300 hover:shadow-md"
           >
             <Quote className="h-6 w-6 text-gold" aria-hidden="true" />
             <RatingStars rating={review.rating} />

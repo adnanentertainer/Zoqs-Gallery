@@ -22,15 +22,21 @@ export function HeroSection() {
 
       <Container className="relative grid grid-cols-1 items-center gap-10 py-12 sm:py-16 lg:grid-cols-2 lg:gap-16 lg:py-24">
         <div className="order-1 flex justify-center lg:order-2">
-          <div className="relative aspect-[4/5] w-full max-w-md overflow-hidden rounded-sm shadow-[0_25px_60px_-15px_rgba(31,31,31,0.35)] ring-1 ring-gold/30">
-            <Image
-              src={heroImage}
-              alt="Bride wearing a gold statement necklace, drop earrings and maang tikka"
-              fill
-              preload
-              sizes="(max-width: 1024px) 100vw, 448px"
-              className="object-cover"
+          <div className="relative w-full max-w-md">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -inset-3 hidden rounded-sm border border-gold/25 sm:block"
             />
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm shadow-[0_25px_60px_-15px_rgba(31,31,31,0.35)] ring-1 ring-gold/30">
+              <Image
+                src={heroImage}
+                alt="Bride wearing a gold statement necklace, drop earrings and maang tikka"
+                fill
+                preload
+                sizes="(max-width: 1024px) 100vw, 448px"
+                className="object-cover"
+              />
+            </div>
           </div>
         </div>
 

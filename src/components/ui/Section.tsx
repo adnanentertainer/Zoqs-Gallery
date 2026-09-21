@@ -40,7 +40,15 @@ export function Section({
       <Container className={containerClassName}>
         {(title ?? subtitle) && (
           <div className="mb-8 flex flex-col items-center gap-3 text-center sm:mb-12">
-            {title && <Heading variant="h2">{title}</Heading>}
+            {title && (
+              <div className="flex flex-col items-center gap-3">
+                <Heading variant="h2">{title}</Heading>
+                <span
+                  aria-hidden="true"
+                  className="h-px w-12 bg-gold"
+                />
+              </div>
+            )}
             {subtitle && (
               <Text variant="bodyLg" className="max-w-2xl text-muted">
                 {subtitle}
