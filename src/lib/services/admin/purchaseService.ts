@@ -1,5 +1,7 @@
+import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import type {
   AdminPurchaseDetail,
   AdminPurchaseFilters,
@@ -324,5 +326,6 @@ export async function completePurchase(id: string): Promise<{ error?: string }> 
     }
     return { error: "Unable to complete this purchase right now." };
   }
+  revalidateTag(CACHE_TAGS.products, { expire: 0 });
   return {};
 }

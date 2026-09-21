@@ -10,7 +10,6 @@ import { ToastProvider } from "@/context/ToastContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
-import { getServerUser } from "@/lib/auth/getServerUser";
 import { safeJsonLd } from "@/lib/utils";
 import "../styles/globals.css";
 
@@ -92,9 +91,7 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const initialUser = await getServerUser();
-
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
@@ -111,7 +108,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           dangerouslySetInnerHTML={{ __html: safeJsonLd(websiteJsonLd) }}
         />
         <ToastProvider>
-          <AuthProvider initialUser={initialUser}>
+          <AuthProvider>
             <WishlistProvider>
               <CartProvider>
                 <FestivalCountdownBanner />

@@ -166,7 +166,7 @@ export function ProductLightbox({
             sizes="92vw"
             className="object-contain transition-transform duration-150 ease-out"
             style={{ transform: `scale(${zoom})` }}
-            priority={isOpen}
+            preload={isOpen}
           />
         </div>
 

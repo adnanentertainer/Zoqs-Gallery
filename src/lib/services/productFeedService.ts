@@ -1,4 +1,6 @@
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { unstable_cache } from "next/cache";
+import { getSupabasePublicClient } from "@/lib/supabase/server";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import { siteConfig } from "@/constants/site";
 
 const baseUrl =
@@ -36,46 +38,59 @@ interface ProductFeedRow {
  * path drops sku/force_unavailable entirely when mapping to the public
  * Product type, but a feed needs both (sku as the catalog retailer_id,
  * force_unavailable to compute real availability).
+ *
+ * Cached: this feed is polled by Meta/Google crawlers on their own schedule,
+ * not by a person waiting on a page load, so there's no reason to hit the
+ * database on every crawl. Tagged so admin product edits and stock changes
+ * still invalidate it (see CACHE_TAGS.products usages).
  */
+const getProductFeedItemsUncached = unstable_cache(
+  async (): Promise<ProductFeedItem[]> => {
+    const supabase = getSupabasePublicClient();
+    const { data, error } = await supabase
+      .from("products")
+      .select(
+        "id, sku, name, slug, description, short_description, price, stock, force_unavailable, categories(name), product_images(image_url, display_order)",
+      )
+      .eq("is_active", true);
+
+    if (error) {
+      console.error("[productFeedService.getProductFeedItems] failed:", error);
+      throw new Error("Unable to load the product feed right now.");
+    }
+
+    const rows = (data ?? []) as unknown as ProductFeedRow[];
+
+    return rows
+      .filter((row) => !!row.sku)
+      .map((row) => {
+        const image = [...row.product_images].sort(
+          (a, b) => a.display_order - b.display_order,
+        )[0];
+        const description = (row.short_description || row.description).slice(
+          0,
+          5000,
+        );
+
+        return {
+          sku: row.sku as string,
+          title: row.name,
+          description,
+          link: `${baseUrl}/product/${row.slug}`,
+          imageUrl: image?.image_url ?? "",
+          available: !row.force_unavailable && row.stock > 0,
+          price: row.price,
+          categoryName: row.categories?.name ?? null,
+        };
+      })
+      .filter((item) => !!item.imageUrl);
+  },
+  ["product-feed:items"],
+  { tags: [CACHE_TAGS.products, CACHE_TAGS.productFeed], revalidate: 600 },
+);
+
 export async function getProductFeedItems(): Promise<ProductFeedItem[]> {
-  const supabase = await getSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("products")
-    .select(
-      "id, sku, name, slug, description, short_description, price, stock, force_unavailable, categories(name), product_images(image_url, display_order)",
-    )
-    .eq("is_active", true);
-
-  if (error) {
-    console.error("[productFeedService.getProductFeedItems] failed:", error);
-    throw new Error("Unable to load the product feed right now.");
-  }
-
-  const rows = (data ?? []) as unknown as ProductFeedRow[];
-
-  return rows
-    .filter((row) => !!row.sku)
-    .map((row) => {
-      const image = [...row.product_images].sort(
-        (a, b) => a.display_order - b.display_order,
-      )[0];
-      const description = (row.short_description || row.description).slice(
-        0,
-        5000,
-      );
-
-      return {
-        sku: row.sku as string,
-        title: row.name,
-        description,
-        link: `${baseUrl}/product/${row.slug}`,
-        imageUrl: image?.image_url ?? "",
-        available: !row.force_unavailable && row.stock > 0,
-        price: row.price,
-        categoryName: row.categories?.name ?? null,
-      };
-    })
-    .filter((item) => !!item.imageUrl);
+  return getProductFeedItemsUncached();
 }
 
 function escapeXml(value: string): string {

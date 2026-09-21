@@ -1,5 +1,7 @@
+import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import type {
   AdminInventoryDashboardMetrics,
   AdminInventoryMovementFilters,
@@ -126,6 +128,7 @@ export async function recordStockMovement(
     }
     return { error: "Unable to record this stock movement right now." };
   }
+  revalidateTag(CACHE_TAGS.products, { expire: 0 });
   return {};
 }
 

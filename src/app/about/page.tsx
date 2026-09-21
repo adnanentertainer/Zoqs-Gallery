@@ -87,7 +87,7 @@ export default function AboutPage() {
               src={galleryImages.modelWearingNecklace}
               alt="Woman wearing a delicate layered necklace from ZOQ's Gallery"
               fill
-              priority
+              preload
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />

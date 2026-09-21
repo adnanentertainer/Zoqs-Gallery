@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { Eye, ShoppingBag } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { RatingStars } from "@/components/shared/RatingStars";
@@ -46,6 +46,11 @@ export function ProductCard({ product }: ProductCardProps) {
   const inStock = isInStock(product);
   const [primaryImage, secondaryImage = primaryImage] = product.images;
   const cart = useCart();
+  // The hover-swap second photo is a desktop-only interaction: mobile has no
+  // hover, so it never shows there. Deferring the mount to first hover (mouse
+  // only — touch taps don't fire mouseenter) means grids full of cards don't
+  // download a second full image per product that most visitors never see.
+  const [hasHoveredOnce, setHasHoveredOnce] = useState(false);
 
   useEffect(() => {
     registerProduct(product);
@@ -61,6 +66,7 @@ export function ProductCard({ product }: ProductCardProps) {
     <article className="group flex flex-col">
       <Link
         href={`/product/${product.slug}`}
+        onMouseEnter={() => setHasHoveredOnce(true)}
         className="relative block aspect-[3/4] w-full overflow-hidden rounded-sm bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
       >
         <Image
@@ -75,18 +81,19 @@ export function ProductCard({ product }: ProductCardProps) {
             "group-hover:opacity-0",
           )}
         />
-        <Image
-          src={secondaryImage}
-          alt=""
-          aria-hidden="true"
-          fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          loading="lazy"
-          className={cn(
-            "object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100",
-            !inStock && "group-hover:opacity-60",
-          )}
-        />
+        {hasHoveredOnce && (
+          <Image
+            src={secondaryImage}
+            alt=""
+            aria-hidden="true"
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className={cn(
+              "object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100",
+              !inStock && "group-hover:opacity-60",
+            )}
+          />
+        )}
 
         {badge && (
           <Badge

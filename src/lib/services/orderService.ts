@@ -1,5 +1,7 @@
+import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { mapOrderRow } from "@/lib/supabase/mappers";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import type { CheckoutCartLine, Order, PaymentMethod } from "@/types/order";
 import type { Database } from "@/types/supabase";
 
@@ -75,6 +77,13 @@ export async function createOrder(
         : "We couldn't place your order right now. Please try again.",
     );
   }
+
+  // create_order() decrements stock atomically in the database; revalidate
+  // the cached product listings so an item that just sold out (or dropped
+  // low) doesn't keep showing its pre-order availability/stock for the rest
+  // of the cache window. Checkout itself is never affected by this cache —
+  // create_order always re-validates stock server-side regardless.
+  revalidateTag(CACHE_TAGS.products, { expire: 0 });
 
   return { orderNumber: data.order_number, guestToken: data.guest_token };
 }

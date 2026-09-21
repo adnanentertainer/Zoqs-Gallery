@@ -1,9 +1,33 @@
+import { unstable_cache } from "next/cache";
 import { getProductReviews as getMockProductReviews } from "@/lib/reviews";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  getSupabasePublicClient,
+  getSupabaseServerClient,
+} from "@/lib/supabase/server";
 import { getServerUser } from "@/lib/auth/getServerUser";
 import { mapReviewRow } from "@/lib/supabase/mappers";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import type { Review } from "@/types";
+
+type ReviewRow = Parameters<typeof mapReviewRow>[0];
+
+const getApprovedReviewRows = unstable_cache(
+  async (productId: string): Promise<ReviewRow[]> => {
+    const supabase = getSupabasePublicClient();
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("*")
+      .eq("product_id", productId)
+      .eq("is_approved", true)
+      .order("review_date", { ascending: false });
+
+    if (error) throw error;
+    return (data ?? []) as ReviewRow[];
+  },
+  ["reviews:approved-by-product"],
+  { tags: [CACHE_TAGS.reviews], revalidate: 120 },
+);
 
 /**
  * @param productId product.id as returned by productService (a Supabase UUID
@@ -21,16 +45,8 @@ export async function getProductReviews(
   }
 
   try {
-    const supabase = await getSupabaseServerClient();
-    const { data, error } = await supabase
-      .from("reviews")
-      .select("*")
-      .eq("product_id", productId)
-      .eq("is_approved", true)
-      .order("review_date", { ascending: false });
-
-    if (error) throw error;
-    return (data ?? []).map((row) => mapReviewRow(row, productName));
+    const rows = await getApprovedReviewRows(productId);
+    return rows.map((row) => mapReviewRow(row, productName));
   } catch (error) {
     console.error(
       "[reviewService.getProductReviews] Supabase query failed:",

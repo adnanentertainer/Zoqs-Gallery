@@ -1,11 +1,13 @@
+import { unstable_cache } from "next/cache";
 import { allProducts as mockAllProducts } from "@/data/products";
 import {
   getProductBySlug as getMockProductBySlug,
   getRelatedProducts as getRelatedProductsFromPool,
 } from "@/lib/products";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabasePublicClient } from "@/lib/supabase/server";
 import { computeRatingAggregate, mapProductRow } from "@/lib/supabase/mappers";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import type { Database } from "@/types/supabase";
 import type { Product } from "@/types";
 
@@ -29,10 +31,17 @@ interface ProductQueryFilters {
   isBestSeller?: boolean;
 }
 
-async function fetchActiveProductRows(
+// Public catalog reads never depend on who's signed in (RLS allows public
+// reads), so these use the cookie-less client and are wrapped in
+// unstable_cache: the same expensive query is then reused across every
+// visitor instead of re-running per request. `revalidate: 120` is a safety
+// net; the actual freshness guarantee comes from revalidateTag(CACHE_TAGS.products)
+// called by every admin/inventory/order path that changes product data (see
+// adminProductService, inventoryService, purchaseService, orderService).
+async function fetchActiveProductRowsUncached(
   filters: ProductQueryFilters = {},
 ): Promise<ProductRowWithCategory[]> {
-  const supabase = await getSupabaseServerClient();
+  const supabase = getSupabasePublicClient();
   const embed = filters.categorySlug
     ? "categories!inner(slug)"
     : "categories(slug)";
@@ -54,10 +63,16 @@ async function fetchActiveProductRows(
   return (data ?? []) as unknown as ProductRowWithCategory[];
 }
 
-async function fetchActiveProductRowBySlug(
+const fetchActiveProductRows = unstable_cache(
+  fetchActiveProductRowsUncached,
+  ["products:active-rows"],
+  { tags: [CACHE_TAGS.products], revalidate: 120 },
+);
+
+async function fetchActiveProductRowBySlugUncached(
   slug: string,
 ): Promise<ProductRowWithCategory | null> {
-  const supabase = await getSupabaseServerClient();
+  const supabase = getSupabasePublicClient();
   const { data, error } = await supabase
     .from("products")
     .select("*, categories(slug)")
@@ -68,6 +83,12 @@ async function fetchActiveProductRowBySlug(
   if (error) throw error;
   return data as unknown as ProductRowWithCategory | null;
 }
+
+const fetchActiveProductRowBySlug = unstable_cache(
+  fetchActiveProductRowBySlugUncached,
+  ["products:row-by-slug"],
+  { tags: [CACHE_TAGS.products], revalidate: 120 },
+);
 
 function groupByProductId<T extends { product_id: string }>(
   rows: T[],
@@ -81,13 +102,20 @@ function groupByProductId<T extends { product_id: string }>(
   return map;
 }
 
-async function hydrateProducts(
-  rows: ProductRowWithCategory[],
-): Promise<Product[]> {
-  if (rows.length === 0) return [];
+interface ProductRelations {
+  images: ProductImageRow[];
+  variants: ProductVariantRow[];
+  reviews: { product_id: string; rating: number }[];
+}
 
-  const supabase = await getSupabaseServerClient();
-  const ids = rows.map((row) => row.id);
+// Cache key is the sorted product id list (not the full rows), so this stays
+// compact and shares an entry across callers that ask for the same set of
+// products (e.g. a product page's related-products lookup landing on the
+// same ids as a listing page already rendered).
+async function fetchProductRelationsUncached(
+  ids: string[],
+): Promise<ProductRelations> {
+  const supabase = getSupabasePublicClient();
 
   const [imagesResult, variantsResult, reviewsResult] = await Promise.all([
     supabase.from("product_images").select("*").in("product_id", ids),
@@ -103,18 +131,32 @@ async function hydrateProducts(
   if (variantsResult.error) throw variantsResult.error;
   if (reviewsResult.error) throw reviewsResult.error;
 
-  const imagesByProduct = groupByProductId(
-    (imagesResult.data ?? []) as ProductImageRow[],
-  );
-  const variantsByProduct = groupByProductId(
-    (variantsResult.data ?? []) as ProductVariantRow[],
-  );
+  return {
+    images: (imagesResult.data ?? []) as ProductImageRow[],
+    variants: (variantsResult.data ?? []) as ProductVariantRow[],
+    reviews: (reviewsResult.data ?? []) as { product_id: string; rating: number }[],
+  };
+}
+
+const fetchProductRelations = unstable_cache(
+  fetchProductRelationsUncached,
+  ["products:relations"],
+  { tags: [CACHE_TAGS.products, CACHE_TAGS.reviews], revalidate: 120 },
+);
+
+async function hydrateProducts(
+  rows: ProductRowWithCategory[],
+): Promise<Product[]> {
+  if (rows.length === 0) return [];
+
+  const ids = [...new Set(rows.map((row) => row.id))].sort();
+  const { images, variants, reviews } = await fetchProductRelations(ids);
+
+  const imagesByProduct = groupByProductId(images);
+  const variantsByProduct = groupByProductId(variants);
 
   const ratingsByProduct = new Map<string, number[]>();
-  for (const row of (reviewsResult.data ?? []) as {
-    product_id: string;
-    rating: number;
-  }[]) {
+  for (const row of reviews) {
     const list = ratingsByProduct.get(row.product_id) ?? [];
     list.push(row.rating);
     ratingsByProduct.set(row.product_id, list);

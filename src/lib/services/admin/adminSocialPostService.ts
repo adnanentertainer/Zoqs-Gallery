@@ -1,5 +1,7 @@
+import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import type {
   AdminSocialPostInput,
   AdminSocialPostListItem,
@@ -85,6 +87,7 @@ export async function createSocialPost(
     console.error("[adminSocialPostService.createSocialPost] failed:", error);
     return { error: "Unable to create this post right now." };
   }
+  revalidateTag(CACHE_TAGS.socialPosts, { expire: 0 });
   return { id: data.id };
 }
 
@@ -110,6 +113,7 @@ export async function updateSocialPost(
     console.error("[adminSocialPostService.updateSocialPost] failed:", error);
     return { error: "Unable to update this post right now." };
   }
+  revalidateTag(CACHE_TAGS.socialPosts, { expire: 0 });
   return {};
 }
 
@@ -124,5 +128,6 @@ export async function deleteSocialPost(
     console.error("[adminSocialPostService.deleteSocialPost] failed:", error);
     return { error: "Unable to delete this post right now." };
   }
+  revalidateTag(CACHE_TAGS.socialPosts, { expire: 0 });
   return {};
 }

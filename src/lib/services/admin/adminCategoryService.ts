@@ -1,5 +1,7 @@
+import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import type { AdminCategoryListItem } from "@/types/admin";
 
 export interface AdminCategoryInput {
@@ -109,6 +111,7 @@ export async function createCategory(
     console.error("[adminCategoryService.createCategory] failed:", error);
     return { error: "Unable to create this category right now." };
   }
+  revalidateTag(CACHE_TAGS.categories, { expire: 0 });
   return { id: data.id };
 }
 
@@ -139,6 +142,7 @@ export async function updateCategory(
     console.error("[adminCategoryService.updateCategory] failed:", error);
     return { error: "Unable to update this category right now." };
   }
+  revalidateTag(CACHE_TAGS.categories, { expire: 0 });
   return {};
 }
 
@@ -164,5 +168,6 @@ export async function deleteCategory(id: string): Promise<{ error?: string }> {
     console.error("[adminCategoryService.deleteCategory] failed:", error);
     return { error: "Unable to delete this category right now." };
   }
+  revalidateTag(CACHE_TAGS.categories, { expire: 0 });
   return {};
 }

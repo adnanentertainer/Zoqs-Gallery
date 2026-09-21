@@ -103,12 +103,14 @@ export default async function ProductPage({
 
   const categoryName = categoryLabel(product.categorySlug);
   const badge = getProductBadge(product);
-  const productReviews = await getProductReviews(product.id, product.name);
+  const [productReviews, relatedProducts] = await Promise.all([
+    getProductReviews(product.id, product.name),
+    getRelatedProducts(product, 4),
+  ]);
   const breakdown = getReviewBreakdown(productReviews);
   const reviewsCount = productReviews.length;
   const averageRating =
     reviewsCount > 0 ? getAverageRating(productReviews) : product.rating;
-  const relatedProducts = await getRelatedProducts(product, 4);
   const inStock = isInStock(product);
 
   // Google won't consider a Product eligible for price/availability rich

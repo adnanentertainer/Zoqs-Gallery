@@ -53,29 +53,34 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 interface AuthProviderProps {
   children: ReactNode;
-  initialUser: User | null;
 }
 
 /**
- * `initialUser` comes from a server-side `auth.getUser()` call (see
- * app/layout.tsx), which Supabase revalidates against its Auth server — so
- * it's already authoritative on first paint. That means no loading gate is
- * needed for the initial render (avoids "flickering authenticated content").
- * `onAuthStateChange` is the single source of truth for everything after
- * that: it fires once immediately with the current session, then again on
- * every sign-in/out/refresh, so isLoading only reflects that first callback.
+ * Auth state is seeded client-side rather than via a server-side
+ * `auth.getUser()` call in the root layout: that call reads request cookies,
+ * and reading cookies anywhere in the layout forces every single route in
+ * the app to render dynamically on every request (no caching, no static
+ * shell) even for pages that have nothing to do with auth. `isLoading`
+ * starts `true` and `onAuthStateChange` fires once immediately on mount with
+ * the current session (read from local storage, no network round trip),
+ * then again on every sign-in/out/refresh. No page currently renders
+ * authenticated-only content before that first callback resolves, so this
+ * trades an imperceptible (single-digit ms) initial `isAuthenticated: false`
+ * moment for every route becoming cacheable.
  */
-export function AuthProvider({ children, initialUser }: AuthProviderProps) {
+export function AuthProvider({ children }: AuthProviderProps) {
   const configured = isSupabaseConfigured();
   const supabase = useMemo(
     () => (configured ? getSupabaseBrowserClient() : null),
     [configured],
   );
 
-  const [user, setUser] = useState<User | null>(initialUser);
+  const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // Only stays true until the first onAuthStateChange callback when Supabase
+  // is actually configured; otherwise there's nothing to wait for.
+  const [isLoading, setIsLoading] = useState(configured);
 
   const loadProfile = useCallback(
     async (userId: string) => {

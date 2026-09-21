@@ -1,5 +1,7 @@
+import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import type { AdminReviewListItem } from "@/types/admin";
 
 export async function listAdminReviews(): Promise<AdminReviewListItem[]> {
@@ -63,6 +65,7 @@ export async function approveReview(id: string): Promise<{ error?: string }> {
     console.error("[adminReviewService.approveReview] failed:", error);
     return { error: "Unable to approve this review right now." };
   }
+  revalidateTag(CACHE_TAGS.reviews, { expire: 0 });
   return {};
 }
 
@@ -81,6 +84,7 @@ export async function unapproveReview(
     console.error("[adminReviewService.unapproveReview] failed:", error);
     return { error: "Unable to hide this review right now." };
   }
+  revalidateTag(CACHE_TAGS.reviews, { expire: 0 });
   return {};
 }
 
@@ -106,6 +110,7 @@ export async function createSeedReview(input: {
     console.error("[adminReviewService.createSeedReview] failed:", error);
     return { error: "Unable to add this review right now." };
   }
+  revalidateTag(CACHE_TAGS.reviews, { expire: 0 });
   return {};
 }
 
@@ -119,5 +124,6 @@ export async function deleteReview(id: string): Promise<{ error?: string }> {
     console.error("[adminReviewService.deleteReview] failed:", error);
     return { error: "Unable to delete this review right now." };
   }
+  revalidateTag(CACHE_TAGS.reviews, { expire: 0 });
   return {};
 }

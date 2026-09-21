@@ -65,7 +65,14 @@ export default async function CategoryPage({
     params,
     searchParams,
   ]);
-  const category = await getCategoryBySlug(slug);
+  // getProductsByCategory only needs the slug (already available), not the
+  // category row, so it doesn't need to wait on getCategoryBySlug — both
+  // fetches start immediately and the notFound() check still runs the same
+  // way once category resolves.
+  const [category, categoryProducts] = await Promise.all([
+    getCategoryBySlug(slug),
+    getProductsByCategory(slug),
+  ]);
 
   if (!category) {
     notFound();
@@ -75,7 +82,6 @@ export default async function CategoryPage({
 
   const filters = parseFilterValues(urlSearchParams);
   const sortKey = parseSortKey(urlSearchParams.get("sort"));
-  const categoryProducts = await getProductsByCategory(slug);
   const results = sortProducts(
     filterProducts(categoryProducts, filters),
     sortKey,

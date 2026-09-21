@@ -1,6 +1,8 @@
+import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { getSiteSetting } from "@/lib/services/settingsService";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import { DEFAULT_FESTIVAL_BANNER, type FestivalBanner } from "@/types/festivalBanner";
 
 export async function getAdminFestivalBanner(): Promise<FestivalBanner> {
@@ -60,5 +62,6 @@ export async function updateAdminFestivalBanner(
     return { error: "Unable to save the festival banner right now." };
   }
 
+  revalidateTag(CACHE_TAGS.siteSettings, { expire: 0 });
   return {};
 }

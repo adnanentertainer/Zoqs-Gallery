@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -10,9 +11,11 @@ import type { Database } from "@/types/supabase";
  * so a signed-in user's session is visible here too (needed for RLS policies
  * that check auth.uid(), e.g. the profiles table).
  *
- * Async because Next.js's cookies() is async. A new client is created per
- * call, matching Next.js's per-request model. Uses the public anon key
- * only — never the service_role key, which is reserved for scripts/seed.ts.
+ * Async because Next.js's cookies() is async. Wrapped in React's `cache()` so
+ * repeated calls within a single request/render pass (e.g. several Server
+ * Components each fetching their own data) reuse the same client and cookie
+ * parse instead of redoing it every time. Uses the public anon key only —
+ * never the service_role key, which is reserved for scripts/seed.ts.
  *
  * Setting cookies from a Server Component render is a no-op by design (Next.js
  * doesn't allow it there); src/proxy.ts refreshes the session cookie on every
@@ -20,18 +23,17 @@ import type { Database } from "@/types/supabase";
  * set cookies and where this same function works unchanged.
  *
  * generateStaticParams runs at build time with no request context, so
- * Next.js's cookies() throws there. Product/category/review/settings queries
- * never need a signed-in session (their RLS policies allow public reads), so
- * falling back to a cookie-less client in that case is safe.
+ * Next.js's cookies() throws there; falls back to the cookie-less public
+ * client in that case.
  */
-export async function getSupabaseServerClient() {
+export const getSupabaseServerClient = cache(async function getSupabaseServerClient() {
   const { url, anonKey } = getSupabaseEnv();
 
   let cookieStore: Awaited<ReturnType<typeof cookies>>;
   try {
     cookieStore = await cookies();
   } catch {
-    return createClient<Database>(url, anonKey);
+    return getSupabasePublicClient();
   }
 
   return createServerClient<Database>(url, anonKey, {
@@ -52,4 +54,19 @@ export async function getSupabaseServerClient() {
       },
     },
   });
-}
+});
+
+/**
+ * Cookie-less Supabase client (anon key only, never touches request cookies
+ * or headers). Use this for reads that don't depend on who's signed in —
+ * products, categories, reviews, site settings, social posts — since their
+ * RLS policies allow public reads either way. Calling Next.js's `cookies()`
+ * anywhere in a route's render tree forces that whole route to render
+ * dynamically on every request; this client lets public storefront data stay
+ * eligible for caching (`unstable_cache`) and static rendering instead.
+ * Wrapped in React's `cache()` for the same per-request reuse as above.
+ */
+export const getSupabasePublicClient = cache(function getSupabasePublicClient() {
+  const { url, anonKey } = getSupabaseEnv();
+  return createClient<Database>(url, anonKey);
+});

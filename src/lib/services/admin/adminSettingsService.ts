@@ -1,6 +1,8 @@
+import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { getSiteSetting } from "@/lib/services/settingsService";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import { siteConfig } from "@/constants/site";
 
 export interface AdminStoreSettings {
@@ -87,5 +89,6 @@ export async function updateAdminStoreSettings(
     }
   }
 
+  revalidateTag(CACHE_TAGS.siteSettings, { expire: 0 });
   return {};
 }

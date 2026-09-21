@@ -1,12 +1,24 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { ZoomIn } from "lucide-react";
-import { ProductLightbox } from "@/components/product/ProductLightbox";
 import { useProductVariantSelection } from "@/context/ProductVariantImageContext";
 import { cn } from "@/lib/utils";
 import type { ProductVariantGroup } from "@/types";
+
+// Code-split: the full-screen viewer (zoom/keyboard/pinch handling) is only
+// needed by visitors who actually open it, not by every product-page load.
+// Not rendered at all until the first open (below), so its JS chunk is only
+// fetched on demand instead of shipping with every product page.
+const ProductLightbox = dynamic(
+  () =>
+    import("@/components/product/ProductLightbox").then(
+      (mod) => mod.ProductLightbox,
+    ),
+  { ssr: false },
+);
 
 interface ProductGalleryProps {
   images: string[];
@@ -28,6 +40,7 @@ export function ProductGallery({
   const { selections, setSelections } = useProductVariantSelection();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [hasOpenedLightboxOnce, setHasOpenedLightboxOnce] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
@@ -106,10 +119,14 @@ export function ProductGallery({
         onMouseEnter={() => setIsHovering(true)}
         onMouseMove={handleImageMouseMove}
         onMouseLeave={() => setIsHovering(false)}
-        onClick={() => setIsLightboxOpen(true)}
+        onClick={() => {
+          setHasOpenedLightboxOnce(true);
+          setIsLightboxOpen(true);
+        }}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
+            setHasOpenedLightboxOnce(true);
             setIsLightboxOpen(true);
           }
         }}
@@ -119,7 +136,7 @@ export function ProductGallery({
           src={mainImage}
           alt={productName}
           fill
-          priority={activeIndex === 0}
+          preload={activeIndex === 0}
           sizes="(max-width: 1024px) 100vw, 50vw"
           className="object-contain transition-transform duration-300 ease-out"
           style={{ transform: `scale(${zoomScale})`, transformOrigin: zoomOrigin }}
@@ -158,14 +175,16 @@ export function ProductGallery({
         </div>
       )}
 
-      <ProductLightbox
-        images={displayImages}
-        productName={productName}
-        activeIndex={activeIndex}
-        isOpen={isLightboxOpen}
-        onClose={() => setIsLightboxOpen(false)}
-        onIndexChange={setActiveIndex}
-      />
+      {hasOpenedLightboxOnce && (
+        <ProductLightbox
+          images={displayImages}
+          productName={productName}
+          activeIndex={activeIndex}
+          isOpen={isLightboxOpen}
+          onClose={() => setIsLightboxOpen(false)}
+          onIndexChange={setActiveIndex}
+        />
+      )}
     </div>
   );
 }

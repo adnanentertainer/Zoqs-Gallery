@@ -27,7 +27,7 @@ export function HeroSection() {
               src={heroImage}
               alt="Bride wearing a gold statement necklace, drop earrings and maang tikka"
               fill
-              priority
+              preload
               sizes="(max-width: 1024px) 100vw, 448px"
               className="object-cover"
             />

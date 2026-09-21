@@ -1,6 +1,8 @@
+import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { publishProductToSocialMedia } from "@/lib/services/admin/socialPostingService";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import type {
   AdminProductDetail,
   AdminProductFilters,
@@ -322,6 +324,7 @@ export async function createProduct(
     console.error("[adminProductService.createProduct] failed:", error);
     return { error: "Unable to create this product right now." };
   }
+  revalidateTag(CACHE_TAGS.products, { expire: 0 });
 
   try {
     await syncProductImagesAndVariants(product.id, input);
@@ -400,6 +403,7 @@ export async function updateProduct(
     console.error("[adminProductService.updateProduct] failed:", error);
     return { error: "Unable to update this product right now." };
   }
+  revalidateTag(CACHE_TAGS.products, { expire: 0 });
 
   try {
     await syncProductImagesAndVariants(id, input);
@@ -499,6 +503,7 @@ export async function setProductActive(
     console.error("[adminProductService.setProductActive] failed:", error);
     return { error: "Unable to update this product right now." };
   }
+  revalidateTag(CACHE_TAGS.products, { expire: 0 });
 
   if (isActive) {
     try {
@@ -526,5 +531,6 @@ export async function deleteProduct(id: string): Promise<{ error?: string }> {
     console.error("[adminProductService.deleteProduct] failed:", error);
     return { error: "Unable to delete this product right now." };
   }
+  revalidateTag(CACHE_TAGS.products, { expire: 0 });
   return {};
 }
