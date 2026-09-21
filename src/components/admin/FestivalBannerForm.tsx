@@ -5,25 +5,11 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { AuthMessage } from "@/components/auth";
 import { updateAdminFestivalBannerAction } from "@/app/admin/settings/actions";
+import {
+  toDatetimeLocalValue,
+  fromDatetimeLocalValue,
+} from "@/lib/admin/datetimeLocal";
 import type { FestivalBanner } from "@/types/festivalBanner";
-
-// <input type="datetime-local"> needs "YYYY-MM-DDTHH:mm" in local time, but
-// the stored value is a full ISO string (UTC) — convert both directions
-// without going through Date's UTC-based toISOString(), which would shift
-// the displayed time by the admin's timezone offset.
-function toDatetimeLocalValue(isoString: string | null): string {
-  if (!isoString) return "";
-  const date = new Date(isoString);
-  if (Number.isNaN(date.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
-
-function fromDatetimeLocalValue(value: string): string | null {
-  if (!value) return null;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date.toISOString();
-}
 
 export function FestivalBannerForm({
   initialValues,

@@ -12,4 +12,5 @@ export const CACHE_TAGS = {
   socialPosts: "social-posts",
   siteSettings: "site-settings",
   productFeed: "product-feed",
+  promoBanners: "promo-banners",
 } as const;

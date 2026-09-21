@@ -18,6 +18,8 @@ export async function getDashboardMetrics(): Promise<AdminDashboardMetrics> {
     pendingOrdersResult,
     orderValueResult,
     recentOrdersResult,
+    activePromoCodesResult,
+    discountResult,
   ] = await Promise.all([
     supabase.from("products").select("id", { count: "exact", head: true }),
     supabase
@@ -48,6 +50,12 @@ export async function getDashboardMetrics(): Promise<AdminDashboardMetrics> {
       .select("*")
       .order("created_at", { ascending: false })
       .limit(RECENT_ORDERS_LIMIT),
+    supabase
+      .from("promo_codes")
+      .select("id", { count: "exact", head: true })
+      .eq("is_active", true),
+    // Same narrow-column-sum-in-app pattern as orderValueResult above.
+    supabase.from("orders").select("discount_amount").gt("discount_amount", 0),
   ]);
 
   for (const result of [
@@ -59,6 +67,8 @@ export async function getDashboardMetrics(): Promise<AdminDashboardMetrics> {
     pendingOrdersResult,
     orderValueResult,
     recentOrdersResult,
+    activePromoCodesResult,
+    discountResult,
   ]) {
     if (result.error) {
       console.error(
@@ -71,6 +81,12 @@ export async function getDashboardMetrics(): Promise<AdminDashboardMetrics> {
 
   const totalOrderValue = (orderValueResult.data ?? []).reduce(
     (sum, row) => sum + row.total,
+    0,
+  );
+
+  const discountRows = discountResult.data ?? [];
+  const totalDiscountsGiven = discountRows.reduce(
+    (sum, row) => sum + row.discount_amount,
     0,
   );
 
@@ -97,5 +113,8 @@ export async function getDashboardMetrics(): Promise<AdminDashboardMetrics> {
     pendingOrders: pendingOrdersResult.count ?? 0,
     totalOrderValue,
     recentOrders,
+    activePromoCodes: activePromoCodesResult.count ?? 0,
+    totalPromoUsage: discountRows.length,
+    totalDiscountsGiven,
   };
 }

@@ -5,6 +5,7 @@ import {
   getGuestOrderByOrderNumber,
   getOrderByOrderNumber,
 } from "@/lib/services/orderService";
+import { validatePromoCode } from "@/lib/services/promoCodeService";
 import { sendNewOrderNotificationEmail } from "@/lib/email/orderNotification";
 import { sendCustomerOrderConfirmationEmail } from "@/lib/email/customerOrderConfirmation";
 import { sendNewOrderNotificationWhatsApp } from "@/lib/whatsapp/orderNotification";
@@ -18,6 +19,7 @@ import {
   validateProvince,
 } from "@/lib/checkout/validation";
 import type { CheckoutCartLine, PaymentMethod } from "@/types/order";
+import type { PromoValidationResult } from "@/types/promoCode";
 
 export interface PlaceOrderInput {
   items: CheckoutCartLine[];
@@ -34,6 +36,7 @@ export interface PlaceOrderInput {
     country: string;
   };
   customerNotes: string;
+  promoCode?: string;
 }
 
 export interface PlaceOrderResult {
@@ -41,6 +44,25 @@ export interface PlaceOrderResult {
   /** Only set for a guest order — must be appended to the confirmation URL. */
   guestToken?: string | null;
   error?: string;
+}
+
+/**
+ * Server Action behind the checkout "Apply" button — a preview only. It
+ * never writes anything (see validate_promo_code() in the Promo Codes
+ * migration), so it's safe to call as often as the customer edits the code
+ * field. The real, authoritative discount is always recalculated from
+ * scratch by placeOrder() → createOrder() → create_order() below, which is
+ * the only place a discount is ever actually applied to a charge.
+ */
+export async function validatePromoCodeAction(
+  code: string,
+  subtotal: number,
+  email: string,
+): Promise<PromoValidationResult> {
+  if (!code.trim()) {
+    return { valid: false, error: "Enter a promo code." };
+  }
+  return validatePromoCode({ code, subtotal, email });
 }
 
 /**
@@ -102,6 +124,7 @@ export async function placeOrder(
       paymentMethod: input.paymentMethod,
       shipping: input.shipping,
       customerNotes: input.customerNotes,
+      promoCode: input.promoCode,
     });
 
     // Best-effort admin notification, awaited (not fire-and-forget) so it

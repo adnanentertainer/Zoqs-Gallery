@@ -394,6 +394,11 @@ export interface Database {
           shipping_country: string;
           customer_notes: string | null;
           whatsapp_confirmed_at: string | null;
+          promo_code: string | null;
+          promo_code_id: string | null;
+          discount_type: string | null;
+          discount_value: number | null;
+          discount_amount: number;
           created_at: string;
           updated_at: string;
         };
@@ -537,6 +542,98 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // No public Insert/Update/Delete policy at all — every row is written
+      // by an admin (via RLS's is_admin() policies) or, for usage_count,
+      // incremented only inside create_order().
+      promo_codes: {
+        Row: {
+          id: string;
+          code: string;
+          discount_type: string;
+          discount_value: number;
+          min_order_amount: number | null;
+          max_discount_amount: number | null;
+          starts_at: string | null;
+          expires_at: string | null;
+          usage_limit: number | null;
+          usage_limit_per_customer: number | null;
+          usage_count: number;
+          is_active: boolean;
+          description: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          code: string;
+          discount_type: string;
+          discount_value: number;
+          min_order_amount?: number | null;
+          max_discount_amount?: number | null;
+          starts_at?: string | null;
+          expires_at?: string | null;
+          usage_limit?: number | null;
+          usage_limit_per_customer?: number | null;
+          is_active?: boolean;
+          description?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["promo_codes"]["Insert"]>;
+        Relationships: [];
+      };
+      // Never written directly by client code — only create_order() inserts
+      // usage rows, and only for an order that actually committed.
+      promo_code_usages: {
+        Row: {
+          id: string;
+          promo_code_id: string;
+          order_id: string;
+          user_id: string | null;
+          customer_email: string;
+          discount_amount: number;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      promotional_banners: {
+        Row: {
+          id: string;
+          title: string;
+          subtitle: string | null;
+          promo_text: string | null;
+          promo_code_id: string | null;
+          button_text: string | null;
+          button_link: string | null;
+          banner_image_url: string | null;
+          background_image_url: string | null;
+          starts_at: string | null;
+          ends_at: string | null;
+          is_active: boolean;
+          display_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          subtitle?: string | null;
+          promo_text?: string | null;
+          promo_code_id?: string | null;
+          button_text?: string | null;
+          button_link?: string | null;
+          banner_image_url?: string | null;
+          background_image_url?: string | null;
+          starts_at?: string | null;
+          ends_at?: string | null;
+          is_active?: boolean;
+          display_order?: number;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["promotional_banners"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -546,14 +643,32 @@ export interface Database {
           p_payment_method: string;
           p_shipping: unknown;
           p_customer_notes?: string | null;
+          p_promo_code?: string | null;
         };
         Returns: {
           id: string;
           order_number: string;
           subtotal: number;
           shipping_cost: number;
+          discount_amount: number;
+          promo_code: string | null;
           total: number;
           guest_token: string | null;
+        };
+      };
+      validate_promo_code: {
+        Args: {
+          p_code: string;
+          p_subtotal: number;
+          p_email?: string | null;
+        };
+        Returns: {
+          valid: boolean;
+          error?: string;
+          code?: string;
+          discount_type?: string;
+          discount_value?: number;
+          discount_amount?: number;
         };
       };
       get_guest_order: {

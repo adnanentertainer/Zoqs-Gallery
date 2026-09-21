@@ -7,6 +7,9 @@ import {
   ShoppingBag,
   Clock,
   Wallet,
+  Ticket,
+  Tag,
+  BadgePercent,
 } from "lucide-react";
 import { AdminPageHeader, StatusBadge } from "@/components/admin";
 import { MetricCard } from "@/components/admin/MetricCard";
@@ -60,6 +63,21 @@ export default async function AdminDashboardPage() {
           label="Total Order Value"
           value={formatPrice(metrics.totalOrderValue)}
           icon={Wallet}
+        />
+        <MetricCard
+          label="Active Promo Codes"
+          value={String(metrics.activePromoCodes)}
+          icon={Ticket}
+        />
+        <MetricCard
+          label="Total Promo Usage"
+          value={String(metrics.totalPromoUsage)}
+          icon={Tag}
+        />
+        <MetricCard
+          label="Total Discounts Given"
+          value={formatPrice(metrics.totalDiscountsGiven)}
+          icon={BadgePercent}
         />
       </div>
       <Text variant="caption" className="-mt-4">

@@ -40,6 +40,11 @@ function renderCustomerOrderEmailHtml(order: Order): string {
 
       <table style="width:100%;margin-bottom:16px;">
         <tr><td>Subtotal</td><td style="text-align:right;">${formatPrice(order.subtotal)}</td></tr>
+        ${
+          order.discountAmount > 0
+            ? `<tr><td>Discount${order.promoCode ? ` (${escapeHtml(order.promoCode)})` : ""}</td><td style="text-align:right;">-${formatPrice(order.discountAmount)}</td></tr>`
+            : ""
+        }
         <tr><td>Shipping</td><td style="text-align:right;">${formatPrice(order.shippingCost)}</td></tr>
         <tr><td style="font-weight:bold;">Total</td><td style="text-align:right;font-weight:bold;">${formatPrice(order.total)}</td></tr>
       </table>

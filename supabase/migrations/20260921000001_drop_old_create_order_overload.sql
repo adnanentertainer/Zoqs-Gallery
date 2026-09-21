@@ -1,0 +1,11 @@
+-- Cleanup: `create or replace function create_order(..., p_promo_code text
+-- default null)` in the previous migration did NOT replace the original
+-- 4-argument create_order() — appending a parameter changes a function's
+-- identity in Postgres (identity = name + argument type list), so it
+-- created a second, separate overload instead of replacing the first one.
+-- The app (src/lib/services/orderService.ts) always calls the RPC with all
+-- five named arguments (p_promo_code included, even as null), so it already
+-- exclusively resolves to the new 5-argument overload — this migration just
+-- removes the now-dead, superseded 4-argument version so only one
+-- create_order() remains.
+drop function if exists create_order(jsonb, text, jsonb, text);

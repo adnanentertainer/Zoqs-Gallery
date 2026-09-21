@@ -13,6 +13,8 @@ import {
   Images,
   Share2,
   Clapperboard,
+  Ticket,
+  Megaphone,
   type LucideIcon,
 } from "lucide-react";
 
@@ -31,6 +33,8 @@ export const adminNavItems: AdminNavItem[] = [
   { label: "Purchases", href: "/admin/purchases", icon: ClipboardList },
   { label: "Reports", href: "/admin/reports", icon: FileBarChart },
   { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
+  { label: "Promo Codes", href: "/admin/promo-codes", icon: Ticket },
+  { label: "Promo Banners", href: "/admin/promo-banners", icon: Megaphone },
   { label: "Reviews", href: "/admin/reviews", icon: Star },
   { label: "Follow Our Style", href: "/admin/social-posts", icon: Images },
   { label: "Social Auto-Post", href: "/admin/social-media", icon: Share2 },

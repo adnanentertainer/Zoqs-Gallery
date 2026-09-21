@@ -13,15 +13,19 @@ interface OrderSummaryProps {
   items: CheckoutItemData[];
   subtotal: number;
   shippingSettings: ShippingSettings;
+  discountAmount?: number;
+  promoCode?: string | null;
 }
 
 export function OrderSummary({
   items,
   subtotal,
   shippingSettings,
+  discountAmount = 0,
+  promoCode,
 }: OrderSummaryProps) {
   const shippingCost = calculateShippingCost(subtotal, shippingSettings);
-  const total = subtotal + shippingCost;
+  const total = subtotal - discountAmount + shippingCost;
   const qualifiesForFreeShipping = shippingCost === 0;
 
   return (
@@ -47,6 +51,8 @@ export function OrderSummary({
         subtotal={subtotal}
         shippingCost={shippingCost}
         total={total}
+        discountAmount={discountAmount}
+        promoCode={promoCode}
       />
     </div>
   );

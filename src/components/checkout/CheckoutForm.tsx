@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { AuthMessage } from "@/components/auth";
 import { EmptyState } from "@/components/product";
@@ -10,9 +10,14 @@ import {
 } from "@/components/checkout/ShippingAddressForm";
 import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
+import {
+  PromoCodeInput,
+  type AppliedPromo,
+} from "@/components/checkout/PromoCodeInput";
 import { PlaceOrderButton } from "@/components/checkout/PlaceOrderButton";
 import { useCart } from "@/context/CartContext";
 import { getVariantSummaryLabel } from "@/lib/cart";
+import { consumePendingPromoCode } from "@/lib/pendingPromo";
 import { placeOrder } from "@/app/checkout/actions";
 import {
   validateAddressLine1,
@@ -61,6 +66,19 @@ export function CheckoutForm({
   const [paymentError, setPaymentError] = useState<string | undefined>();
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null);
+  const [pendingPromoCode, setPendingPromoCode] = useState("");
+
+  // A banner CTA carries its linked code through as a pre-filled field only
+  // — never auto-applied — so the customer still sees and confirms the
+  // discount before it affects their total (see PromoBannerCarousel). This
+  // has to be an effect (not a lazy useState initializer) since it reads
+  // localStorage, which isn't available during server rendering.
+  useEffect(() => {
+    const code = consumePendingPromoCode();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (code) setPendingPromoCode(code);
+  }, []);
 
   if (cart.lineItems.length === 0) {
     return (
@@ -115,11 +133,19 @@ export function CheckoutForm({
       paymentMethod,
       shipping,
       customerNotes,
+      promoCode: appliedPromo?.code,
     });
 
     if (result.error || !result.orderNumber) {
       setIsSubmitting(false);
       setFormError(result.error ?? "Something went wrong. Please try again.");
+      // create_order() is the final authority on the code's validity — if it
+      // rejected the code (expired/limit hit in the moment between Apply and
+      // Submit), clear it here so the customer can retry without it blocking
+      // checkout, rather than resubmitting the same now-invalid code.
+      if (result.error?.toLowerCase().includes("promo code")) {
+        setAppliedPromo(null);
+      }
       return;
     }
 
@@ -191,6 +217,16 @@ export function CheckoutForm({
       </div>
 
       <div className="flex flex-col gap-4 lg:sticky lg:top-24">
+        <div className="rounded-sm border border-beige p-6">
+          <PromoCodeInput
+            subtotal={cart.subtotal}
+            email={shipping.email}
+            appliedPromo={appliedPromo}
+            onApply={setAppliedPromo}
+            onRemove={() => setAppliedPromo(null)}
+            initialCode={pendingPromoCode}
+          />
+        </div>
         <OrderSummary
           items={cart.lineItems.map((item) => ({
             key: item.key,
@@ -205,6 +241,8 @@ export function CheckoutForm({
           }))}
           subtotal={cart.subtotal}
           shippingSettings={shippingSettings}
+          discountAmount={appliedPromo?.discountAmount}
+          promoCode={appliedPromo?.code}
         />
         <div className="lg:hidden">
           <PlaceOrderButton

@@ -163,6 +163,9 @@ export interface AdminDashboardMetrics {
    */
   totalOrderValue: number;
   recentOrders: AdminOrderListItem[];
+  activePromoCodes: number;
+  totalPromoUsage: number;
+  totalDiscountsGiven: number;
 }
 
 // ============================================================================

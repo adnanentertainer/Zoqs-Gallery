@@ -23,12 +23,17 @@ export interface CreateOrderInput {
     country: string;
   };
   customerNotes: string;
+  /** Re-validated and re-priced from scratch inside create_order() — never
+   * trusted for the discount amount, only used to look up the code. */
+  promoCode?: string;
 }
 
 export interface CreateOrderResult {
   orderNumber: string;
   /** Only set for a guest (unauthenticated) order — see getGuestOrderByOrderNumber. */
   guestToken: string | null;
+  discountAmount: number;
+  promoCode: string | null;
 }
 
 /**
@@ -64,6 +69,7 @@ export async function createOrder(
     p_payment_method: input.paymentMethod,
     p_shipping: shippingPayload,
     p_customer_notes: input.customerNotes || null,
+    p_promo_code: input.promoCode || null,
   });
 
   if (error) {
@@ -72,7 +78,12 @@ export async function createOrder(
       error.message.includes("no longer available") ||
         error.message.includes("Insufficient stock") ||
         error.message.includes("incomplete") ||
-        error.message.includes("Cart is empty")
+        error.message.includes("Cart is empty") ||
+        // Every promo-related exception create_order() raises is already a
+        // clear, customer-facing message (see the Promo Codes migration) —
+        // never replaced by the generic fallback below.
+        error.message.includes("promo code") ||
+        error.message.includes("Minimum order")
         ? error.message
         : "We couldn't place your order right now. Please try again.",
     );
@@ -85,7 +96,12 @@ export async function createOrder(
   // create_order always re-validates stock server-side regardless.
   revalidateTag(CACHE_TAGS.products, { expire: 0 });
 
-  return { orderNumber: data.order_number, guestToken: data.guest_token };
+  return {
+    orderNumber: data.order_number,
+    guestToken: data.guest_token,
+    discountAmount: data.discount_amount,
+    promoCode: data.promo_code,
+  };
 }
 
 /**

@@ -157,6 +157,8 @@ export function OrderConfirmation({
           subtotal={order.subtotal}
           shippingCost={order.shippingCost}
           total={order.total}
+          discountAmount={order.discountAmount}
+          promoCode={order.promoCode}
         />
       </div>
 

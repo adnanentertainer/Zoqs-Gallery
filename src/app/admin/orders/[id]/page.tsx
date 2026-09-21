@@ -75,6 +75,8 @@ export default async function AdminOrderDetailPage({
               subtotal={order.subtotal}
               shippingCost={order.shippingCost}
               total={order.total}
+              discountAmount={order.discountAmount}
+              promoCode={order.promoCode}
             />
           </div>
         </div>

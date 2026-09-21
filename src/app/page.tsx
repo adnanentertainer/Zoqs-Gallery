@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PromoBannerSection } from "@/components/home/PromoBannerSection";
 import { HeroSection } from "@/components/home/HeroSection";
 import { CategorySection } from "@/components/home/CategorySection";
 import { ProductSection } from "@/components/home/ProductSection";
@@ -31,6 +32,7 @@ export default async function Home() {
 
   return (
     <>
+      <PromoBannerSection />
       <HeroSection />
       <CategorySection categories={categories} />
       <ProductSection

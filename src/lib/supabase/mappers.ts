@@ -290,6 +290,10 @@ export function mapOrderRow(row: OrderRow, items: OrderItemRow[]): Order {
     },
     customerNotes: row.customer_notes,
     whatsappConfirmedAt: row.whatsapp_confirmed_at,
+    promoCode: row.promo_code,
+    discountType: row.discount_type as Order["discountType"],
+    discountValue: row.discount_value,
+    discountAmount: row.discount_amount,
     createdAt: row.created_at,
     items: items.map(mapOrderItemRow),
   };

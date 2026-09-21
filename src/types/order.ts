@@ -47,6 +47,10 @@ export interface Order {
   shippingAddress: ShippingAddress;
   customerNotes: string | null;
   whatsappConfirmedAt: string | null;
+  promoCode: string | null;
+  discountType: "percentage" | "fixed" | null;
+  discountValue: number | null;
+  discountAmount: number;
   createdAt: string;
   items: OrderItem[];
 }
