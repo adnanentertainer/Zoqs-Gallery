@@ -80,6 +80,11 @@ export const metadata: Metadata = {
     // Confirms domain ownership for Google Search Console — do not remove,
     // even after verification succeeds, or Search Console loses access.
     google: "NG2dySLIOEj5PqZ1xPGXemAW9vxmYRvEwNJPN-rEiCQ",
+    // Confirms domain ownership for Meta Business Manager — do not remove,
+    // even after verification succeeds, or Meta re-flags the domain unverified.
+    other: {
+      "facebook-domain-verification": "08n8l2hki0x2dfea7nuyrgt7zyy4pf",
+    },
   },
 };
 
