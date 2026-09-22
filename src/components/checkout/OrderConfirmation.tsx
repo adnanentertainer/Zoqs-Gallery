@@ -5,6 +5,7 @@ import { buttonVariants } from "@/components/ui/Button";
 import { AuthMessage } from "@/components/auth";
 import { CheckoutItem } from "@/components/checkout/CheckoutItem";
 import { CheckoutTotals } from "@/components/checkout/CheckoutTotals";
+import { MetaPixelPurchaseTracker } from "@/components/checkout/MetaPixelPurchaseTracker";
 import { WhatsAppIcon } from "@/components/icons/social-icons";
 import { PAYMENT_METHODS } from "@/lib/checkout/paymentMethods";
 import { orderStatusLabel, paymentStatusLabel } from "@/lib/checkout/orderLabels";
@@ -42,6 +43,15 @@ export function OrderConfirmation({
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-8">
+      <MetaPixelPurchaseTracker
+        orderId={order.id}
+        orderNumber={order.orderNumber}
+        value={order.total}
+        currency={order.currency}
+        contentIds={order.items
+          .map((item) => item.productId)
+          .filter((id): id is string => id !== null)}
+      />
       <div className="flex flex-col items-center gap-3 text-center">
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-success/10 text-success">
           <CheckCircle2 className="h-7 w-7" aria-hidden="true" />

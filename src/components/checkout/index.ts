@@ -6,3 +6,4 @@ export { CheckoutItem } from "@/components/checkout/CheckoutItem";
 export { CheckoutTotals } from "@/components/checkout/CheckoutTotals";
 export { PlaceOrderButton } from "@/components/checkout/PlaceOrderButton";
 export { OrderConfirmation } from "@/components/checkout/OrderConfirmation";
+export { MetaPixelPurchaseTracker } from "@/components/checkout/MetaPixelPurchaseTracker";

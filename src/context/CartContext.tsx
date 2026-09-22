@@ -24,7 +24,9 @@ import {
   type FreeShippingProgress,
 } from "@/lib/cart";
 import { createLocalStorageStore } from "@/lib/localStorageStore";
+import { trackAddToCart } from "@/lib/metaPixel";
 import { useToast } from "@/context/ToastContext";
+import { siteConfig } from "@/constants/site";
 import type { Product } from "@/types";
 
 const STORAGE_KEY = "zoqs-gallery-cart";
@@ -269,6 +271,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
         productSlug: product.slug,
         quantity,
         selectedVariants,
+      });
+      trackAddToCart({
+        contentId: product.id,
+        contentName: product.name,
+        value: getVariantUnitPrice(product, selectedVariants),
+        currency: siteConfig.currency,
+        quantity,
       });
       if (!options?.silent) {
         showToast(`${product.name} added to cart`);

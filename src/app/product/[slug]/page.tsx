@@ -6,6 +6,7 @@ import { Heading, Text } from "@/components/ui/Typography";
 import { Badge } from "@/components/ui/Badge";
 import { RatingStars } from "@/components/shared/RatingStars";
 import {
+  MetaPixelViewContentTracker,
   ProductActions,
   ProductGallery,
   ProductPrice,
@@ -223,6 +224,12 @@ export default async function ProductPage({
         dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
       <RecentlyViewedTracker slug={product.slug} />
+      <MetaPixelViewContentTracker
+        productId={product.id}
+        productName={product.name}
+        price={product.price}
+        currency={siteConfig.currency}
+      />
       <ProductWhatsAppButton product={product} />
 
       <Container className="flex flex-col gap-3 pt-6 pb-4">

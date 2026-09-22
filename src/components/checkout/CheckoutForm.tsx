@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { AuthMessage } from "@/components/auth";
 import { EmptyState } from "@/components/product";
@@ -17,7 +17,9 @@ import {
 import { PlaceOrderButton } from "@/components/checkout/PlaceOrderButton";
 import { useCart } from "@/context/CartContext";
 import { getVariantSummaryLabel } from "@/lib/cart";
+import { trackInitiateCheckout } from "@/lib/metaPixel";
 import { consumePendingPromoCode } from "@/lib/pendingPromo";
+import { siteConfig } from "@/constants/site";
 import { placeOrder } from "@/app/checkout/actions";
 import {
   validateAddressLine1,
@@ -79,6 +81,18 @@ export function CheckoutForm({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (code) setPendingPromoCode(code);
   }, []);
+
+  const hasTrackedCheckout = useRef(false);
+  useEffect(() => {
+    if (hasTrackedCheckout.current || cart.lineItems.length === 0) return;
+    hasTrackedCheckout.current = true;
+    trackInitiateCheckout({
+      contentIds: cart.lineItems.map((item) => item.product.id),
+      value: cart.subtotal,
+      currency: siteConfig.currency,
+      numItems: cart.totalQuantity,
+    });
+  }, [cart.lineItems, cart.subtotal, cart.totalQuantity]);
 
   if (cart.lineItems.length === 0) {
     return (

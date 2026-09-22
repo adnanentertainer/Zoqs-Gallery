@@ -19,4 +19,5 @@ export { ReviewSummary } from "@/components/product/ReviewSummary";
 export { ProductReviews } from "@/components/product/ProductReviews";
 export { ReviewForm } from "@/components/product/ReviewForm";
 export { RecentlyViewedTracker } from "@/components/product/RecentlyViewedTracker";
+export { MetaPixelViewContentTracker } from "@/components/product/MetaPixelViewContentTracker";
 export { RecentlyViewedSection } from "@/components/product/RecentlyViewedSection";
