@@ -31,7 +31,9 @@ export async function listProductOptions(): Promise<ProductOption[]> {
 
   const { data, error } = await supabase
     .from("products")
-    .select("id, name, sku, stock, product_variants(id, option_value, sku, stock)")
+    .select(
+      "id, name, sku, stock, category_id, categories(name), product_variants(id, option_value, sku, stock)",
+    )
     .eq("is_active", true)
     .order("name", { ascending: true });
 
@@ -45,6 +47,8 @@ export async function listProductOptions(): Promise<ProductOption[]> {
     name: string;
     sku: string | null;
     stock: number;
+    category_id: string | null;
+    categories: { name: string } | null;
     product_variants: {
       id: string;
       option_value: string;
@@ -53,18 +57,25 @@ export async function listProductOptions(): Promise<ProductOption[]> {
     }[];
   }[];
 
-  return rows.map((row) => ({
-    id: row.id,
-    name: row.name,
-    sku: row.sku,
-    stock: row.stock,
-    variants: row.product_variants.map((variant) => ({
-      id: variant.id,
-      label: variant.option_value,
-      sku: variant.sku,
-      stock: variant.stock,
-    })),
-  }));
+  return rows
+    .map((row) => ({
+      id: row.id,
+      name: row.name,
+      sku: row.sku,
+      stock: row.stock,
+      categoryId: row.category_id,
+      categoryName: row.categories?.name ?? "Uncategorized",
+      variants: row.product_variants.map((variant) => ({
+        id: variant.id,
+        label: variant.option_value,
+        sku: variant.sku,
+        stock: variant.stock,
+      })),
+    }))
+    .sort(
+      (a, b) =>
+        a.categoryName.localeCompare(b.categoryName) || a.name.localeCompare(b.name),
+    );
 }
 
 function mapProductListRow(row: ProductListRow): AdminProductListItem {

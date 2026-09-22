@@ -29,6 +29,8 @@ export interface ProductOption {
   name: string;
   sku: string | null;
   stock: number;
+  categoryId: string | null;
+  categoryName: string;
   variants: { id: string; label: string; sku: string | null; stock: number | null }[];
 }
 
