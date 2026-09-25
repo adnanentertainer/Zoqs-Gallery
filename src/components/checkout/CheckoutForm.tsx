@@ -198,7 +198,10 @@ export function CheckoutForm({
               setPaymentError(undefined);
             }}
             error={paymentError}
-            shippingCost={calculateShippingCost(cart.subtotal, shippingSettings)}
+            shippingCost={calculateShippingCost(
+              cart.subtotal - (appliedPromo?.discountAmount ?? 0),
+              shippingSettings,
+            )}
           />
         </section>
 

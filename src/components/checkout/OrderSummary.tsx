@@ -24,8 +24,12 @@ export function OrderSummary({
   discountAmount = 0,
   promoCode,
 }: OrderSummaryProps) {
-  const shippingCost = calculateShippingCost(subtotal, shippingSettings);
-  const total = subtotal - discountAmount + shippingCost;
+  const discountedSubtotal = subtotal - discountAmount;
+  const shippingCost = calculateShippingCost(
+    discountedSubtotal,
+    shippingSettings,
+  );
+  const total = discountedSubtotal + shippingCost;
   const qualifiesForFreeShipping = shippingCost === 0;
 
   return (
@@ -42,7 +46,10 @@ export function OrderSummary({
 
       {!qualifiesForFreeShipping && (
         <p className="font-body text-xs text-muted">
-          Add {formatPrice(shippingSettings.freeShippingThreshold - subtotal)}{" "}
+          Add{" "}
+          {formatPrice(
+            shippingSettings.freeShippingThreshold - discountedSubtotal,
+          )}{" "}
           more to qualify for free shipping.
         </p>
       )}
