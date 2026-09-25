@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type KeyboardEvent } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
 import { X } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -34,6 +34,46 @@ export function PromoCodeInput({
   const [code, setCode] = useState(initialCode);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // A promo's discount is a snapshot taken when "Apply" was clicked. If the
+  // cart changes afterward — e.g. the customer adjusts quantities in the
+  // header's cart drawer without navigating away from checkout — without
+  // re-applying the code, that snapshot goes stale — the preview would keep
+  // showing the old discount/total against the new subtotal. Re-validate
+  // whenever the subtotal moves so the preview stays honest; this never
+  // writes anything and is cheap to call repeatedly (see
+  // validatePromoCodeAction's own comment). The real charge at order time
+  // is always recalculated from scratch regardless, so this only fixes what
+  // the customer sees before submitting, not what they'd actually be
+  // charged either way.
+  useEffect(() => {
+    if (!appliedPromo) return;
+    let cancelled = false;
+    const { code: promoCode, discountAmount: previousAmount } = appliedPromo;
+
+    validatePromoCodeAction(promoCode, subtotal, email).then((result) => {
+      if (cancelled) return;
+      if (!result.valid || result.discountAmount === undefined) {
+        onRemove();
+        setError(
+          result.error ?? "Your promo code no longer applies to this order.",
+        );
+        return;
+      }
+      if (result.discountAmount !== previousAmount) {
+        onApply({
+          code: result.code ?? promoCode,
+          discountAmount: result.discountAmount,
+        });
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+    // Deliberately reacting to `subtotal` alone — see the comment above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtotal]);
 
   async function handleApply() {
     if (isSubmitting || !code.trim()) return;
