@@ -66,6 +66,8 @@ export function buildFacebookCaption(input: SocialPostProductInput): string {
     "🛍️ Shop Now:",
     input.productUrl,
     "",
+    "❤️ Like & Share this post with your friends! 💕",
+    "",
     buildHashtags(BASE_FACEBOOK_HASHTAGS, input.categoryName),
   );
 
@@ -88,6 +90,8 @@ export function buildInstagramCaption(input: SocialPostProductInput): string {
       "",
       `💫 ${formatPrice(input.price)} | Limited stock`,
       `🔗 Shop the link: ${input.productUrl}`,
+      "",
+      "❤️ Like & Share this post with your friends! 💕",
       "",
       hashtags,
     );
