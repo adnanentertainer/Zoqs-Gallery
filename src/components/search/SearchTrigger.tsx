@@ -15,7 +15,7 @@ import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { searchProducts } from "@/lib/products";
 import { categoryLabel, cn, formatPrice } from "@/lib/utils";
-import { allProducts } from "@/data/products";
+import type { Product } from "@/types";
 
 const POPULAR_SEARCHES = [
   "Earrings",
@@ -52,8 +52,10 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
   const isMounted = useIsClient();
   const inputRef = useRef<HTMLInputElement>(null);
+  const hasFetchedProducts = useRef(false);
 
   function closeOverlay() {
     setIsOpen(false);
@@ -69,9 +71,20 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
     return () => window.clearTimeout(id);
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen || hasFetchedProducts.current) return;
+    hasFetchedProducts.current = true;
+    fetch("/api/products/search")
+      .then((response) => (response.ok ? response.json() : []))
+      .then((data: Product[]) => setProducts(data))
+      .catch(() => {
+        hasFetchedProducts.current = false;
+      });
+  }, [isOpen]);
+
   const suggestions = useMemo(
-    () => (query.trim() ? searchProducts(allProducts, query).slice(0, 6) : []),
-    [query],
+    () => (query.trim() ? searchProducts(products, query).slice(0, 6) : []),
+    [query, products],
   );
 
   function runSearch(value: string) {
