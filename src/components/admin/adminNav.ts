@@ -15,8 +15,10 @@ import {
   Clapperboard,
   Ticket,
   Megaphone,
+  Gift,
   type LucideIcon,
 } from "lucide-react";
+import { SOCIAL_ENGAGEMENT_CAMPAIGNS_ENABLED } from "@/lib/features";
 
 export interface AdminNavItem {
   label: string;
@@ -35,6 +37,9 @@ export const adminNavItems: AdminNavItem[] = [
   { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
   { label: "Promo Codes", href: "/admin/promo-codes", icon: Ticket },
   { label: "Promo Banners", href: "/admin/promo-banners", icon: Megaphone },
+  ...(SOCIAL_ENGAGEMENT_CAMPAIGNS_ENABLED
+    ? [{ label: "Social Campaigns", href: "/admin/social-campaigns", icon: Gift }]
+    : []),
   { label: "Reviews", href: "/admin/reviews", icon: Star },
   { label: "Follow Our Style", href: "/admin/social-posts", icon: Images },
   { label: "Social Auto-Post", href: "/admin/social-media", icon: Share2 },

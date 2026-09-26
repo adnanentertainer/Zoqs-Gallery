@@ -8,6 +8,7 @@ import { LogoutButton } from "@/components/auth";
 import { getServerUser } from "@/lib/auth/getServerUser";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { mapProfileRow } from "@/lib/supabase/mappers";
+import { SOCIAL_ENGAGEMENT_CAMPAIGNS_ENABLED } from "@/lib/features";
 
 export const metadata: Metadata = {
   title: "My Account | ZOQ's Gallery",
@@ -61,6 +62,16 @@ export default async function AccountPage() {
             Update your name and contact details.
           </Text>
         </Link>
+        {SOCIAL_ENGAGEMENT_CAMPAIGNS_ENABLED && (
+          <Link href="/account/rewards" className={cardStyles}>
+            <Heading variant="h3" as="h2">
+              Earn Your Discount
+            </Heading>
+            <Text variant="bodySm" className="mt-1 text-muted">
+              Engage with our social posts to unlock a reward code.
+            </Text>
+          </Link>
+        )}
         <Link href="/wishlist" className={cardStyles}>
           <Heading variant="h3" as="h2">
             Wishlist

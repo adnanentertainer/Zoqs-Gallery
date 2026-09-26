@@ -560,6 +560,12 @@ export interface Database {
           usage_count: number;
           is_active: boolean;
           description: string | null;
+          // Added by 20260927000000_social_engagement_campaigns.sql — all
+          // nullable/defaulted so every pre-existing row is unaffected.
+          source: string;
+          campaign_id: string | null;
+          owner_user_id: string | null;
+          participation_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -576,8 +582,141 @@ export interface Database {
           usage_limit_per_customer?: number | null;
           is_active?: boolean;
           description?: string | null;
+          source?: string;
+          campaign_id?: string | null;
+          owner_user_id?: string | null;
+          participation_id?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["promo_codes"]["Insert"]>;
+        Relationships: [];
+      };
+      social_campaigns: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          facebook_page_id: string | null;
+          instagram_account_id: string | null;
+          engagement_type: string;
+          required_engagement_count: number;
+          discount_type: string;
+          discount_value: number;
+          min_order_amount: number | null;
+          max_discount_amount: number | null;
+          coupon_validity_days: number;
+          starts_at: string | null;
+          ends_at: string | null;
+          max_total_claims: number | null;
+          max_claims_per_customer: number;
+          allow_repeat_claims: boolean;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          facebook_page_id?: string | null;
+          instagram_account_id?: string | null;
+          engagement_type: string;
+          required_engagement_count: number;
+          discount_type: string;
+          discount_value: number;
+          min_order_amount?: number | null;
+          max_discount_amount?: number | null;
+          coupon_validity_days?: number;
+          starts_at?: string | null;
+          ends_at?: string | null;
+          max_total_claims?: number | null;
+          max_claims_per_customer?: number;
+          allow_repeat_claims?: boolean;
+          status?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["social_campaigns"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      social_campaign_content: {
+        Row: {
+          id: string;
+          campaign_id: string;
+          platform: string;
+          post_url: string;
+          post_id: string | null;
+          thumbnail_url: string | null;
+          caption: string | null;
+          posted_at: string | null;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          campaign_id: string;
+          platform: string;
+          post_url: string;
+          post_id?: string | null;
+          thumbnail_url?: string | null;
+          caption?: string | null;
+          posted_at?: string | null;
+          is_active?: boolean;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["social_campaign_content"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // Written only by start_campaign_participation()/
+      // admin_review_campaign_submission() — never a direct client insert.
+      social_campaign_participations: {
+        Row: {
+          id: string;
+          campaign_id: string;
+          user_id: string;
+          cycle_number: number;
+          status: string;
+          started_at: string;
+          submitted_at: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      // Written only by toggle_campaign_engagement() — never a direct client
+      // insert/delete.
+      social_campaign_engagements: {
+        Row: {
+          id: string;
+          participation_id: string;
+          content_id: string;
+          engagement_type: string;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      // Written only by submit_campaign_proof()/
+      // admin_review_campaign_submission() — never a direct client insert.
+      social_campaign_submissions: {
+        Row: {
+          id: string;
+          participation_id: string;
+          proof_link: string | null;
+          proof_note: string | null;
+          status: string;
+          admin_notes: string | null;
+          reviewed_by: string | null;
+          reviewed_at: string | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
         Relationships: [];
       };
       // Never written directly by client code — only create_order() inserts
@@ -705,6 +844,44 @@ export interface Database {
         };
         Returns: {
           purchase_number: string;
+        };
+      };
+      start_campaign_participation: {
+        Args: {
+          p_campaign_id: string;
+        };
+        Returns: Database["public"]["Tables"]["social_campaign_participations"]["Row"];
+      };
+      toggle_campaign_engagement: {
+        Args: {
+          p_participation_id: string;
+          p_content_id: string;
+          p_engagement_type: string;
+          p_mark_done: boolean;
+        };
+        Returns: Database["public"]["Tables"]["social_campaign_participations"]["Row"];
+      };
+      submit_campaign_proof: {
+        Args: {
+          p_participation_id: string;
+          p_proof_link: string | null;
+          p_proof_note: string | null;
+        };
+        Returns: Database["public"]["Tables"]["social_campaign_submissions"]["Row"];
+      };
+      admin_review_campaign_submission: {
+        Args: {
+          p_submission_id: string;
+          p_decision: string;
+          p_admin_notes: string | null;
+        };
+        Returns: {
+          decision: string;
+          promo_code_id?: string;
+          code?: string;
+          discount_type?: string;
+          discount_value?: number;
+          expires_at?: string;
         };
       };
     };

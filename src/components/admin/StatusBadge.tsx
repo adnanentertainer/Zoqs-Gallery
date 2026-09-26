@@ -17,7 +17,17 @@ export type StatusBadgeValue =
   | "out-of-stock"
   | "completed"
   | "unpaid"
-  | "partial";
+  | "partial"
+  | "draft"
+  | "paused"
+  | "expired"
+  | "in_progress"
+  | "pending_verification"
+  | "more_proof_requested"
+  | "approved"
+  | "rejected"
+  | "reward_issued"
+  | "reward_used";
 
 const STATUS_CONFIG: Record<
   StatusBadgeValue,
@@ -40,6 +50,16 @@ const STATUS_CONFIG: Record<
   completed: { label: "Completed", variant: "success" },
   unpaid: { label: "Unpaid", variant: "error" },
   partial: { label: "Partial", variant: "warning" },
+  draft: { label: "Draft", variant: "default" },
+  paused: { label: "Paused", variant: "warning" },
+  expired: { label: "Expired", variant: "outline" },
+  in_progress: { label: "In Progress", variant: "gold" },
+  pending_verification: { label: "Pending Verification", variant: "warning" },
+  more_proof_requested: { label: "More Proof Requested", variant: "warning" },
+  approved: { label: "Approved", variant: "success" },
+  rejected: { label: "Rejected", variant: "error" },
+  reward_issued: { label: "Reward Issued", variant: "success" },
+  reward_used: { label: "Reward Used", variant: "outline" },
 };
 
 export function StatusBadge({ status }: { status: StatusBadgeValue }) {
