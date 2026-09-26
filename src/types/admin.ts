@@ -34,6 +34,13 @@ export interface ProductOption {
   variants: { id: string; label: string; sku: string | null; stock: number | null }[];
 }
 
+export interface ReelProductOption extends ProductOption {
+  /** Caption pre-generated from this product's own details (same template
+   * used by the photo auto-poster), so publishing a Reel never needs the
+   * admin to type product details by hand. */
+  defaultCaption: string;
+}
+
 export interface AdminProductListItem {
   id: string;
   name: string;

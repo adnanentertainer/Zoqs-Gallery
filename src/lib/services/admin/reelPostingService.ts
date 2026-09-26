@@ -4,17 +4,99 @@ import { publishFacebookReel } from "@/lib/meta/facebookPublisher";
 import { publishInstagramReel } from "@/lib/meta/instagramPublisher";
 import { getPageAccessToken } from "@/lib/meta/graphClient";
 import { findCatalogProductId } from "@/lib/meta/catalogClient";
+import { buildInstagramCaption } from "@/lib/meta/captionBuilder";
 import type {
   ProductReelInput,
   ProductReelRecord,
   SocialPlatformStatus,
 } from "@/types/socialMedia";
-import type { PaginationResult } from "@/types/admin";
+import type { PaginationResult, ReelProductOption } from "@/types/admin";
+
+const baseUrl =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+  "http://localhost:3000";
 
 interface PlatformResult {
   status: SocialPlatformStatus;
   id?: string;
   error?: string;
+}
+
+interface ReelProductOptionRow {
+  id: string;
+  name: string;
+  sku: string | null;
+  stock: number;
+  category_id: string | null;
+  slug: string;
+  short_description: string | null;
+  price: number;
+  categories: { name: string } | null;
+  product_variants: {
+    id: string;
+    option_value: string;
+    option_type: string;
+    is_active: boolean;
+    sku: string | null;
+    stock: number | null;
+  }[];
+}
+
+/**
+ * Same product list as listProductOptions(), plus a caption pre-built from
+ * each product's own details (via the same captionBuilder the photo
+ * auto-poster uses) -- the Reel form uses this so publishing a Reel for an
+ * existing product never requires the admin to retype its details.
+ */
+export async function listReelProductOptions(): Promise<ReelProductOption[]> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("products")
+    .select(
+      "id, name, sku, stock, category_id, slug, short_description, price, categories(name), product_variants(id, option_value, option_type, is_active, sku, stock)",
+    )
+    .eq("is_active", true)
+    .order("name", { ascending: true });
+
+  if (error) {
+    console.error("[reelPostingService.listReelProductOptions] failed:", error);
+    throw new Error("Unable to load products right now.");
+  }
+
+  const rows = (data ?? []) as unknown as ReelProductOptionRow[];
+
+  return rows.map((row) => {
+    const colorOptions = row.product_variants
+      .filter((variant) => variant.option_type === "color" && variant.is_active)
+      .map((variant) => variant.option_value);
+
+    const defaultCaption = buildInstagramCaption({
+      name: row.name,
+      shortDescription: row.short_description,
+      price: row.price,
+      productUrl: `${baseUrl}/product/${row.slug}`,
+      categoryName: row.categories?.name,
+      colorOptions,
+    });
+
+    return {
+      id: row.id,
+      name: row.name,
+      sku: row.sku,
+      stock: row.stock,
+      categoryId: row.category_id,
+      categoryName: row.categories?.name ?? "Uncategorized",
+      variants: row.product_variants.map((variant) => ({
+        id: variant.id,
+        label: variant.option_value,
+        sku: variant.sku,
+        stock: variant.stock,
+      })),
+      defaultCaption,
+    };
+  });
 }
 
 interface SettingsRow {

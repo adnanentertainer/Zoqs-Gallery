@@ -7,14 +7,14 @@ import { Input } from "@/components/ui/Input";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { AuthMessage } from "@/components/auth";
 import { createReelAction } from "@/app/admin/reels/actions";
-import type { ProductOption } from "@/types/admin";
+import type { ReelProductOption } from "@/types/admin";
 
 const selectStyles =
   "h-11 w-full rounded-sm border border-beige bg-white px-3 font-body text-sm text-primary focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold";
 const fieldLabelStyles = "font-body text-sm font-medium text-primary";
 
 interface ReelFormProps {
-  products: ProductOption[];
+  products: ReelProductOption[];
 }
 
 export function ReelForm({ products }: ReelFormProps) {
@@ -52,6 +52,12 @@ export function ReelForm({ products }: ReelFormProps) {
         (!value || (product.categoryId ?? product.categoryName) === value),
     );
     if (!stillVisible) setProductId("");
+  }
+
+  function handleProductChange(id: string) {
+    setProductId(id);
+    const selected = products.find((product) => product.id === id);
+    setCaption(selected?.defaultCaption ?? "");
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -100,7 +106,7 @@ export function ReelForm({ products }: ReelFormProps) {
           <select
             required
             value={productId}
-            onChange={(event) => setProductId(event.target.value)}
+            onChange={(event) => handleProductChange(event.target.value)}
             className={selectStyles}
           >
             <option value="" disabled>
@@ -143,13 +149,15 @@ export function ReelForm({ products }: ReelFormProps) {
           <label className={fieldLabelStyles}>Caption</label>
           <textarea
             required
-            rows={4}
+            rows={9}
             value={caption}
             onChange={(event) => setCaption(event.target.value)}
             className="w-full rounded-sm border border-beige bg-white px-4 py-3 font-body text-sm text-primary focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
           />
           <p className="font-body text-xs text-muted">
-            Posted as-is to both Facebook and Instagram.
+            Auto-filled from the selected product&apos;s name, description,
+            price, and link — edit if you want, but nothing needs to be typed
+            by hand. Posted as-is to both Facebook and Instagram.
           </p>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AdminPageHeader } from "@/components/admin";
 import { ReelForm } from "@/components/admin/ReelForm";
-import { listProductOptions } from "@/lib/services/admin/adminProductService";
+import { listReelProductOptions } from "@/lib/services/admin/reelPostingService";
 
 export const metadata: Metadata = {
   title: "Publish Reel | Admin | ZOQ's Gallery",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function NewReelPage() {
-  const products = await listProductOptions();
+  const products = await listReelProductOptions();
 
   return (
     <div className="flex flex-col gap-6">
