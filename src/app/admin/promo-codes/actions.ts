@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import {
   createPromoCode,
@@ -8,6 +8,7 @@ import {
   setPromoCodeActive,
   updatePromoCode,
 } from "@/lib/services/admin/adminPromoCodeService";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import type { AdminPromoCodeInput } from "@/types/promoCode";
 
 function validatePromoCodeInput(
@@ -52,7 +53,10 @@ export async function createPromoCodeAction(
   const validationError = validatePromoCodeInput(input);
   if (validationError) return { error: validationError };
   const result = await createPromoCode(input);
-  if (!result.error) revalidatePath("/admin/promo-codes");
+  if (!result.error) {
+    revalidatePath("/admin/promo-codes");
+    revalidateTag(CACHE_TAGS.activePromoCode, { expire: 0 });
+  }
   return result;
 }
 
@@ -67,6 +71,7 @@ export async function updatePromoCodeAction(
   if (!result.error) {
     revalidatePath("/admin/promo-codes");
     revalidatePath(`/admin/promo-codes/${id}`);
+    revalidateTag(CACHE_TAGS.activePromoCode, { expire: 0 });
   }
   return result;
 }
@@ -77,7 +82,10 @@ export async function setPromoCodeActiveAction(
 ): Promise<{ error?: string }> {
   await requireAdmin();
   const result = await setPromoCodeActive(id, isActive);
-  if (!result.error) revalidatePath("/admin/promo-codes");
+  if (!result.error) {
+    revalidatePath("/admin/promo-codes");
+    revalidateTag(CACHE_TAGS.activePromoCode, { expire: 0 });
+  }
   return result;
 }
 
@@ -86,6 +94,9 @@ export async function deletePromoCodeAction(
 ): Promise<{ error?: string }> {
   await requireAdmin();
   const result = await deletePromoCode(id);
-  if (!result.error) revalidatePath("/admin/promo-codes");
+  if (!result.error) {
+    revalidatePath("/admin/promo-codes");
+    revalidateTag(CACHE_TAGS.activePromoCode, { expire: 0 });
+  }
   return result;
 }

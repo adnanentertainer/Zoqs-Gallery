@@ -810,6 +810,10 @@ export interface Database {
           discount_amount?: number;
         };
       };
+      has_active_promo_code: {
+        Args: Record<PropertyKey, never>;
+        Returns: boolean;
+      };
       get_guest_order: {
         Args: {
           p_order_number: string;

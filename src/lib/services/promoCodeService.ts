@@ -1,4 +1,10 @@
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { unstable_cache } from "next/cache";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
+import {
+  getSupabasePublicClient,
+  getSupabaseServerClient,
+} from "@/lib/supabase/server";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import type { PromoValidationResult } from "@/types/promoCode";
 
 export interface ValidatePromoCodeInput {
@@ -50,4 +56,39 @@ export async function validatePromoCode(
     discountValue: result.discount_value,
     discountAmount: result.discount_amount,
   };
+}
+
+// Read on every checkout page load, so this follows the same cached + tagged
+// pattern as settingsService.getSiteSetting / promoBannerService — an admin
+// create/update/activate/delete calls revalidateTag(CACHE_TAGS.activePromoCode)
+// so a change shows up immediately instead of waiting out the window below.
+const hasActivePromoCodeUncached = unstable_cache(
+  async (): Promise<boolean> => {
+    const supabase = getSupabasePublicClient();
+    const { data, error } = await supabase.rpc("has_active_promo_code");
+    if (error) throw error;
+    return Boolean(data);
+  },
+  ["promo-codes:has-active"],
+  { tags: [CACHE_TAGS.activePromoCode], revalidate: 300 },
+);
+
+/**
+ * Whether at least one promo code is currently redeemable (active, within
+ * its start/expiry window, under its usage limit) — used to hide the
+ * checkout "Have a promo code?" field entirely when no campaign is running,
+ * instead of showing an Apply box that could only ever say "invalid code".
+ */
+export async function hasActivePromoCode(): Promise<boolean> {
+  if (!isSupabaseConfigured()) return false;
+
+  try {
+    return await hasActivePromoCodeUncached();
+  } catch (error) {
+    console.error(
+      "[promoCodeService.hasActivePromoCode] Supabase query failed:",
+      error,
+    );
+    return false;
+  }
 }

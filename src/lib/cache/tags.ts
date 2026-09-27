@@ -13,4 +13,5 @@ export const CACHE_TAGS = {
   siteSettings: "site-settings",
   productFeed: "product-feed",
   promoBanners: "promo-banners",
+  activePromoCode: "active-promo-code",
 } as const;

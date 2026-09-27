@@ -40,11 +40,15 @@ import type { PaymentMethod, ShippingAddress } from "@/types/order";
 interface CheckoutFormProps {
   initialShipping: Pick<ShippingAddress, "fullName" | "email" | "phone">;
   shippingSettings: ShippingSettings;
+  /** Hide the "Have a promo code?" field entirely when no promo code is
+   * currently active — see promoCodeService.hasActivePromoCode(). */
+  showPromoCode: boolean;
 }
 
 export function CheckoutForm({
   initialShipping,
   shippingSettings,
+  showPromoCode,
 }: CheckoutFormProps) {
   const router = useRouter();
   const cart = useCart();
@@ -234,16 +238,18 @@ export function CheckoutForm({
       </div>
 
       <div className="flex flex-col gap-4 lg:sticky lg:top-24">
-        <div className="rounded-sm border border-beige p-6">
-          <PromoCodeInput
-            subtotal={cart.subtotal}
-            email={shipping.email}
-            appliedPromo={appliedPromo}
-            onApply={setAppliedPromo}
-            onRemove={() => setAppliedPromo(null)}
-            initialCode={pendingPromoCode}
-          />
-        </div>
+        {showPromoCode && (
+          <div className="rounded-sm border border-beige p-6">
+            <PromoCodeInput
+              subtotal={cart.subtotal}
+              email={shipping.email}
+              appliedPromo={appliedPromo}
+              onApply={setAppliedPromo}
+              onRemove={() => setAppliedPromo(null)}
+              initialCode={pendingPromoCode}
+            />
+          </div>
+        )}
         <OrderSummary
           items={cart.lineItems.map((item) => ({
             key: item.key,
