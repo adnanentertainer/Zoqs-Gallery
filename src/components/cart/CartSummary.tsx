@@ -34,7 +34,9 @@ export function CartSummary({
 
       <div className="flex flex-col gap-3">
         <Link
-          href="/checkout/start"
+          // Login/register prompt (/checkout/start) is disabled — go
+          // straight to checkout so guests aren't asked to sign in first.
+          href="/checkout"
           onClick={onNavigate}
           className={buttonVariants("gold", "lg", "w-full")}
         >

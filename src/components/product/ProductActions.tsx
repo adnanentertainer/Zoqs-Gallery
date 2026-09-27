@@ -64,7 +64,9 @@ export function ProductActions({ product }: ProductActionsProps) {
   function handleBuyNow() {
     if (!canPurchase) return;
     cart.addItem(product, quantity, selections, { silent: true });
-    router.push("/checkout/start");
+    // Login/register prompt (/checkout/start) is disabled — go straight to
+    // checkout so guests aren't asked to sign in first.
+    router.push("/checkout");
   }
 
   async function handleShare() {
