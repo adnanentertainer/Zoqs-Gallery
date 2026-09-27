@@ -1,12 +1,49 @@
 const GRAPH_API_VERSION = "v21.0";
 const GRAPH_API_BASE = `https://graph.facebook.com/${GRAPH_API_VERSION}`;
 
+interface GraphErrorBody {
+  error?: {
+    message?: string;
+    code?: number;
+    error_subcode?: number;
+    is_transient?: boolean;
+  };
+}
+
+/**
+ * Carries Meta's structured error fields (code/error_subcode/is_transient)
+ * instead of just a stringified body, so callers can react to a specific
+ * known error (e.g. "media not ready for publishing") without re-parsing
+ * the message text themselves.
+ */
+export class GraphApiError extends Error {
+  code?: number;
+  errorSubcode?: number;
+  isTransient?: boolean;
+
+  constructor(
+    status: number,
+    rawBody: string,
+    parsed?: GraphErrorBody["error"],
+  ) {
+    super(`Meta Graph API request failed (${status}): ${rawBody}`);
+    this.name = "GraphApiError";
+    this.code = parsed?.code;
+    this.errorSubcode = parsed?.error_subcode;
+    this.isTransient = parsed?.is_transient;
+  }
+}
+
 async function parseGraphResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(
-      `Meta Graph API request failed (${response.status}): ${body}`,
-    );
+    let parsedError: GraphErrorBody["error"];
+    try {
+      parsedError = (JSON.parse(body) as GraphErrorBody).error;
+    } catch {
+      // Body wasn't JSON -- GraphApiError falls back to just the raw text.
+    }
+    throw new GraphApiError(response.status, body, parsedError);
   }
   return response.json() as Promise<T>;
 }

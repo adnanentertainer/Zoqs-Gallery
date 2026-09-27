@@ -1,4 +1,4 @@
-import { graphApiGet, graphApiPost } from "@/lib/meta/graphClient";
+import { GraphApiError, graphApiGet, graphApiPost } from "@/lib/meta/graphClient";
 
 interface PublishInstagramPostInput {
   igUserId: string;
@@ -27,6 +27,39 @@ const REEL_STATUS_POLL_DELAY_MS = 3000;
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// error_subcode 2207027 ("media not ready for publishing") is a known Meta
+// race condition: status_code can report FINISHED slightly before the
+// container is actually ready for /media_publish. Meta's own error message
+// for it is literally "please wait for a moment", so a short retry clears
+// it almost every time rather than failing an otherwise-successful upload.
+const MEDIA_NOT_READY_SUBCODE = 2207027;
+const PUBLISH_RETRY_ATTEMPTS = 4;
+const PUBLISH_RETRY_DELAY_MS = 4000;
+
+async function publishMediaContainer(
+  igUserId: string,
+  accessToken: string,
+  creationId: string,
+): Promise<MediaContainerResponse> {
+  for (let attempt = 0; attempt < PUBLISH_RETRY_ATTEMPTS; attempt++) {
+    try {
+      return await graphApiPost<MediaContainerResponse>(
+        `${igUserId}/media_publish`,
+        accessToken,
+        { creation_id: creationId },
+      );
+    } catch (error) {
+      const isMediaNotReady =
+        error instanceof GraphApiError &&
+        error.errorSubcode === MEDIA_NOT_READY_SUBCODE;
+      if (!isMediaNotReady || attempt === PUBLISH_RETRY_ATTEMPTS - 1) throw error;
+      await delay(PUBLISH_RETRY_DELAY_MS);
+    }
+  }
+  // Unreachable -- the loop above always returns or throws.
+  throw new Error("Unable to publish Instagram media.");
 }
 
 /**
@@ -100,11 +133,7 @@ export async function publishInstagramPost({
     STATUS_POLL_DELAY_MS,
   );
 
-  const published = await graphApiPost<MediaContainerResponse>(
-    `${igUserId}/media_publish`,
-    accessToken,
-    { creation_id: creationId },
-  );
+  const published = await publishMediaContainer(igUserId, accessToken, creationId);
 
   return { mediaId: published.id };
 }
@@ -155,11 +184,7 @@ export async function publishInstagramReel({
     REEL_STATUS_POLL_DELAY_MS,
   );
 
-  const published = await graphApiPost<MediaContainerResponse>(
-    `${igUserId}/media_publish`,
-    accessToken,
-    { creation_id: creationId },
-  );
+  const published = await publishMediaContainer(igUserId, accessToken, creationId);
 
   return { mediaId: published.id };
 }
