@@ -1,6 +1,9 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
-import { publishFacebookReel } from "@/lib/meta/facebookPublisher";
+import {
+  publishFacebookReel,
+  updateFacebookVideoDescription,
+} from "@/lib/meta/facebookPublisher";
 import { publishInstagramReel } from "@/lib/meta/instagramPublisher";
 import { getPageAccessToken } from "@/lib/meta/graphClient";
 import { findCatalogProductId } from "@/lib/meta/catalogClient";
@@ -371,6 +374,110 @@ function mapProductReelRow(row: ProductReelRow): ProductReelRecord {
     retryCount: row.retry_count,
     createdAt: row.created_at,
   };
+}
+
+export async function getProductReel(
+  reelId: string,
+): Promise<ProductReelRecord | null> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("product_reels")
+    .select("*, products(name, slug)")
+    .eq("id", reelId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[reelPostingService.getProductReel] failed:", error);
+    throw new Error("Unable to load this reel right now.");
+  }
+  if (!data) return null;
+
+  return mapProductReelRow(data as unknown as ProductReelRow);
+}
+
+interface UpdateReelCaptionResult {
+  error?: string;
+  facebookUpdated: boolean;
+}
+
+/**
+ * Updates the caption on an already-published reel. Facebook's Video node
+ * (Reels included) supports editing the description of a published video via
+ * POST /{video-id} -- Instagram has no equivalent: the Content Publishing API
+ * is publish-only, with no endpoint to edit a caption after the fact, so an
+ * Instagram post can only be corrected by deleting/reposting or editing it
+ * by hand in the Instagram app. This always saves the new caption to our own
+ * record regardless, so at least our history reflects what was intended.
+ */
+export async function updateProductReelCaption(
+  reelId: string,
+  caption: string,
+): Promise<UpdateReelCaptionResult> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+
+  const { data: reel } = await supabase
+    .from("product_reels")
+    .select("id, facebook_video_id, facebook_status")
+    .eq("id", reelId)
+    .maybeSingle();
+  if (!reel) return { error: "Reel not found.", facebookUpdated: false };
+
+  let facebookUpdated = false;
+  if (reel.facebook_video_id && reel.facebook_status === "success") {
+    const { data: settings } = await supabase
+      .from("social_media_settings")
+      .select("facebook_page_id, facebook_access_token")
+      .limit(1)
+      .maybeSingle();
+
+    if (settings?.facebook_page_id && settings?.facebook_access_token) {
+      try {
+        const pageAccessToken = await getPageAccessToken(
+          settings.facebook_page_id,
+          settings.facebook_access_token,
+        );
+        await updateFacebookVideoDescription(
+          reel.facebook_video_id,
+          pageAccessToken,
+          caption,
+        );
+        facebookUpdated = true;
+      } catch (error) {
+        console.error(
+          "[reelPostingService.updateProductReelCaption] Facebook update failed:",
+          error,
+        );
+        return {
+          error:
+            error instanceof Error
+              ? error.message
+              : "Unable to update the Facebook post's caption.",
+          facebookUpdated: false,
+        };
+      }
+    }
+  }
+
+  const { error: updateError } = await supabase
+    .from("product_reels")
+    .update({ caption })
+    .eq("id", reelId);
+
+  if (updateError) {
+    console.error(
+      "[reelPostingService.updateProductReelCaption] failed to save caption:",
+      updateError,
+    );
+    return {
+      error: "Unable to save the caption right now.",
+      facebookUpdated,
+    };
+  }
+
+  return { facebookUpdated };
 }
 
 export async function listProductReels(

@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth/requireAdmin";
 import {
   createProductReel,
   retryProductReel,
+  updateProductReelCaption,
 } from "@/lib/services/admin/reelPostingService";
 import type { ProductReelInput } from "@/types/socialMedia";
 
@@ -33,5 +34,20 @@ export async function retryReelAction(reelId: string): Promise<{ error?: string 
   await requireAdmin();
   const result = await retryProductReel(reelId);
   revalidatePath("/admin/reels");
+  return result;
+}
+
+export async function updateReelCaptionAction(
+  reelId: string,
+  caption: string,
+): Promise<{ error?: string; facebookUpdated?: boolean }> {
+  await requireAdmin();
+  if (caption.trim().length === 0) return { error: "Caption is required." };
+
+  const result = await updateProductReelCaption(reelId, caption);
+  if (!result.error) {
+    revalidatePath("/admin/reels");
+    revalidatePath(`/admin/reels/${reelId}/edit`);
+  }
   return result;
 }

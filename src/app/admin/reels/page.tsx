@@ -113,6 +113,10 @@ export default async function AdminReelsPage({
                       {reel.retryCount}
                     </td>
                     <td className="px-5 py-3 text-right">
+                      {/* Edit Caption link hidden for now (page/action/service
+                          still exist at /admin/reels/[id]/edit) -- re-add
+                          `<Link href={`/admin/reels/${reel.id}/edit`}>Edit
+                          Caption</Link>` here to bring it back. */}
                       <RetryReelButton
                         reelId={reel.id}
                         productName={reel.productName ?? "this product"}

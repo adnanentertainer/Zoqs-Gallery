@@ -123,3 +123,18 @@ export async function publishFacebookReel({
 
   return { videoId: start.video_id };
 }
+
+/**
+ * Facebook's Video node supports updating an already-published video's
+ * description via POST /{video-id} (unlike Instagram, which has no
+ * publish-time-only Content Publishing API and no way to edit a caption
+ * after the fact at all). Reels are still Video nodes under the hood, so
+ * the same call updates an already-published Reel's caption too.
+ */
+export async function updateFacebookVideoDescription(
+  videoId: string,
+  accessToken: string,
+  description: string,
+): Promise<void> {
+  await graphApiPost(videoId, accessToken, { description });
+}
