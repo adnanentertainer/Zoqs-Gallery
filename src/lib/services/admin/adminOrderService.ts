@@ -30,6 +30,7 @@ function toAdminOrderListItem(row: OrderRow): AdminOrderListItem {
     orderNumber: row.order_number,
     customerName: row.shipping_full_name,
     customerEmail: row.shipping_email,
+    customerPhone: row.shipping_phone,
     total: row.total,
     status: row.status as OrderStatus,
     paymentStatus: row.payment_status as PaymentStatus,

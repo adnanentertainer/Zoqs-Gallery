@@ -5,6 +5,7 @@ import {
   Pagination,
   StatusBadge,
 } from "@/components/admin";
+import { OrderWhatsAppIconLink } from "@/components/admin/OrderWhatsAppIconLink";
 import { Input } from "@/components/ui/Input";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Typography";
@@ -217,7 +218,19 @@ export default async function AdminOrdersPage({
                       {new Date(order.createdAt).toLocaleDateString("en-PK")}
                     </td>
                     <td className="px-5 py-3 text-right">
-                      <div className="flex items-center justify-end gap-4">
+                      <div className="flex items-center justify-end gap-3">
+                        <OrderWhatsAppIconLink
+                          orderNumber={order.orderNumber}
+                          total={order.total}
+                          paymentMethodLabel={
+                            PAYMENT_METHODS.find(
+                              (m) => m.value === order.paymentMethod,
+                            )?.label ?? order.paymentMethod
+                          }
+                          customerName={order.customerName}
+                          customerPhone={order.customerPhone}
+                          status={order.status}
+                        />
                         <Link
                           href={`/admin/orders/${order.id}`}
                           className="font-body text-sm font-medium text-gold hover:underline"

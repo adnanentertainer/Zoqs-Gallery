@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin";
 import { OrderStatusForm } from "@/components/admin/OrderStatusForm";
 import { WhatsAppConfirmationCard } from "@/components/admin/WhatsAppConfirmationCard";
+import { OrderWhatsAppButton } from "@/components/admin/OrderWhatsAppButton";
 import { CheckoutItem, CheckoutTotals } from "@/components/checkout";
 import { Heading, Text } from "@/components/ui/Typography";
 import { getAdminOrderById } from "@/lib/services/admin/adminOrderService";
@@ -41,6 +42,15 @@ export default async function AdminOrderDetailPage({
             orderId={order.id}
             status={order.status}
             paymentStatus={order.paymentStatus}
+          />
+
+          <OrderWhatsAppButton
+            orderNumber={order.orderNumber}
+            total={order.total}
+            paymentMethodLabel={paymentMethod?.label ?? order.paymentMethod}
+            customerName={order.shippingAddress.fullName}
+            customerPhone={order.shippingAddress.phone}
+            status={order.status}
           />
 
           {order.paymentMethod === "cod" && (

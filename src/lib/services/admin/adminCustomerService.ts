@@ -121,6 +121,7 @@ export async function getAdminCustomerById(
       orderNumber: row.order_number,
       customerName: row.shipping_full_name,
       customerEmail: row.shipping_email,
+      customerPhone: row.shipping_phone,
       total: row.total,
       status: row.status as AdminOrderListItem["status"],
       paymentStatus: row.payment_status as AdminOrderListItem["paymentStatus"],

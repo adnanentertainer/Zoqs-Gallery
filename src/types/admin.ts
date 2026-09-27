@@ -136,6 +136,7 @@ export interface AdminOrderListItem {
   orderNumber: string;
   customerName: string;
   customerEmail: string;
+  customerPhone: string;
   total: number;
   status: OrderStatus;
   paymentStatus: PaymentStatus;
