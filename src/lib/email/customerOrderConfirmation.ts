@@ -78,6 +78,11 @@ function renderCustomerOrderEmailHtml(order: Order): string {
 export async function sendCustomerOrderConfirmationEmail(
   order: Order,
 ): Promise<void> {
+  // Email is optional at checkout — nothing to send to for a guest who left
+  // it blank (phone is their contact method instead, see the WhatsApp
+  // confirmation sent alongside this).
+  if (!order.shippingAddress.email.trim()) return;
+
   try {
     const resend = getResendClient();
     const { error } = await resend.emails.send({

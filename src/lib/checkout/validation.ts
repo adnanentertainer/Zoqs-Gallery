@@ -1,6 +1,17 @@
-export { validateFullName, validateEmail } from "@/lib/auth/validation";
+export { validateFullName } from "@/lib/auth/validation";
+import { isValidEmail } from "@/lib/auth/validation";
 
 const CUSTOMER_NOTES_MAX_LENGTH = 500;
+
+/**
+ * Unlike auth's validateEmail (an account identifier, always required),
+ * email at checkout is optional — phone is the primary delivery contact.
+ * A blank value passes; a non-blank one still has to be a real address.
+ */
+export function validateCheckoutEmail(value: string): string | undefined {
+  if (value.trim().length === 0) return undefined;
+  return isValidEmail(value) ? undefined : "Enter a valid email address.";
+}
 
 /**
  * Accepts common Pakistani mobile formats: 03XXXXXXXXX (11 digits) or

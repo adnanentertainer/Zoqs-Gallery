@@ -23,9 +23,9 @@ import { siteConfig } from "@/constants/site";
 import { placeOrder } from "@/app/checkout/actions";
 import {
   validateAddressLine1,
+  validateCheckoutEmail,
   validateCity,
   validateCustomerNotes,
-  validateEmail,
   validateFullName,
   validatePakistaniPhone,
   validateProvince,
@@ -119,7 +119,7 @@ export function CheckoutForm({
 
     const nextErrors: ShippingFieldErrors = {
       fullName: validateFullName(shipping.fullName),
-      email: validateEmail(shipping.email),
+      email: validateCheckoutEmail(shipping.email),
       phone: validatePakistaniPhone(shipping.phone),
       addressLine1: validateAddressLine1(shipping.addressLine1),
       city: validateCity(shipping.city),

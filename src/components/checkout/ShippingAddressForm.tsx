@@ -33,11 +33,10 @@ export function ShippingAddressForm({
         className="sm:col-span-2"
       />
       <Input
-        label="Email"
+        label="Email (optional)"
         type="email"
         name="email"
         autoComplete="email"
-        required
         value={values.email}
         onChange={(event) => onChange("email", event.target.value)}
         error={errors.email}

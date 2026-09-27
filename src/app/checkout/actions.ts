@@ -11,9 +11,9 @@ import { sendCustomerOrderConfirmationEmail } from "@/lib/email/customerOrderCon
 import { sendNewOrderNotificationWhatsApp } from "@/lib/whatsapp/orderNotification";
 import {
   validateAddressLine1,
+  validateCheckoutEmail,
   validateCity,
   validateCustomerNotes,
-  validateEmail,
   validateFullName,
   validatePakistaniPhone,
   validateProvince,
@@ -106,7 +106,7 @@ export async function placeOrder(
 
   const shippingErrors = [
     validateFullName(input.shipping.fullName),
-    validateEmail(input.shipping.email),
+    validateCheckoutEmail(input.shipping.email),
     validatePakistaniPhone(input.shipping.phone),
     validateAddressLine1(input.shipping.addressLine1),
     validateCity(input.shipping.city),
