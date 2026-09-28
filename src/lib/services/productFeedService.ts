@@ -77,7 +77,7 @@ const getProductFeedItemsUncached = unstable_cache(
           title: row.name,
           description,
           link: `${baseUrl}/product/${row.slug}`,
-          imageUrl: image?.image_url ?? "",
+          imageUrl: toFeedImageUrl(image?.image_url),
           available: !row.force_unavailable && row.stock > 0,
           price: row.price,
           categoryName: row.categories?.name ?? null,
@@ -91,6 +91,20 @@ const getProductFeedItemsUncached = unstable_cache(
 
 export async function getProductFeedItems(): Promise<ProductFeedItem[]> {
   return getProductFeedItemsUncached();
+}
+
+/**
+ * Cloudinary's f_auto negotiates format by the requester's Accept header,
+ * so Meta's ad/catalog crawler (which advertises image/webp support) gets
+ * served WebP while a plain browser gets JPEG. Meta's catalog image
+ * pipeline then fails to ingest that WebP variant ("Invalid image in ad"),
+ * even though the URL is perfectly fetchable. Forcing f_jpg here pins the
+ * feed to a format Meta always accepts, without touching f_auto anywhere
+ * the site serves images to browsers.
+ */
+function toFeedImageUrl(url: string | undefined): string {
+  if (!url) return "";
+  return url.replace("f_auto", "f_jpg");
 }
 
 function escapeXml(value: string): string {
