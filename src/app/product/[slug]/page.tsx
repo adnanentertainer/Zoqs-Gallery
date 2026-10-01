@@ -21,7 +21,7 @@ import {
 import { ProductSection } from "@/components/home/ProductSection";
 import { ProductVariantImageProvider } from "@/context/ProductVariantImageContext";
 import { siteConfig } from "@/constants/site";
-import { getProductBadge, isInStock } from "@/lib/products";
+import { getProductBadge, isInStock, isLowStock } from "@/lib/products";
 import {
   getProductBySlug,
   getProducts,
@@ -283,7 +283,9 @@ export default async function ProductPage({
                   className="h-2 w-2 rounded-full bg-success"
                   aria-hidden="true"
                 />
-                In Stock
+                {isLowStock(product)
+                  ? `Only ${product.stock} left in stock`
+                  : "In Stock"}
               </span>
             ) : (
               <span className="inline-flex w-fit items-center gap-2 font-body text-sm font-medium text-error">
