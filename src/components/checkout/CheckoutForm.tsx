@@ -10,6 +10,7 @@ import {
 } from "@/components/checkout/ShippingAddressForm";
 import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
+import { CheckoutTrustBadges } from "@/components/checkout/CheckoutTrustBadges";
 import {
   PromoCodeInput,
   type AppliedPromo,
@@ -267,6 +268,7 @@ export function CheckoutForm({
           discountAmount={appliedPromo?.discountAmount}
           promoCode={appliedPromo?.code}
         />
+        <CheckoutTrustBadges />
         <div className="lg:hidden">
           <PlaceOrderButton
             paymentMethod={paymentMethod}
