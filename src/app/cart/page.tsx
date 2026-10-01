@@ -7,6 +7,7 @@ import { Heading, Text } from "@/components/ui/Typography";
 import { EmptyState } from "@/components/product";
 import { CartItem } from "@/components/cart/CartItem";
 import { CartSummary } from "@/components/cart/CartSummary";
+import { CartWhatsAppButton } from "@/components/cart/CartWhatsAppButton";
 import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
@@ -53,6 +54,7 @@ export default function CartPage() {
           </div>
         </div>
       )}
+      {lineItems.length > 0 && <CartWhatsAppButton />}
     </Container>
   );
 }

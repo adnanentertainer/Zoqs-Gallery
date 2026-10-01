@@ -17,6 +17,7 @@ import {
 } from "@/components/checkout/PromoCodeInput";
 import { PlaceOrderButton } from "@/components/checkout/PlaceOrderButton";
 import { useCart } from "@/context/CartContext";
+import { CartWhatsAppButton } from "@/components/cart/CartWhatsAppButton";
 import { getVariantSummaryLabel } from "@/lib/cart";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
 import { consumePendingPromoCode } from "@/lib/pendingPromo";
@@ -181,6 +182,7 @@ export function CheckoutForm({
       noValidate
       className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start"
     >
+      <CartWhatsAppButton />
       <div className="flex flex-col gap-8 lg:col-span-2">
         {formError && <AuthMessage variant="error" message={formError} />}
 
