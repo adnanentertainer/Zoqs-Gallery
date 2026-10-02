@@ -61,12 +61,32 @@ export function trackInitiateCheckout(params: {
   });
 }
 
+// Meta's pixel hashes em/ph client-side before sending -- callers must pass
+// raw values here, never pre-hash them.
+function setAdvancedMatchingUserData(user: { email?: string; phone?: string }) {
+  const userData: Record<string, string> = {};
+  if (user.email) userData.em = user.email.trim().toLowerCase();
+  // Phone is required at checkout (unlike email), so this covers every
+  // order -- normalized to country-code digits-only, the format Meta
+  // matches best against (e.g. "03XXXXXXXXX" -> "923XXXXXXXXX").
+  if (user.phone) {
+    const digits = user.phone.replace(/\D/g, "");
+    userData.ph = digits.startsWith("0") ? `92${digits.slice(1)}` : digits;
+  }
+  if (Object.keys(userData).length > 0) {
+    fire("set", "userData", userData);
+  }
+}
+
 export function trackPurchase(params: {
   contentIds: string[];
   value: number;
   currency: string;
   orderId: string;
+  email?: string;
+  phone?: string;
 }) {
+  setAdvancedMatchingUserData({ email: params.email, phone: params.phone });
   fire("track", "Purchase", {
     content_ids: params.contentIds,
     content_type: "product",

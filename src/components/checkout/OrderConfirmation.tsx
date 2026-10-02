@@ -51,6 +51,8 @@ export function OrderConfirmation({
         contentIds={order.items
           .map((item) => item.productId)
           .filter((id): id is string => id !== null)}
+        email={order.shippingAddress.email || undefined}
+        phone={order.shippingAddress.phone}
       />
       <div className="flex flex-col items-center gap-3 text-center">
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-success/10 text-success">
