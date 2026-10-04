@@ -20,7 +20,7 @@ const getCategoriesUncached = unstable_cache(
     return (data ?? []).map(mapCategoryRow);
   },
   ["categories:active"],
-  { tags: [CACHE_TAGS.categories], revalidate: 300 },
+  { tags: [CACHE_TAGS.categories], revalidate: 3600 },
 );
 
 export async function getCategories(): Promise<Category[]> {
@@ -53,7 +53,7 @@ const getCategoryBySlugUncached = unstable_cache(
     return data ? mapCategoryRow(data) : undefined;
   },
   ["categories:by-slug"],
-  { tags: [CACHE_TAGS.categories], revalidate: 300 },
+  { tags: [CACHE_TAGS.categories], revalidate: 3600 },
 );
 
 export async function getCategoryBySlug(

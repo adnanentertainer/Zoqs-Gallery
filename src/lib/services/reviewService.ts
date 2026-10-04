@@ -26,7 +26,7 @@ const getApprovedReviewRows = unstable_cache(
     return (data ?? []) as ReviewRow[];
   },
   ["reviews:approved-by-product"],
-  { tags: [CACHE_TAGS.reviews], revalidate: 120 },
+  { tags: [CACHE_TAGS.reviews], revalidate: 3600 },
 );
 
 /**

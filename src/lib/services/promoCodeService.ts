@@ -70,7 +70,7 @@ const hasActivePromoCodeUncached = unstable_cache(
     return Boolean(data);
   },
   ["promo-codes:has-active"],
-  { tags: [CACHE_TAGS.activePromoCode], revalidate: 300 },
+  { tags: [CACHE_TAGS.activePromoCode], revalidate: 3600 },
 );
 
 /**

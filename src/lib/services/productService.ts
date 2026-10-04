@@ -34,7 +34,7 @@ interface ProductQueryFilters {
 // Public catalog reads never depend on who's signed in (RLS allows public
 // reads), so these use the cookie-less client and are wrapped in
 // unstable_cache: the same expensive query is then reused across every
-// visitor instead of re-running per request. `revalidate: 120` is a safety
+// visitor instead of re-running per request. `revalidate: 3600` is a safety
 // net; the actual freshness guarantee comes from revalidateTag(CACHE_TAGS.products)
 // called by every admin/inventory/order path that changes product data (see
 // adminProductService, inventoryService, purchaseService, orderService).
@@ -66,7 +66,7 @@ async function fetchActiveProductRowsUncached(
 const fetchActiveProductRows = unstable_cache(
   fetchActiveProductRowsUncached,
   ["products:active-rows"],
-  { tags: [CACHE_TAGS.products], revalidate: 120 },
+  { tags: [CACHE_TAGS.products], revalidate: 3600 },
 );
 
 async function fetchActiveProductRowBySlugUncached(
@@ -87,7 +87,7 @@ async function fetchActiveProductRowBySlugUncached(
 const fetchActiveProductRowBySlug = unstable_cache(
   fetchActiveProductRowBySlugUncached,
   ["products:row-by-slug"],
-  { tags: [CACHE_TAGS.products], revalidate: 120 },
+  { tags: [CACHE_TAGS.products], revalidate: 3600 },
 );
 
 function groupByProductId<T extends { product_id: string }>(
@@ -141,7 +141,7 @@ async function fetchProductRelationsUncached(
 const fetchProductRelations = unstable_cache(
   fetchProductRelationsUncached,
   ["products:relations"],
-  { tags: [CACHE_TAGS.products, CACHE_TAGS.reviews], revalidate: 120 },
+  { tags: [CACHE_TAGS.products, CACHE_TAGS.reviews], revalidate: 3600 },
 );
 
 async function hydrateProducts(

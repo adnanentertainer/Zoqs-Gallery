@@ -40,7 +40,7 @@ const getSiteSettingUncached = unstable_cache(
     return row?.value ?? null;
   },
   ["site-settings:by-key"],
-  { tags: [CACHE_TAGS.siteSettings], revalidate: 300 },
+  { tags: [CACHE_TAGS.siteSettings], revalidate: 3600 },
 );
 
 export async function getSiteSetting<T = unknown>(

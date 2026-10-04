@@ -19,7 +19,7 @@ const getSocialPostsUncached = unstable_cache(
     return (data ?? []).map(mapSocialPostRow);
   },
   ["social-posts:active"],
-  { tags: [CACHE_TAGS.socialPosts], revalidate: 300 },
+  { tags: [CACHE_TAGS.socialPosts], revalidate: 3600 },
 );
 
 export async function getSocialPosts(): Promise<SocialPost[]> {

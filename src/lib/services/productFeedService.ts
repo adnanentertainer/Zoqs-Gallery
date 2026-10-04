@@ -86,7 +86,7 @@ const getProductFeedItemsUncached = unstable_cache(
       .filter((item) => !!item.imageUrl);
   },
   ["product-feed:items"],
-  { tags: [CACHE_TAGS.products, CACHE_TAGS.productFeed], revalidate: 600 },
+  { tags: [CACHE_TAGS.products, CACHE_TAGS.productFeed], revalidate: 3600 },
 );
 
 export async function getProductFeedItems(): Promise<ProductFeedItem[]> {

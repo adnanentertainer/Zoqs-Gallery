@@ -61,7 +61,7 @@ const getActivePromoBannersUncached = unstable_cache(
       );
   },
   ["promo-banners:active"],
-  { tags: [CACHE_TAGS.promoBanners], revalidate: 300 },
+  { tags: [CACHE_TAGS.promoBanners], revalidate: 3600 },
 );
 
 export async function getActivePromoBanners(): Promise<PromoBanner[]> {
