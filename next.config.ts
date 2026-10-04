@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
   // is unaffected by it.
   output: "standalone",
   images: {
+    // Cloudinary and Supabase Storage already serve pre-sized/pre-optimized
+    // images, so routing them through Vercel's Image Optimization too is
+    // redundant re-processing that counts against the (tight, easy-to-blow-
+    // through-on-Hobby) image optimization quota for no real benefit.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
