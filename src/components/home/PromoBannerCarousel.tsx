@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Tag } from "lucide-react";
 import { buttonVariants } from "@/components/ui/Button";
 import { setPendingPromoCode } from "@/lib/pendingPromo";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,7 @@ function slideHref(banner: PromoBanner): string {
 function Slide({ banner }: { banner: PromoBanner }) {
   return (
     <div
-      className="relative flex min-h-[280px] items-center overflow-hidden bg-primary sm:min-h-[320px]"
+      className="relative flex min-h-[300px] items-center overflow-hidden bg-primary sm:min-h-[340px]"
       style={
         banner.backgroundImageUrl
           ? {
@@ -32,27 +32,40 @@ function Slide({ banner }: { banner: PromoBanner }) {
           : undefined
       }
     >
-      {banner.backgroundImageUrl && (
-        <div className="absolute inset-0 bg-primary/60" aria-hidden="true" />
+      {banner.backgroundImageUrl ? (
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/60 to-primary/30"
+          aria-hidden="true"
+        />
+      ) : (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(230,164,33,0.16),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(230,164,33,0.12),transparent_50%)]"
+        />
       )}
-      <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-6 px-4 py-12 text-center sm:px-6 lg:flex-row lg:justify-between lg:px-8 lg:text-left">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-6 px-4 py-14 text-center sm:px-6 lg:flex-row lg:justify-between lg:px-8 lg:py-16 lg:text-left">
         <div className="flex flex-col items-center gap-3 lg:items-start">
           {banner.promoText && (
-            <span className="font-body text-xs font-semibold uppercase tracking-[0.15em] text-gold">
+            <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+              <span className="h-px w-8 bg-gold" aria-hidden="true" />
               {banner.promoText}
             </span>
           )}
-          <h2 className="font-heading text-2xl font-semibold text-white sm:text-3xl">
+          <h2 className="font-heading text-3xl font-semibold text-white sm:text-4xl">
             {banner.title}
           </h2>
           {banner.subtitle && (
-            <p className="max-w-md font-body text-sm text-white/85">
+            <p className="max-w-md font-body text-base text-white/85">
               {banner.subtitle}
             </p>
           )}
           {banner.promoCode && (
-            <span className="rounded-sm border border-white/40 px-3 py-1.5 font-body text-sm font-medium text-white">
-              Use code: <span className="font-semibold">{banner.promoCode}</span>
+            <span className="inline-flex items-center gap-2 rounded-sm border border-dashed border-gold/60 bg-white/5 px-3 py-1.5 font-body text-sm text-white">
+              <Tag className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
+              Use code{" "}
+              <span className="font-semibold tracking-wide text-gold">
+                {banner.promoCode}
+              </span>
             </span>
           )}
           {banner.buttonText && (
@@ -61,14 +74,21 @@ function Slide({ banner }: { banner: PromoBanner }) {
               onClick={() => {
                 if (banner.promoCode) setPendingPromoCode(banner.promoCode);
               }}
-              className={buttonVariants("gold", "lg", "mt-1")}
+              className={cn(
+                buttonVariants("gold", "lg", "group mt-1"),
+                "transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+              )}
             >
               {banner.buttonText}
+              <ArrowRight
+                className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+                aria-hidden="true"
+              />
             </Link>
           )}
         </div>
         {banner.bannerImageUrl && (
-          <div className="relative h-40 w-40 shrink-0 overflow-hidden rounded-full border-4 border-white/20 sm:h-52 sm:w-52">
+          <div className="relative h-40 w-40 shrink-0 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)] sm:h-52 sm:w-52">
             <Image
               src={banner.bannerImageUrl}
               alt=""

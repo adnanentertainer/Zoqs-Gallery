@@ -93,6 +93,18 @@ export interface ReviewBreakdown {
   percentage: number;
 }
 
+/** A single curated review used for the homepage highlight reel — a subset
+ * of Review's fields plus the product slug/image needed to link back. */
+export interface Testimonial {
+  id: string;
+  customerName: string;
+  rating: number;
+  reviewText: string;
+  verifiedPurchase: boolean;
+  purchasedProduct: string;
+  productSlug: string;
+}
+
 export type UserRole = "customer" | "admin";
 
 export interface Profile {

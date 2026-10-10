@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { Container } from "@/components/ui/Container";
-import { Heading, Text } from "@/components/ui/Typography";
+import { PageHeader } from "@/components/shared/PageHeader";
 import {
   FilterSidebar,
   MobileFilterButton,
@@ -57,16 +56,11 @@ export default async function ShopPage({ searchParams }: PageProps<"/shop">) {
 
   return (
     <>
-      <Container className="flex flex-col gap-3 pt-6 pb-8">
-        <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Shop" }]} />
-        <Heading variant="h1" as="h1">
-          Shop All Jewellery
-        </Heading>
-        <Text variant="body" className="max-w-2xl text-muted">
-          Discover elegant artificial jewellery and fashion accessories designed
-          for every occasion.
-        </Text>
-      </Container>
+      <PageHeader
+        breadcrumb={[{ label: "Home", href: "/" }, { label: "Shop" }]}
+        title="Shop All Jewellery"
+        subtitle="Discover elegant artificial jewellery and fashion accessories designed for every occasion."
+      />
 
       <Container className="flex flex-col gap-8 pb-16 lg:flex-row lg:items-start">
         <FilterSidebar />

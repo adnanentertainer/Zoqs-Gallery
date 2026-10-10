@@ -8,7 +8,8 @@ import {
 import { getServerUser } from "@/lib/auth/getServerUser";
 import { mapReviewRow } from "@/lib/supabase/mappers";
 import { CACHE_TAGS } from "@/lib/cache/tags";
-import type { Review } from "@/types";
+import { reviews as mockReviews } from "@/data/reviews";
+import type { Review, Testimonial } from "@/types";
 
 type ReviewRow = Parameters<typeof mapReviewRow>[0];
 
@@ -53,6 +54,86 @@ export async function getProductReviews(
       error,
     );
     throw new Error("Unable to load reviews right now.");
+  }
+}
+
+interface FeaturedReviewRow {
+  id: string;
+  customer_name: string;
+  rating: number;
+  review: string;
+  is_verified_purchase: boolean;
+  products: { name: string; slug: string } | null;
+}
+
+const getFeaturedReviewRows = unstable_cache(
+  async (): Promise<FeaturedReviewRow[]> => {
+    const supabase = getSupabasePublicClient();
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("id, customer_name, rating, review, is_verified_purchase, products(name, slug)")
+      .eq("is_approved", true)
+      // "Customer" is the fallback name submitReview() writes when a
+      // reviewer's profile has no name set — excluding it, along with rows
+      // where the "review" is just the product's own name typed back (a
+      // handful of early rows with no real text), keeps this homepage
+      // spotlight to reviews that read like an actual customer wrote them.
+      .neq("customer_name", "Customer")
+      .order("rating", { ascending: false })
+      .order("review_date", { ascending: false })
+      .limit(12);
+
+    if (error) throw error;
+    return (data ?? []) as unknown as FeaturedReviewRow[];
+  },
+  ["reviews:featured"],
+  { tags: [CACHE_TAGS.reviews], revalidate: 3600 },
+);
+
+/**
+ * Real, named reviews for the homepage highlight reel — never the full
+ * per-product review list (see getProductReviews for that), and never
+ * placeholder content: an empty result means ReviewsSection renders nothing
+ * rather than inventing testimonials.
+ */
+export async function getFeaturedTestimonials(
+  limit: number,
+): Promise<Testimonial[]> {
+  if (!isSupabaseConfigured()) {
+    return mockReviews
+      .filter((review) => review.customerName !== "Customer")
+      .slice(0, limit)
+      .map((review) => ({
+        id: review.id,
+        customerName: review.customerName,
+        rating: review.rating,
+        reviewText: review.reviewText,
+        verifiedPurchase: review.verifiedPurchase,
+        purchasedProduct: review.purchasedProduct,
+        productSlug: "",
+      }));
+  }
+
+  try {
+    const rows = await getFeaturedReviewRows();
+    return rows
+      .filter((row) => row.products && row.customer_name !== row.review)
+      .slice(0, limit)
+      .map((row) => ({
+        id: row.id,
+        customerName: row.customer_name,
+        rating: row.rating,
+        reviewText: row.review,
+        verifiedPurchase: row.is_verified_purchase,
+        purchasedProduct: row.products!.name,
+        productSlug: row.products!.slug,
+      }));
+  } catch (error) {
+    console.error(
+      "[reviewService.getFeaturedTestimonials] Supabase query failed:",
+      error,
+    );
+    return [];
   }
 }
 

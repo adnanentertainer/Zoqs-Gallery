@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Share2, ShoppingBag, Zap } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -8,7 +8,7 @@ import { VariantSelector } from "@/components/product/VariantSelector";
 import { QuantitySelector } from "@/components/product/QuantitySelector";
 import { ProductPrice } from "@/components/product/ProductPrice";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
-import { formatPrice } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import { LOW_STOCK_THRESHOLD, isInStock } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
 import { useProductVariantSelection } from "@/context/ProductVariantImageContext";
@@ -32,10 +32,26 @@ export function ProductActions({ product }: ProductActionsProps) {
   const [cartStatus, setCartStatus] = useState<CartStatus>("idle");
   const [linkCopied, setLinkCopied] = useState(false);
   const [shareFallbackUrl, setShareFallbackUrl] = useState<string | null>(null);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const primaryActionsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     registerProduct(product);
   }, [product]);
+
+  // The mobile sticky bar duplicates the Add to Cart / Buy Now buttons
+  // above, so it only appears once those have scrolled out of view —
+  // otherwise a shopper sees the same two buttons twice on first load.
+  useEffect(() => {
+    const target = primaryActionsRef.current;
+    if (!target) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyBar(!entry.isIntersecting),
+      { rootMargin: "0px 0px -1px 0px" },
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, []);
 
   const selectedOptions = (product.variants ?? []).map((group) =>
     group.options.find((option) => option.value === selections[group.type])!,
@@ -134,7 +150,7 @@ export function ProductActions({ product }: ProductActionsProps) {
         )}
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div ref={primaryActionsRef} className="flex flex-col gap-3">
         <div className="flex gap-3">
           <Button
             type="button"
@@ -204,7 +220,13 @@ export function ProductActions({ product }: ProductActionsProps) {
         </div>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-beige bg-white/95 px-4 py-3 shadow-[0_-4px_16px_rgba(31,31,31,0.08)] backdrop-blur lg:hidden">
+      <div
+        aria-hidden={!showStickyBar}
+        className={cn(
+          "fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-beige bg-white/95 px-4 py-3 shadow-[0_-4px_16px_rgba(31,31,31,0.08)] backdrop-blur transition-transform duration-200 motion-reduce:transition-none lg:hidden",
+          showStickyBar ? "translate-y-0" : "pointer-events-none translate-y-full",
+        )}
+      >
         <div className="flex flex-col leading-tight">
           <span className="font-body text-[0.65rem] uppercase tracking-wide text-muted">
             Price
@@ -218,6 +240,7 @@ export function ProductActions({ product }: ProductActionsProps) {
           variant="outline"
           size="md"
           className="flex-1"
+          tabIndex={showStickyBar ? 0 : -1}
           onClick={handleAddToCart}
           isLoading={cartStatus === "loading"}
           disabled={!canPurchase}
@@ -229,6 +252,7 @@ export function ProductActions({ product }: ProductActionsProps) {
           variant="gold"
           size="md"
           className="flex-1"
+          tabIndex={showStickyBar ? 0 : -1}
           onClick={handleBuyNow}
           disabled={!canPurchase}
         >

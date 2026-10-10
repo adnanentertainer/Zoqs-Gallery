@@ -31,7 +31,7 @@ export function Section({
   return (
     <section
       className={cn(
-        "py-12 sm:py-16 lg:py-24",
+        "py-10 sm:py-12 lg:py-16",
         backgroundStyles[background],
         className,
       )}

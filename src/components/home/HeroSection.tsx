@@ -14,14 +14,17 @@ const trustBadges = [
 
 export function HeroSection() {
   return (
-    <section className="relative flex min-h-[80vh] items-center overflow-hidden bg-secondary sm:min-h-[85vh] lg:min-h-[90vh]">
+    <section className="relative flex items-center overflow-hidden bg-secondary lg:min-h-[85vh]">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(230,164,33,0.14),transparent_45%),radial-gradient(circle_at_85%_85%,rgba(230,164,33,0.10),transparent_45%)]"
       />
 
-      <Container className="relative grid grid-cols-1 items-center gap-10 py-12 sm:py-16 lg:grid-cols-2 lg:gap-16 lg:py-24">
-        <div className="order-1 flex justify-center lg:order-2">
+      <Container className="relative grid grid-cols-1 items-center gap-8 py-10 sm:py-14 lg:grid-cols-2 lg:gap-16 lg:py-24">
+        {/* Text leads on every breakpoint (order-2 on mobile would otherwise
+            push the heading and "Shop" CTA below a full-bleed photo, costing
+            a full scroll before a mobile visitor sees any call to action). */}
+        <div className="order-2 flex justify-center">
           <div className="relative w-full max-w-md">
             <div
               aria-hidden="true"
@@ -40,7 +43,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        <div className="order-2 flex flex-col items-center gap-5 text-center lg:order-1 lg:items-start lg:text-left">
+        <div className="order-1 flex flex-col items-center gap-5 text-center lg:items-start lg:text-left">
           <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-gold">
             <span className="h-px w-8 bg-gold" aria-hidden="true" />
             Premium Artificial Jewellery

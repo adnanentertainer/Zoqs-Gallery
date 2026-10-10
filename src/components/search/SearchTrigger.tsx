@@ -14,6 +14,7 @@ import { Search, X } from "lucide-react";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { searchProducts } from "@/lib/products";
+import { recentSearchesStore, recordSearchTerm } from "@/lib/recentSearchesStore";
 import { categoryLabel, cn, formatPrice } from "@/lib/utils";
 import type { Product } from "@/types";
 
@@ -24,7 +25,6 @@ const POPULAR_SEARCHES = [
   "Necklace",
   "Bracelet",
 ];
-const RECENT_SEARCHES = ["Necklace", "Rings"];
 
 const iconButtonStyles =
   "items-center justify-center rounded-sm p-2 text-primary transition-colors hover:bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold";
@@ -56,6 +56,11 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
   const isMounted = useIsClient();
   const inputRef = useRef<HTMLInputElement>(null);
   const hasFetchedProducts = useRef(false);
+  const recentSearches = useSyncExternalStore(
+    recentSearchesStore.subscribe,
+    recentSearchesStore.getSnapshot,
+    recentSearchesStore.getServerSnapshot,
+  );
 
   function closeOverlay() {
     setIsOpen(false);
@@ -90,6 +95,7 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
   function runSearch(value: string) {
     const trimmed = value.trim();
     if (!trimmed) return;
+    recordSearchTerm(trimmed);
     router.push(`/search?q=${encodeURIComponent(trimmed)}`);
     closeOverlay();
   }
@@ -239,24 +245,26 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
                         ))}
                       </div>
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <span className="font-body text-xs uppercase tracking-wide text-muted">
-                        Recent Searches
-                      </span>
-                      <div className="flex flex-wrap gap-2">
-                        {RECENT_SEARCHES.map((term) => (
-                          <button
-                            key={term}
-                            type="button"
-                            onClick={() => runSearch(term)}
-                            tabIndex={isOpen ? 0 : -1}
-                            className="rounded-full bg-beige px-3 py-1.5 font-body text-sm text-primary transition-colors hover:bg-gold hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-                          >
-                            {term}
-                          </button>
-                        ))}
+                    {recentSearches.length > 0 && (
+                      <div className="flex flex-col gap-2">
+                        <span className="font-body text-xs uppercase tracking-wide text-muted">
+                          Recent Searches
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                          {recentSearches.map((term) => (
+                            <button
+                              key={term}
+                              type="button"
+                              onClick={() => runSearch(term)}
+                              tabIndex={isOpen ? 0 : -1}
+                              className="rounded-full bg-beige px-3 py-1.5 font-body text-sm text-primary transition-colors hover:bg-gold hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                            >
+                              {term}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 )}
               </div>

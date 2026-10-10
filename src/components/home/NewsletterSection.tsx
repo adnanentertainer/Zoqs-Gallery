@@ -36,8 +36,17 @@ export function NewsletterSection() {
   }
 
   return (
-    <section className="bg-primary text-white">
-      <Container className="flex flex-col items-center gap-6 py-16 text-center sm:py-20">
+    <section className="relative overflow-hidden bg-primary text-white">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(230,164,33,0.12),transparent_55%)]"
+      />
+      <Container className="relative flex flex-col items-center gap-6 py-16 text-center sm:py-20">
+        <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+          <span className="h-px w-8 bg-gold" aria-hidden="true" />
+          Stay Connected
+          <span className="h-px w-8 bg-gold" aria-hidden="true" />
+        </span>
         <Heading variant="h2" as="h2" className="text-white">
           Join the ZOQ&apos;s Circle
         </Heading>
@@ -108,6 +117,10 @@ export function NewsletterSection() {
             Subscribe
           </Button>
         </form>
+
+        <Text variant="bodySm" className="text-white/50">
+          No spam — just new arrivals and offers. Unsubscribe anytime.
+        </Text>
       </Container>
     </section>
   );

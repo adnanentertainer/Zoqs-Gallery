@@ -3,7 +3,10 @@
 :root {
   --color-charcoal: #1c1a17;
   --color-cream: #faf6ef;
-  --color-gold: #c79a3d;
+  /* Deepened from the original #c79a3d (2.6:1 on white — fails WCAG AA)
+     to meet 4.5:1 for small text/icons and white-on-gold buttons/badges,
+     per the "avoid pale gold for small text" requirement. */
+  --color-gold: #8a6a24;
   --color-beige: #ece3d3;
   --color-muted: #6f6a61;
   --color-success: #2e7d32;

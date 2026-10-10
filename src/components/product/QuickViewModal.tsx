@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { X, ShoppingBag } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonVariants } from "@/components/ui/Button";
 import { Heading, Text } from "@/components/ui/Typography";
 import { RatingStars } from "@/components/shared/RatingStars";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
@@ -48,9 +48,15 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
   const badge = getProductBadge(product);
   const inStock = isInStock(product);
   const discount = getDiscountPercentage(product);
+  // Mirrors ProductCard's quick-add guard: a group with more than one
+  // option needs the customer's own pick, so this modal can't safely
+  // one-click add it — it sends them to the full product page instead.
+  const requiresVariantChoice = (product.variants ?? []).some(
+    (group) => group.options.length > 1,
+  );
 
   function handleAddToCart() {
-    if (!product || !inStock) return;
+    if (!product || !inStock || requiresVariantChoice) return;
     cart.addItem(product, 1, getDefaultVariantSelections(product));
     onClose();
   }
@@ -130,17 +136,27 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
           )}
 
           <div className="mt-2 flex items-center gap-3">
-            <Button
-              type="button"
-              variant="primary"
-              size="md"
-              disabled={!inStock}
-              onClick={handleAddToCart}
-              leftIcon={<ShoppingBag className="h-4 w-4" aria-hidden="true" />}
-              className="flex-1"
-            >
-              {inStock ? "Add to Cart" : "Out of Stock"}
-            </Button>
+            {requiresVariantChoice && inStock ? (
+              <Link
+                href={`/product/${product.slug}`}
+                onClick={onClose}
+                className={buttonVariants("primary", "md", "flex-1")}
+              >
+                Select Options
+              </Link>
+            ) : (
+              <Button
+                type="button"
+                variant="primary"
+                size="md"
+                disabled={!inStock}
+                onClick={handleAddToCart}
+                leftIcon={<ShoppingBag className="h-4 w-4" aria-hidden="true" />}
+                className="flex-1"
+              >
+                {inStock ? "Add to Cart" : "Out of Stock"}
+              </Button>
+            )}
             <WishlistButton
               productSlug={product.slug}
               productName={product.name}

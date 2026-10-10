@@ -147,7 +147,12 @@ export function ProductGallery({
       </div>
 
       {displayImages.length > 1 && (
-        <div className="flex gap-3 overflow-x-auto pb-1 lg:w-20 lg:flex-col lg:overflow-x-visible lg:overflow-y-auto lg:pb-0">
+        // p-1 on every side, not just pb-1: overflow-x-auto implicitly
+        // clips the other axis too (per the CSS overflow spec), which was
+        // cutting the focus ring off each thumbnail's top edge. The same
+        // applies to the lg column layout once it switches scroll axis, so
+        // this stays uniform instead of being reset per breakpoint.
+        <div className="flex gap-3 overflow-x-auto p-1 lg:w-20 lg:flex-col lg:overflow-x-visible lg:overflow-y-auto">
           {displayImages.map((image, index) => (
             <button
               key={`${image}-${index}`}

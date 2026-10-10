@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, type MouseEvent } from "react";
 import { Eye, ShoppingBag } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
@@ -45,8 +46,15 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const badge = getProductBadge(product);
   const inStock = isInStock(product);
+  // A group with more than one option is a real choice (size, color, ...)
+  // that quick-add can't safely guess — route those to the product page
+  // instead of silently picking the first option. See handleAddToCart.
+  const requiresVariantChoice = (product.variants ?? []).some(
+    (group) => group.options.length > 1,
+  );
   const [primaryImage, secondaryImage = primaryImage] = product.images;
   const cart = useCart();
+  const router = useRouter();
   // The hover-swap second photo is a desktop-only interaction: mobile has no
   // hover, so it never shows there. Deferring the mount to first hover (mouse
   // only — touch taps don't fire mouseenter) means grids full of cards don't
@@ -61,6 +69,13 @@ export function ProductCard({ product }: ProductCardProps) {
   function handleAddToCart(event: MouseEvent) {
     preventCardNavigation(event);
     if (!inStock) return;
+    // Options like size or color need the customer's own pick, so this
+    // button only one-click-adds when there's nothing to choose; otherwise
+    // it sends them to the product page to select options first.
+    if (requiresVariantChoice) {
+      router.push(`/product/${product.slug}`);
+      return;
+    }
     cart.addItem(product, 1, getDefaultVariantSelections(product));
   }
 
@@ -131,10 +146,13 @@ export function ProductCard({ product }: ProductCardProps) {
             onClick={handleAddToCart}
             disabled={!inStock}
             aria-label={
-              inStock
-                ? `Add ${product.name} to cart`
-                : `${product.name} is out of stock`
+              !inStock
+                ? `${product.name} is out of stock`
+                : requiresVariantChoice
+                  ? `Choose options for ${product.name}`
+                  : `Add ${product.name} to cart`
             }
+            title={requiresVariantChoice ? "Choose options" : "Add to cart"}
             className={iconButtonStyles}
           >
             <ShoppingBag className="h-4 w-4" aria-hidden="true" />

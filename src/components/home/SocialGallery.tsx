@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { InstagramIcon } from "@/components/icons/social-icons";
 import { Section } from "@/components/ui/Section";
+import { siteConfig } from "@/constants/site";
 import type { SocialPost } from "@/types";
 
 interface SocialGalleryProps {
@@ -41,6 +42,21 @@ export function SocialGallery({ posts }: SocialGalleryProps) {
             </div>
           </a>
         ))}
+      </div>
+
+      <div className="mt-8 flex justify-center sm:mt-10">
+        <a
+          href={siteConfig.socialLinks.instagram}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex items-center gap-2 rounded-sm font-body text-sm font-semibold uppercase tracking-[0.1em] text-primary transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+        >
+          <InstagramIcon
+            className="h-4 w-4 transition-transform duration-200 group-hover:scale-110"
+            aria-hidden="true"
+          />
+          Follow Us on Instagram
+        </a>
       </div>
     </Section>
   );

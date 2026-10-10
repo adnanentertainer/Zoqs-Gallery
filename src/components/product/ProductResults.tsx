@@ -12,7 +12,13 @@ interface ProductResultsProps {
   pageSize?: number;
   emptyTitle?: string;
   emptyDescription?: string;
+  /** Shown as a "Clear Filters" link on filterable pages (Shop, Category,
+   * Search) — pass emptyActionLabel/emptyActionHref instead for a curated,
+   * unfilterable page (New Arrivals, Best Sellers) where "clear filters"
+   * wouldn't make sense. */
   clearFiltersHref?: string;
+  emptyActionLabel?: string;
+  emptyActionHref?: string;
 }
 
 export function ProductResults({
@@ -21,6 +27,8 @@ export function ProductResults({
   emptyTitle = "No jewellery found",
   emptyDescription = "Try adjusting your filters or search for something else.",
   clearFiltersHref,
+  emptyActionLabel,
+  emptyActionHref,
 }: ProductResultsProps) {
   const [visibleCount, setVisibleCount] = useState(pageSize);
 
@@ -29,8 +37,10 @@ export function ProductResults({
       <EmptyState
         title={emptyTitle}
         description={emptyDescription}
-        actionLabel={clearFiltersHref ? "Clear Filters" : undefined}
-        actionHref={clearFiltersHref}
+        actionLabel={
+          emptyActionLabel ?? (clearFiltersHref ? "Clear Filters" : undefined)
+        }
+        actionHref={emptyActionHref ?? clearFiltersHref}
       />
     );
   }

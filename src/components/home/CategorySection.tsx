@@ -13,7 +13,7 @@ export function CategorySection({ categories }: CategorySectionProps) {
       title="Shop By Category"
       subtitle="Find the perfect piece for every occasion, from everyday essentials to bridal statements."
     >
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 lg:gap-8">
         {categories.map((category) => (
           <CategoryCard key={category.id} category={category} />
         ))}

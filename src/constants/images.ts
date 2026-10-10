@@ -31,4 +31,5 @@ export const galleryImages = {
 export const heroImage =
   "https://res.cloudinary.com/mg0ric2u/image/upload/f_auto,q_auto,w_1200,c_limit/v1789678102/72096_n.jpg";
 export const promoBannerImage = unsplash("1611085583191-a3b181a88401", 1600);
-export const bridalBannerImage = unsplash("1610173827043-9db50e0d8ef9", 1600);
+export const bridalBannerImage =
+  "https://res.cloudinary.com/mg0ric2u/image/upload/f_auto,q_auto/v1791635079/Bridal_portrait_with_flowing_red_lehenga_1.jpg";
