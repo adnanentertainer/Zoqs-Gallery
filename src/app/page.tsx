@@ -8,6 +8,7 @@ import { BenefitsSection } from "@/components/home/BenefitsSection";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 import { SocialGallery } from "@/components/home/SocialGallery";
+import { WhatsAppFloatingButton } from "@/components/shared/WhatsAppFloatingButton";
 import { getCategories } from "@/lib/services/categoryService";
 import { getBestSellers, getNewArrivals } from "@/lib/services/productService";
 import { getSocialPosts } from "@/lib/services/socialPostService";
@@ -32,6 +33,7 @@ export default async function Home() {
 
   return (
     <>
+      <WhatsAppFloatingButton ariaLabel="Chat with ZOQ's Gallery on WhatsApp" />
       <PromoBannerSection />
       <HeroSection />
       <CategorySection categories={categories} />

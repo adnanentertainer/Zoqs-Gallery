@@ -10,7 +10,9 @@ const whatsappNumber = siteConfig.socialLinks.whatsapp.replace(
 );
 
 interface WhatsAppFloatingButtonProps {
-  message: string;
+  /** Pre-filled chat text. Omit for a plain "open a chat" entry point with
+   * nothing pre-typed (e.g. the homepage, with no product/cart to reference). */
+  message?: string;
   ariaLabel: string;
 }
 
@@ -24,7 +26,9 @@ export function WhatsAppFloatingButton({
   message,
   ariaLabel,
 }: WhatsAppFloatingButtonProps) {
-  const href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+  const href = message
+    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+    : `https://wa.me/${whatsappNumber}`;
 
   return (
     <a
