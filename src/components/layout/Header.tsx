@@ -93,7 +93,7 @@ export function Header() {
             <Link
               href="/contact"
               aria-label="Contact Us"
-              className={cn("hidden lg:inline-flex", iconButtonStyles)}
+              className={cn("inline-flex", iconButtonStyles)}
             >
               <Headset className="h-5 w-5" aria-hidden="true" />
             </Link>
