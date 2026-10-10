@@ -1,7 +1,5 @@
-import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
-import { CACHE_TAGS } from "@/lib/cache/tags";
 import type {
   AdminInventoryDashboardMetrics,
   AdminInventoryMovementFilters,
@@ -128,7 +126,9 @@ export async function recordStockMovement(
     }
     return { error: "Unable to record this stock movement right now." };
   }
-  revalidateTag(CACHE_TAGS.products, { expire: 0 });
+  // Not force-revalidated here — see completePurchase() in purchaseService.ts
+  // for why. The storefront picks this up within the product cache's 120s
+  // window; the admin dashboard reads stock directly (uncached).
   return {};
 }
 

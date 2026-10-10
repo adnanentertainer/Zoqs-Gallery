@@ -1,7 +1,5 @@
-import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { mapOrderRow } from "@/lib/supabase/mappers";
-import { CACHE_TAGS } from "@/lib/cache/tags";
 import type { CheckoutCartLine, Order, PaymentMethod } from "@/types/order";
 import type { Database } from "@/types/supabase";
 
@@ -89,12 +87,14 @@ export async function createOrder(
     );
   }
 
-  // create_order() decrements stock atomically in the database; revalidate
-  // the cached product listings so an item that just sold out (or dropped
-  // low) doesn't keep showing its pre-order availability/stock for the rest
-  // of the cache window. Checkout itself is never affected by this cache —
-  // create_order always re-validates stock server-side regardless.
-  revalidateTag(CACHE_TAGS.products, { expire: 0 });
+  // create_order() decrements stock atomically in the database. We do NOT
+  // force-revalidate the product cache here — every order would otherwise
+  // bust the shared "products" tag and regenerate every storefront page
+  // (home/shop/category/every product), which is what blew through Vercel's
+  // ISR write quota. Stale stock/availability on the storefront self-heals
+  // within the service's 120s revalidate window, and checkout itself is
+  // never affected by this cache — create_order always re-validates stock
+  // server-side regardless.
 
   return {
     orderNumber: data.order_number,

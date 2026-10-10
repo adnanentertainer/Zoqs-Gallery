@@ -1,7 +1,5 @@
-import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
-import { CACHE_TAGS } from "@/lib/cache/tags";
 import type {
   AdminPurchaseDetail,
   AdminPurchaseFilters,
@@ -326,6 +324,10 @@ export async function completePurchase(id: string): Promise<{ error?: string }> 
     }
     return { error: "Unable to complete this purchase right now." };
   }
-  revalidateTag(CACHE_TAGS.products, { expire: 0 });
+  // Stock bump shows up on the storefront within the product cache's 120s
+  // revalidate window; not force-revalidated here, since every restock
+  // busting the shared "products" tag across the whole catalog is what
+  // drove the site's Vercel ISR write usage over quota. The admin dashboard
+  // reads purchases/stock directly (uncached), so this screen is unaffected.
   return {};
 }
