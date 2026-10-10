@@ -3,7 +3,7 @@
 import { useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Heart, Menu, ShoppingBag } from "lucide-react";
+import { Headset, Heart, Menu, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
 import { mainNavLinks } from "@/constants/navigation";
@@ -90,6 +90,13 @@ export function Header() {
 
           <div className="flex items-center justify-end gap-1 sm:gap-2">
             <SearchTrigger className={iconButtonStyles} />
+            <Link
+              href="/contact"
+              aria-label="Contact Us"
+              className={cn("hidden lg:inline-flex", iconButtonStyles)}
+            >
+              <Headset className="h-5 w-5" aria-hidden="true" />
+            </Link>
             <AccountMenu
               className={cn("hidden lg:inline-flex", iconButtonStyles)}
             />

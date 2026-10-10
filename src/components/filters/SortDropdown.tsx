@@ -23,7 +23,7 @@ export function SortDropdown() {
   }
 
   return (
-    <label className="relative inline-flex items-center gap-2 rounded-sm border border-beige px-3 py-2 font-body text-sm text-primary transition-colors hover:border-gold focus-within:border-gold">
+    <label className="relative inline-flex items-center gap-2 rounded-xl border border-beige px-3 py-2 font-body text-sm text-primary transition-colors hover:border-gold focus-within:border-gold">
       <ArrowUpDown className="h-4 w-4 text-muted" aria-hidden="true" />
       <span className="sr-only">Sort products</span>
       <select

@@ -89,7 +89,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <Link
         href={`/product/${product.slug}`}
         onMouseEnter={() => setHasHoveredOnce(true)}
-        className="relative block aspect-[3/4] w-full overflow-hidden rounded-sm bg-beige shadow-sm transition-shadow duration-300 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+        className="relative block aspect-[3/4] w-full overflow-hidden rounded-2xl bg-beige shadow-sm transition-shadow duration-300 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
       >
         <Image
           src={primaryImage}
@@ -177,7 +177,12 @@ export function ProductCard({ product }: ProductCardProps) {
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="font-body text-sm font-semibold text-primary">
+          <span
+            className={cn(
+              "font-body text-sm font-semibold",
+              product.originalPrice ? "text-success" : "text-primary",
+            )}
+          >
             {formatPrice(product.price)}
           </span>
           {product.originalPrice && (
@@ -186,7 +191,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </span>
           )}
           {getDiscountPercentage(product) !== undefined && (
-            <span className="font-body text-xs font-medium text-error">
+            <span className="inline-flex items-center rounded-full bg-error px-2 py-0.5 font-body text-[0.65rem] font-semibold text-white">
               -{getDiscountPercentage(product)}%
             </span>
           )}

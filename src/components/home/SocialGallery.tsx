@@ -24,7 +24,7 @@ export function SocialGallery({ posts }: SocialGalleryProps) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="View this look on Instagram"
-            className="group relative aspect-square overflow-hidden rounded-sm bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+            className="group relative aspect-square overflow-hidden rounded-2xl bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
           >
             <Image
               src={post.image}

@@ -35,7 +35,7 @@ export function buttonVariants(
   className?: string,
 ) {
   return cn(
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm font-body font-semibold uppercase tracking-[0.08em] transition-all duration-200",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl font-body font-semibold uppercase tracking-[0.08em] transition-all duration-200",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
     "disabled:pointer-events-none disabled:opacity-50",
     variantStyles[variant],

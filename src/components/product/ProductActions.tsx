@@ -18,7 +18,7 @@ import type { Product } from "@/types";
 type CartStatus = "idle" | "loading" | "added";
 
 const iconButtonStyles =
-  "inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-sm border border-beige text-primary transition-colors hover:border-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold";
+  "inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-beige text-primary transition-colors hover:border-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold";
 
 interface ProductActionsProps {
   product: Product;

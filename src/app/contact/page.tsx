@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { MessageCircle } from "lucide-react";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { Container } from "@/components/ui/Container";
 import { Heading, Text } from "@/components/ui/Typography";
 import { ContactForm } from "@/components/contact/ContactForm";
-import { InstagramIcon, FacebookIcon } from "@/components/icons/social-icons";
+import {
+  InstagramIcon,
+  FacebookIcon,
+  WhatsAppIcon,
+} from "@/components/icons/social-icons";
 import { siteConfig } from "@/constants/site";
 import { buildOpenGraph } from "@/lib/utils";
 
@@ -20,7 +23,7 @@ export const metadata: Metadata = {
 
 const contactChannels = [
   {
-    icon: MessageCircle,
+    icon: WhatsAppIcon,
     title: "WhatsApp",
     detail: siteConfig.mobileWalletNumber,
     href: siteConfig.socialLinks.whatsapp,
@@ -59,23 +62,24 @@ export default function ContactPage() {
         </Text>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
         {contactChannels.map(({ icon: Icon, title, detail, href, cta }) => (
           <a
             key={title}
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center gap-2 rounded-sm border border-beige bg-white p-6 text-center transition-colors hover:border-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+            className="group flex flex-col items-center gap-3 rounded-2xl border border-beige bg-white p-8 text-center shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-gold hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
           >
-            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-gold">
-              <Icon className="h-5 w-5" aria-hidden="true" />
-            </span>
-            <span className="font-body text-sm font-semibold text-primary">
+            <Icon
+              className="h-16 w-16 transition-transform duration-200 group-hover:scale-105"
+              aria-hidden="true"
+            />
+            <span className="font-heading text-lg font-semibold text-primary">
               {title}
             </span>
             <span className="font-body text-sm text-muted">{detail}</span>
-            <span className="font-body text-xs font-medium text-gold">
+            <span className="font-body text-xs font-semibold uppercase tracking-wide text-gold">
               {cta}
             </span>
           </a>

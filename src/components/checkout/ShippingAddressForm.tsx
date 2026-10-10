@@ -13,7 +13,7 @@ interface ShippingAddressFormProps {
 }
 
 const selectStyles =
-  "h-11 w-full rounded-sm border border-beige bg-white px-4 font-body text-sm text-primary focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold disabled:cursor-not-allowed disabled:opacity-50";
+  "h-11 w-full rounded-2xl border border-beige bg-white px-4 font-body text-sm text-primary focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold disabled:cursor-not-allowed disabled:opacity-50";
 
 export function ShippingAddressForm({
   values,

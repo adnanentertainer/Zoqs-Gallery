@@ -19,9 +19,9 @@ export function BridalSection() {
         <div className="relative mx-auto w-full max-w-md lg:mx-0">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -inset-3 hidden rounded-sm border border-gold/25 sm:block"
+            className="pointer-events-none absolute -inset-3 hidden rounded-2xl border border-gold/25 sm:block"
           />
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] ring-1 ring-gold/40">
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] ring-1 ring-gold/40">
             <Image
               src={bridalBannerImage}
               alt="Bride in a flowing red and gold embroidered lehenga wearing a gold choker necklace, jhumka earrings, maang tikka and bangles"

@@ -8,7 +8,7 @@ import { Button, buttonVariants } from "@/components/ui/Button";
 import { Heading, Text } from "@/components/ui/Typography";
 import { RatingStars } from "@/components/shared/RatingStars";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
-import { categoryLabel, formatPrice } from "@/lib/utils";
+import { categoryLabel, cn, formatPrice } from "@/lib/utils";
 import { getDefaultVariantSelections } from "@/lib/cart";
 import {
   getDiscountPercentage,
@@ -72,7 +72,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="quick-view-title"
-        className="relative flex w-full max-w-2xl flex-col overflow-hidden rounded-sm bg-white shadow-xl sm:flex-row sm:max-h-[85vh]"
+        className="relative flex w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl sm:flex-row sm:max-h-[85vh]"
       >
         <button
           type="button"
@@ -115,7 +115,12 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-body text-lg font-semibold text-primary">
+            <span
+              className={cn(
+                "font-body text-lg font-semibold",
+                discount !== undefined ? "text-success" : "text-primary",
+              )}
+            >
               {formatPrice(product.price)}
             </span>
             {product.originalPrice && (
@@ -124,7 +129,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
               </span>
             )}
             {discount !== undefined && (
-              <span className="font-body text-sm font-medium text-error">
+              <span className="inline-flex items-center rounded-full bg-error px-2 py-0.5 font-body text-xs font-semibold text-white">
                 -{discount}%
               </span>
             )}

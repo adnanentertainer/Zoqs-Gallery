@@ -13,6 +13,6 @@ export const mainNavLinks: NavLink[] = [
 
 export const mobileNavLinks: NavLink[] = [
   ...mainNavLinks,
-  { label: "About Us", href: "#about" },
-  { label: "Contact", href: "#contact" },
+  { label: "About Us", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];

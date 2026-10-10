@@ -28,9 +28,9 @@ export function HeroSection() {
           <div className="relative w-full max-w-md">
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute -inset-3 hidden rounded-sm border border-gold/25 sm:block"
+              className="pointer-events-none absolute -inset-3 hidden rounded-2xl border border-gold/25 sm:block"
             />
-            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm shadow-[0_25px_60px_-15px_rgba(31,31,31,0.35)] ring-1 ring-gold/30">
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-[0_25px_60px_-15px_rgba(31,31,31,0.35)] ring-1 ring-gold/30">
               <Image
                 src={heroImage}
                 alt="Bride wearing a gold statement necklace, drop earrings and maang tikka"

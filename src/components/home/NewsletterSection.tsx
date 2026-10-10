@@ -82,7 +82,7 @@ export function NewsletterSection() {
                 aria-invalid={status === "error" || undefined}
                 aria-describedby={status === "error" ? errorId : undefined}
                 className={cn(
-                  "h-12 w-full rounded-sm border bg-white pl-11 pr-4 font-body text-sm text-primary placeholder:text-muted",
+                  "h-12 w-full rounded-2xl border bg-white pl-11 pr-4 font-body text-sm text-primary placeholder:text-muted",
                   "focus:outline-none focus:ring-2 focus:ring-gold",
                   status === "error" ? "border-error" : "border-transparent",
                 )}

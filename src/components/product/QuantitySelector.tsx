@@ -41,7 +41,7 @@ export function QuantitySelector({
       )}
       <div
         className={cn(
-          "inline-flex w-fit items-center rounded-sm border border-beige",
+          "inline-flex w-fit items-center rounded-xl border border-beige",
           compact ? "h-9" : "h-11",
         )}
         role="group"

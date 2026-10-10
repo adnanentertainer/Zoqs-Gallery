@@ -130,7 +130,7 @@ export function ProductGallery({
             setIsLightboxOpen(true);
           }
         }}
-        className="group relative aspect-[3/4] w-full cursor-zoom-in overflow-hidden rounded-sm bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+        className="group relative aspect-[3/4] w-full cursor-zoom-in overflow-hidden rounded-2xl bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
       >
         <Image
           src={mainImage}
@@ -161,7 +161,7 @@ export function ProductGallery({
               aria-label={`Show image ${index + 1} of ${displayImages.length}`}
               aria-current={index === activeIndex}
               className={cn(
-                "relative aspect-square w-16 shrink-0 overflow-hidden rounded-sm border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold lg:w-full",
+                "relative aspect-square w-16 shrink-0 overflow-hidden rounded-xl border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold lg:w-full",
                 index === activeIndex
                   ? "border-gold"
                   : "border-transparent hover:border-beige",

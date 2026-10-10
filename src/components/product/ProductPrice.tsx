@@ -1,4 +1,4 @@
-import { formatPrice } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import { getDiscountPercentage } from "@/lib/products";
 import type { Product } from "@/types";
 
@@ -20,11 +20,11 @@ export function ProductPrice({
   return (
     <div className="flex flex-wrap items-center gap-3">
       <span
-        className={
-          size === "lg"
-            ? "font-heading text-2xl font-semibold text-primary sm:text-3xl"
-            : "font-heading text-xl font-semibold text-primary"
-        }
+        className={cn(
+          "font-heading font-semibold",
+          size === "lg" ? "text-2xl sm:text-3xl" : "text-xl",
+          discount !== undefined ? "text-success" : "text-primary",
+        )}
       >
         {formatPrice(currentPrice)}
       </span>
@@ -34,8 +34,8 @@ export function ProductPrice({
         </span>
       )}
       {discount !== undefined && (
-        <span className="font-body text-sm font-semibold text-error">
-          {discount}% OFF
+        <span className="inline-flex items-center rounded-full bg-error px-2.5 py-1 font-body text-xs font-semibold text-white">
+          -{discount}%
         </span>
       )}
     </div>

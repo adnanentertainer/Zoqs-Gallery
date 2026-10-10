@@ -94,7 +94,7 @@ export function ContactForm() {
           aria-describedby={
             errors.message ? "contact-message-error" : undefined
           }
-          className="w-full rounded-sm border border-beige bg-white px-4 py-3 font-body text-sm text-primary placeholder:text-muted focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
+          className="w-full rounded-2xl border border-beige bg-white px-4 py-3 font-body text-sm text-primary placeholder:text-muted focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
         />
         {errors.message && (
           <p

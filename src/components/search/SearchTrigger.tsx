@@ -155,7 +155,7 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
                       placeholder="Search for jewellery, categories, materials..."
                       aria-label="Search products"
                       tabIndex={isOpen ? 0 : -1}
-                      className="h-12 w-full rounded-sm border border-beige bg-white pl-11 pr-10 font-body text-sm text-primary placeholder:text-muted focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
+                      className="h-12 w-full rounded-2xl border border-beige bg-white pl-11 pr-10 font-body text-sm text-primary placeholder:text-muted focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
                     />
                     {query && (
                       <button

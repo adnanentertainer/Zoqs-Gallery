@@ -227,7 +227,7 @@ export function CheckoutForm({
             placeholder="e.g. Please call before delivery."
             value={customerNotes}
             onChange={(event) => setCustomerNotes(event.target.value)}
-            className="w-full rounded-sm border border-beige bg-white px-4 py-3 font-body text-sm text-primary placeholder:text-muted focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
+            className="w-full rounded-2xl border border-beige bg-white px-4 py-3 font-body text-sm text-primary placeholder:text-muted focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
           />
         </section>
 

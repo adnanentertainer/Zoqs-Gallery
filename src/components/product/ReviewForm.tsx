@@ -95,7 +95,7 @@ export function ReviewForm({ productId, productSlug }: ReviewFormProps) {
           value={reviewText}
           onChange={(event) => setReviewText(event.target.value)}
           placeholder="Share your experience with this product..."
-          className="w-full rounded-sm border border-beige bg-white px-4 py-3 font-body text-sm text-primary focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
+          className="w-full rounded-2xl border border-beige bg-white px-4 py-3 font-body text-sm text-primary focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
         />
       </div>
       <Button
