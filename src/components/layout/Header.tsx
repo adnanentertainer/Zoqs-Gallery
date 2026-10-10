@@ -43,22 +43,22 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-beige bg-white/95 backdrop-blur">
-        <Container className="flex h-16 items-center justify-between gap-4 lg:h-20">
-          <div className="flex items-center gap-4 lg:gap-10">
+        <Container className="flex h-16 items-center justify-between gap-2 sm:gap-4 lg:h-20">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4 lg:gap-10">
             <button
               type="button"
               onClick={() => setIsMobileNavOpen(true)}
               aria-expanded={isMobileNavOpen}
               aria-controls="mobile-nav"
               aria-label="Open menu"
-              className={cn("inline-flex lg:hidden", iconButtonStyles)}
+              className={cn("inline-flex shrink-0 lg:hidden", iconButtonStyles)}
             >
               <Menu className="h-6 w-6" aria-hidden="true" />
             </button>
 
             <Link
               href="/"
-              className="rounded-sm font-heading text-xl font-semibold tracking-wider text-primary transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:text-2xl lg:text-[1.75rem]"
+              className="shrink-0 whitespace-nowrap rounded-sm font-heading text-lg font-semibold tracking-wider text-primary transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:text-2xl lg:text-[1.75rem]"
               style={{
                 textShadow:
                   "0 1px 0 rgba(255,255,255,0.9), 0 -1px 0 rgba(0,0,0,0.35)",
