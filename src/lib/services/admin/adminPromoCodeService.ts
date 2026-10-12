@@ -30,6 +30,7 @@ function toListItem(row: PromoCodeRow): AdminPromoCodeListItem {
     expiresAt: row.expires_at,
     isActive: row.is_active,
     createdAt: row.created_at,
+    description: row.description ?? "",
   };
 }
 

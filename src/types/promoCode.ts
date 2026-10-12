@@ -44,6 +44,10 @@ export interface AdminPromoCodeListItem {
   expiresAt: string | null;
   isActive: boolean;
   createdAt: string;
+  /** Why this code exists/is scheduled, e.g. "Eid-ul-Fitr sale" — set from
+   * the admin form (or seeded by a migration) so the reason behind a
+   * scheduled campaign isn't just a bare code string. */
+  description: string;
 }
 
 /** Result of validating a code at checkout — never trusted for the final

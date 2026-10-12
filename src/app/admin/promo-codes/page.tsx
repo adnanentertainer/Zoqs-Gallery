@@ -150,8 +150,15 @@ export default async function AdminPromoCodesPage({
                     key={promo.id}
                     className="border-b border-beige last:border-b-0"
                   >
-                    <td className="px-5 py-3 font-body text-sm font-medium text-primary">
-                      {promo.code}
+                    <td className="px-5 py-3">
+                      <div className="font-body text-sm font-medium text-primary">
+                        {promo.code}
+                      </div>
+                      {promo.description && (
+                        <div className="font-body text-xs text-muted">
+                          {promo.description}
+                        </div>
+                      )}
                     </td>
                     <td className="px-5 py-3 font-body text-sm text-primary">
                       {discountLabel(promo.discountType, promo.discountValue)}
