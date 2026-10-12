@@ -17,6 +17,7 @@ import {
   isInStock,
 } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
+import { usePromoStatus } from "@/context/PromoStatusContext";
 import { registerProduct } from "@/lib/productCache";
 import type { Product, ProductBadge } from "@/types";
 
@@ -44,7 +45,13 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  // While a promo code is running, a product's own "already discounted"
+  // signal is hidden — stacking a strike-through sale price with a promo
+  // code on top reads as deceptive. The promo discount still applies to the
+  // real product.price at checkout either way.
+  const promoActive = usePromoStatus();
   const badge = getProductBadge(product);
+  const hideBadge = promoActive && badge === "Sale";
   const inStock = isInStock(product);
   // A group with more than one option is a real choice (size, color, ...)
   // that quick-add can't safely guess — route those to the product page
@@ -117,7 +124,7 @@ export function ProductCard({ product }: ProductCardProps) {
           />
         )}
 
-        {badge && (
+        {badge && !hideBadge && (
           <Badge
             variant={badgeVariant[badge]}
             className="absolute left-3 top-3"
@@ -180,17 +187,19 @@ export function ProductCard({ product }: ProductCardProps) {
           <span
             className={cn(
               "font-body text-sm font-semibold",
-              product.originalPrice ? "text-success" : "text-primary",
+              product.originalPrice && !promoActive
+                ? "text-success"
+                : "text-primary",
             )}
           >
             {formatPrice(product.price)}
           </span>
-          {product.originalPrice && (
+          {product.originalPrice && !promoActive && (
             <span className="font-body text-xs text-muted line-through">
               {formatPrice(product.originalPrice)}
             </span>
           )}
-          {getDiscountPercentage(product) !== undefined && (
+          {!promoActive && getDiscountPercentage(product) !== undefined && (
             <span className="inline-flex items-center rounded-full bg-error px-2 py-0.5 font-body text-[0.65rem] font-semibold text-white">
               -{getDiscountPercentage(product)}%
             </span>

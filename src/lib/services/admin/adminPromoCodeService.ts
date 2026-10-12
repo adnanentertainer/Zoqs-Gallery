@@ -67,7 +67,12 @@ export async function listAdminPromoCodes(
     query = query.eq("is_active", filters.status === "active");
   }
 
-  query = query.order("created_at", { ascending: false });
+  // Soonest-upcoming start date first (codes with no start date — i.e.
+  // always-on — sort last, since there's no "upcoming" moment for them);
+  // expires_at breaks ties between codes starting the same day.
+  query = query
+    .order("starts_at", { ascending: true, nullsFirst: false })
+    .order("expires_at", { ascending: true, nullsFirst: false });
 
   const from = (filters.page - 1) * filters.pageSize;
   const to = from + filters.pageSize - 1;

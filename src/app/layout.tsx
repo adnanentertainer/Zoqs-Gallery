@@ -11,15 +11,14 @@ import { ToastProvider } from "@/context/ToastContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { PromoStatusProvider } from "@/context/PromoStatusContext";
+import { getShippingSettings } from "@/lib/checkout/getShippingSettings";
+import { hasActivePromoCode } from "@/lib/services/promoCodeService";
+import { META_PIXEL_ID } from "@/constants/meta";
 import { safeJsonLd } from "@/lib/utils";
 import "../styles/globals.css";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-
-// Meta Pixel (Events Manager > ZOQ's Gallery Website Pixel) — tracks PageView
-// for Facebook/Instagram ads. Do not remove without also removing it in
-// Events Manager, or ad performance/audience data goes stale silently.
-const metaPixelId = "980785478378788";
 
 const organizationJsonLd = {
   "@context": "https://schema.org/",
@@ -102,7 +101,10 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const shippingSettings = await getShippingSettings();
+  const promoActive = await hasActivePromoCode();
+
   return (
     <html
       lang="en"
@@ -121,13 +123,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ToastProvider>
           <AuthProvider>
             <WishlistProvider>
-              <CartProvider>
-                <FestivalCountdownBanner />
-                <AnnouncementBar />
-                <Header />
-                <main className="flex flex-1 flex-col">{children}</main>
-                <Footer />
-              </CartProvider>
+              <PromoStatusProvider hasActivePromoCode={promoActive}>
+                <CartProvider shippingSettings={shippingSettings}>
+                  <FestivalCountdownBanner />
+                  <AnnouncementBar />
+                  <Header />
+                  <main className="flex flex-1 flex-col">{children}</main>
+                  <Footer />
+                </CartProvider>
+              </PromoStatusProvider>
             </WishlistProvider>
           </AuthProvider>
         </ToastProvider>
@@ -142,7 +146,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${metaPixelId}');
+            fbq('init', '${META_PIXEL_ID}');
             fbq('track', 'PageView');
           `}
         </Script>
@@ -151,7 +155,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             height="1"
             width="1"
             style={{ display: "none" }}
-            src={`https://www.facebook.com/tr?id=${metaPixelId}&ev=PageView&noscript=1`}
+            src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
             alt=""
           />
         </noscript>

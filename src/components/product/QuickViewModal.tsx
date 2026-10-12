@@ -16,6 +16,7 @@ import {
   isInStock,
 } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
+import { usePromoStatus } from "@/context/PromoStatusContext";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import type { Product, ProductBadge } from "@/types";
@@ -38,6 +39,9 @@ interface QuickViewModalProps {
 
 export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
   const cart = useCart();
+  // While a promo code is running, hide the product's own "already
+  // discounted" signal — see PromoStatusContext for why.
+  const promoActive = usePromoStatus();
   const open = product !== null;
 
   useEscapeKey(open, onClose);
@@ -46,8 +50,9 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
   if (!product) return null;
 
   const badge = getProductBadge(product);
+  const hideBadge = promoActive && badge === "Sale";
   const inStock = isInStock(product);
-  const discount = getDiscountPercentage(product);
+  const discount = promoActive ? undefined : getDiscountPercentage(product);
   // Mirrors ProductCard's quick-add guard: a group with more than one
   // option needs the customer's own pick, so this modal can't safely
   // one-click add it — it sends them to the full product page instead.
@@ -91,7 +96,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
             sizes="(max-width: 640px) 100vw, 50vw"
             className={!inStock ? "object-cover opacity-60" : "object-cover"}
           />
-          {badge && (
+          {badge && !hideBadge && (
             <Badge
               variant={badgeVariant[badge]}
               className="absolute left-3 top-3"
@@ -123,7 +128,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
             >
               {formatPrice(product.price)}
             </span>
-            {product.originalPrice && (
+            {!promoActive && product.originalPrice && (
               <span className="font-body text-sm text-muted line-through">
                 {formatPrice(product.originalPrice)}
               </span>

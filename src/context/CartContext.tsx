@@ -27,6 +27,7 @@ import { createLocalStorageStore } from "@/lib/localStorageStore";
 import { trackAddToCart } from "@/lib/metaPixel";
 import { useToast } from "@/context/ToastContext";
 import { siteConfig } from "@/constants/site";
+import type { ShippingSettings } from "@/lib/checkout/shipping";
 import type { Product } from "@/types";
 
 const STORAGE_KEY = "zoqs-gallery-cart";
@@ -185,7 +186,16 @@ interface CartContextValue {
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
-export function CartProvider({ children }: { children: ReactNode }) {
+interface CartProviderProps {
+  children: ReactNode;
+  /** Same admin-configurable settings checkout uses (see
+   * lib/checkout/getShippingSettings.ts) — passed down from the server-
+   * rendered root layout so the cart's displayed shipping fee always
+   * matches what checkout will actually charge. */
+  shippingSettings: ShippingSettings;
+}
+
+export function CartProvider({ children, shippingSettings }: CartProviderProps) {
   const items = useSyncExternalStore(
     cartStore.subscribe,
     cartStore.getSnapshot,
@@ -243,8 +253,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const freeShipping = useMemo(
-    () => getFreeShippingProgress(subtotal),
-    [subtotal],
+    () => getFreeShippingProgress(subtotal, shippingSettings),
+    [subtotal, shippingSettings],
   );
 
   const isInCart = useCallback(

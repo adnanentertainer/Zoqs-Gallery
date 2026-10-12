@@ -83,15 +83,25 @@ export function trackPurchase(params: {
   value: number;
   currency: string;
   orderId: string;
+  /** Shared with the server-side Conversions API call for the same order
+   * (see lib/meta/conversionsApi.ts) -- Meta deduplicates a Purchase event
+   * seen from both the browser pixel and the server on (event_name,
+   * event_id), so sending both never double-counts revenue. */
+  eventId: string;
   email?: string;
   phone?: string;
 }) {
   setAdvancedMatchingUserData({ email: params.email, phone: params.phone });
-  fire("track", "Purchase", {
-    content_ids: params.contentIds,
-    content_type: "product",
-    value: params.value,
-    currency: params.currency,
-    order_id: params.orderId,
-  });
+  fire(
+    "track",
+    "Purchase",
+    {
+      content_ids: params.contentIds,
+      content_type: "product",
+      value: params.value,
+      currency: params.currency,
+      order_id: params.orderId,
+    },
+    { eventID: params.eventId },
+  );
 }

@@ -1,4 +1,4 @@
-import { siteConfig } from "@/constants/site";
+import type { ShippingSettings } from "@/lib/checkout/shipping";
 import type { Product } from "@/types";
 
 export function getDefaultVariantSelections(
@@ -62,14 +62,20 @@ export interface FreeShippingProgress {
   remaining: number;
   percentage: number;
   qualifies: boolean;
+  /** Rs. 0 once qualifies is true, otherwise settings.flatShippingCost —
+   * shown in the cart (not just at checkout) so the flat fee is never a
+   * surprise sprung on the customer after they've filled in their address. */
+  shippingCost: number;
 }
 
 export function getFreeShippingProgress(
   subtotal: number,
+  settings: ShippingSettings,
 ): FreeShippingProgress {
-  const threshold = siteConfig.freeShippingThreshold;
+  const threshold = settings.freeShippingThreshold;
   const qualifies = subtotal >= threshold;
   const remaining = qualifies ? 0 : threshold - subtotal;
   const percentage = Math.min(100, Math.round((subtotal / threshold) * 100));
-  return { threshold, remaining, percentage, qualifies };
+  const shippingCost = qualifies ? 0 : settings.flatShippingCost;
+  return { threshold, remaining, percentage, qualifies, shippingCost };
 }

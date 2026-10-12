@@ -27,7 +27,15 @@ export function MetaPixelPurchaseTracker({
   useEffect(() => {
     const dedupeKey = `zoqs-gallery-purchase-tracked:${orderNumber}`;
     if (window.localStorage.getItem(dedupeKey)) return;
-    trackPurchase({ orderId, value, currency, contentIds, email, phone });
+    trackPurchase({
+      orderId,
+      eventId: orderNumber,
+      value,
+      currency,
+      contentIds,
+      email,
+      phone,
+    });
     window.localStorage.setItem(dedupeKey, "1");
   }, [orderId, orderNumber, value, currency, contentIds, email, phone]);
 

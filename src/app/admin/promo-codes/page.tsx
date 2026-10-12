@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { AdminPageHeader, Pagination, StatusBadge } from "@/components/admin";
+import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Typography";
@@ -28,6 +29,17 @@ function discountLabel(
   return discountType === "percentage"
     ? `${discountValue}%`
     : formatPrice(discountValue);
+}
+
+/** Whole days between now and a future starts_at, or null if it's not an
+ * upcoming date (already started, or no start date at all). Mirrors the
+ * 2-day window the "ZOQ Gallery — festival/promo 2-day reminder" cloud
+ * routine alerts on, so this badge and that push notification always agree. */
+function daysUntilStart(startsAt: string | null): number | null {
+  if (!startsAt) return null;
+  const diffMs = new Date(startsAt).getTime() - Date.now();
+  if (diffMs <= 0) return null;
+  return Math.ceil(diffMs / 86_400_000);
 }
 
 export default async function AdminPromoCodesPage({
@@ -130,7 +142,10 @@ export default async function AdminPromoCodesPage({
                 </tr>
               </thead>
               <tbody>
-                {result.items.map((promo) => (
+                {result.items.map((promo) => {
+                  const daysUntil = daysUntilStart(promo.startsAt);
+                  const startingSoon = daysUntil !== null && daysUntil <= 2;
+                  return (
                   <tr
                     key={promo.id}
                     className="border-b border-beige last:border-b-0"
@@ -149,9 +164,16 @@ export default async function AdminPromoCodesPage({
                       {promo.usageLimit ? ` / ${promo.usageLimit}` : ""}
                     </td>
                     <td className="px-5 py-3 font-body text-sm text-muted">
-                      {promo.startsAt
-                        ? new Date(promo.startsAt).toLocaleDateString("en-PK")
-                        : "—"}
+                      <div className="flex items-center gap-2">
+                        {promo.startsAt
+                          ? new Date(promo.startsAt).toLocaleDateString("en-PK")
+                          : "—"}
+                        {startingSoon && (
+                          <Badge variant="warning">
+                            Starts in {daysUntil}d
+                          </Badge>
+                        )}
+                      </div>
                     </td>
                     <td className="px-5 py-3 font-body text-sm text-muted">
                       {promo.expiresAt
@@ -174,7 +196,8 @@ export default async function AdminPromoCodesPage({
                       />
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

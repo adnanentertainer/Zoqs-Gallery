@@ -9,6 +9,7 @@ import { validatePromoCode } from "@/lib/services/promoCodeService";
 import { sendNewOrderNotificationEmail } from "@/lib/email/orderNotification";
 import { sendCustomerOrderConfirmationEmail } from "@/lib/email/customerOrderConfirmation";
 import { sendNewOrderNotificationWhatsApp } from "@/lib/whatsapp/orderNotification";
+import { sendPurchaseConversionEvent } from "@/lib/meta/conversionsApi";
 import {
   validateAddressLine1,
   validateCheckoutEmail,
@@ -136,10 +137,26 @@ export async function placeOrder(
         ? await getGuestOrderByOrderNumber(result.orderNumber, result.guestToken)
         : await getOrderByOrderNumber(result.orderNumber);
       if (order) {
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://zoqsgallery.com";
         await Promise.all([
           sendNewOrderNotificationEmail(order),
           sendNewOrderNotificationWhatsApp(order),
           sendCustomerOrderConfirmationEmail(order),
+          // Shares its event_id with the client-side fbq() Purchase call on
+          // the confirmation page (see MetaPixelPurchaseTracker) so Meta
+          // dedupes the two instead of double-counting revenue.
+          sendPurchaseConversionEvent({
+            eventId: order.orderNumber,
+            orderId: order.id,
+            value: order.total,
+            currency: order.currency,
+            contentIds: order.items
+              .map((item) => item.productId)
+              .filter((id): id is string => id !== null),
+            email: order.shippingAddress.email || undefined,
+            phone: order.shippingAddress.phone,
+            eventSourceUrl: `${siteUrl}/checkout`,
+          }),
         ]);
       }
     } catch (notificationError) {

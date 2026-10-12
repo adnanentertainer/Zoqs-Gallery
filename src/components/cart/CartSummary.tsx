@@ -23,13 +23,29 @@ export function CartSummary({
     <div className={cn("flex flex-col gap-4", className)}>
       <ShippingProgress progress={freeShipping} />
 
-      <div className="flex items-center justify-between border-t border-beige pt-4">
-        <span className="font-body text-base font-medium text-primary">
-          Subtotal
-        </span>
-        <span className="font-heading text-xl font-semibold text-primary">
-          {formatPrice(subtotal)}
-        </span>
+      <div className="flex flex-col gap-2 border-t border-beige pt-4">
+        <div className="flex items-center justify-between">
+          <span className="font-body text-sm text-muted">Subtotal</span>
+          <span className="font-body text-sm text-primary">
+            {formatPrice(subtotal)}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="font-body text-sm text-muted">Shipping</span>
+          <span className="font-body text-sm text-primary">
+            {freeShipping.qualifies
+              ? "Free"
+              : formatPrice(freeShipping.shippingCost)}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="font-body text-base font-medium text-primary">
+            Total
+          </span>
+          <span className="font-heading text-xl font-semibold text-primary">
+            {formatPrice(subtotal + freeShipping.shippingCost)}
+          </span>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3">

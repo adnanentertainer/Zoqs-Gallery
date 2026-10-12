@@ -19,7 +19,11 @@ export function ShippingProgress({ progress }: ShippingProgressProps) {
             <span className="font-semibold text-gold">
               {formatPrice(progress.remaining)}
             </span>{" "}
-            away from free shipping
+            away from free shipping — otherwise{" "}
+            <span className="font-semibold text-primary">
+              {formatPrice(progress.shippingCost)}
+            </span>{" "}
+            shipping applies
           </>
         )}
       </p>
