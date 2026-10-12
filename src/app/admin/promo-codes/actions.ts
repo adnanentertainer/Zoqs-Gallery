@@ -7,6 +7,7 @@ import {
   deletePromoCode,
   setPromoCodeActive,
   updatePromoCode,
+  uploadPromoCodeHeroImage,
 } from "@/lib/services/admin/adminPromoCodeService";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 import type { AdminPromoCodeInput } from "@/types/promoCode";
@@ -87,6 +88,17 @@ export async function setPromoCodeActiveAction(
     revalidateTag(CACHE_TAGS.activePromoCode, { expire: 0 });
   }
   return result;
+}
+
+export async function uploadPromoCodeHeroImageAction(
+  formData: FormData,
+): Promise<{ url?: string; error?: string }> {
+  await requireAdmin();
+  const file = formData.get("file");
+  if (!(file instanceof File)) {
+    return { error: "No file provided." };
+  }
+  return uploadPromoCodeHeroImage(file);
 }
 
 export async function deletePromoCodeAction(

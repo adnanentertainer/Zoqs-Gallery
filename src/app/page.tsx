@@ -12,6 +12,8 @@ import { WhatsAppFloatingButton } from "@/components/shared/WhatsAppFloatingButt
 import { getCategories } from "@/lib/services/categoryService";
 import { getBestSellers, getNewArrivals } from "@/lib/services/productService";
 import { getSocialPosts } from "@/lib/services/socialPostService";
+import { getActiveHeroImage } from "@/lib/services/promoCodeService";
+import { getSiteSetting } from "@/lib/services/settingsService";
 
 export const metadata: Metadata = {
   title: "ZOQ's Gallery | Premium Artificial Jewellery in Pakistan",
@@ -23,19 +25,30 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const [categories, newArrivals, bestSellers, socialPosts] =
-    await Promise.all([
-      getCategories(),
-      getNewArrivals(),
-      getBestSellers(),
-      getSocialPosts(),
-    ]);
+  const [
+    categories,
+    newArrivals,
+    bestSellers,
+    socialPosts,
+    activeHeroImage,
+    defaultHeroImage,
+  ] = await Promise.all([
+    getCategories(),
+    getNewArrivals(),
+    getBestSellers(),
+    getSocialPosts(),
+    getActiveHeroImage(),
+    getSiteSetting<string>("default_hero_image"),
+  ]);
 
   return (
     <>
       <WhatsAppFloatingButton ariaLabel="Chat with ZOQ's Gallery on WhatsApp" />
       <PromoBannerSection />
-      <HeroSection />
+      <HeroSection
+        imageUrl={activeHeroImage?.imageUrl || defaultHeroImage || undefined}
+        imageAlt={activeHeroImage?.imageAlt}
+      />
       <CategorySection categories={categories} />
       <ProductSection
         id="new-arrivals"

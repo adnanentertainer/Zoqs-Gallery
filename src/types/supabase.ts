@@ -566,6 +566,8 @@ export interface Database {
           campaign_id: string | null;
           owner_user_id: string | null;
           participation_id: string | null;
+          // Added by 20261013020000_promo_code_hero_images.sql.
+          hero_image_url: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -586,6 +588,7 @@ export interface Database {
           campaign_id?: string | null;
           owner_user_id?: string | null;
           participation_id?: string | null;
+          hero_image_url?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["promo_codes"]["Insert"]>;
         Relationships: [];

@@ -7,6 +7,10 @@ import {
   type AdminStoreSettings,
 } from "@/lib/services/admin/adminSettingsService";
 import { updateAdminFestivalBanner } from "@/lib/services/admin/adminFestivalBannerService";
+import {
+  updateAdminDefaultHeroImage,
+  uploadDefaultHeroImage,
+} from "@/lib/services/admin/adminHeroImageService";
 import type { FestivalBanner } from "@/types/festivalBanner";
 
 export async function updateAdminStoreSettingsAction(
@@ -33,4 +37,27 @@ export async function updateAdminFestivalBannerAction(
     revalidatePath("/admin/settings");
   }
   return result;
+}
+
+export async function updateAdminDefaultHeroImageAction(
+  url: string,
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const result = await updateAdminDefaultHeroImage(url);
+  if (!result.error) {
+    revalidatePath("/admin/settings");
+    revalidatePath("/");
+  }
+  return result;
+}
+
+export async function uploadDefaultHeroImageAction(
+  formData: FormData,
+): Promise<{ url?: string; error?: string }> {
+  await requireAdmin();
+  const file = formData.get("file");
+  if (!(file instanceof File)) {
+    return { error: "No file provided." };
+  }
+  return uploadDefaultHeroImage(file);
 }

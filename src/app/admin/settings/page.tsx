@@ -3,8 +3,10 @@ import { AdminPageHeader } from "@/components/admin";
 import { Heading, Text } from "@/components/ui/Typography";
 import { SettingsForm } from "@/components/admin/SettingsForm";
 import { FestivalBannerForm } from "@/components/admin/FestivalBannerForm";
+import { DefaultHeroImageForm } from "@/components/admin/DefaultHeroImageForm";
 import { getAdminStoreSettings } from "@/lib/services/admin/adminSettingsService";
 import { getAdminFestivalBanner } from "@/lib/services/admin/adminFestivalBannerService";
+import { getAdminDefaultHeroImage } from "@/lib/services/admin/adminHeroImageService";
 
 export const metadata: Metadata = {
   title: "Settings | Admin | ZOQ's Gallery",
@@ -12,9 +14,10 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminSettingsPage() {
-  const [settings, festivalBanner] = await Promise.all([
+  const [settings, festivalBanner, defaultHeroImage] = await Promise.all([
     getAdminStoreSettings(),
     getAdminFestivalBanner(),
+    getAdminDefaultHeroImage(),
   ]);
 
   return (
@@ -35,6 +38,17 @@ export default async function AdminSettingsPage() {
         </Text>
       </div>
       <FestivalBannerForm initialValues={festivalBanner} />
+
+      <div className="mt-4">
+        <Heading variant="h3" as="h2">
+          Homepage Hero Image
+        </Heading>
+        <Text variant="bodySm" className="mt-1 text-muted">
+          Change the homepage hero photo outside of any scheduled promo
+          event.
+        </Text>
+      </div>
+      <DefaultHeroImageForm initialValue={defaultHeroImage} />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { AuthMessage } from "@/components/auth";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import {
   toDatetimeLocalValue,
   fromDatetimeLocalValue,
@@ -15,6 +16,7 @@ import {
   createPromoCodeAction,
   deletePromoCodeAction,
   updatePromoCodeAction,
+  uploadPromoCodeHeroImageAction,
 } from "@/app/admin/promo-codes/actions";
 import type { AdminPromoCodeInput } from "@/types/promoCode";
 
@@ -37,6 +39,7 @@ function emptyPromoCode(): AdminPromoCodeInput {
     usageLimitPerCustomer: null,
     isActive: true,
     description: "",
+    heroImageUrl: null,
   };
 }
 
@@ -213,6 +216,31 @@ export function PromoCodeForm({
             value={values.description}
             onChange={(event) => update("description", event.target.value)}
             className="w-full rounded-sm border border-beige bg-white px-4 py-3 font-body text-sm text-primary focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <ImageUploadField
+            label="Homepage Hero Banner (optional)"
+            helpText={
+              <>
+                <p className="font-body text-xs text-muted">
+                  Replaces the homepage hero photo for as long as this code
+                  is live (within its start/expiry window above). Leave
+                  empty to keep the default photo during this code&apos;s
+                  window.
+                </p>
+                <p className="font-body text-xs text-muted">
+                  Upload a tall{" "}
+                  <strong>portrait photo, cropped to a 4:5 ratio</strong>{" "}
+                  (e.g. 1200&times;1500px) — the same shape as the current
+                  hero photo. A differently-shaped image will get cropped to
+                  fit and may cut off faces or important details.
+                </p>
+              </>
+            }
+            value={values.heroImageUrl ?? ""}
+            onChange={(url) => update("heroImageUrl", url || null)}
+            uploadAction={uploadPromoCodeHeroImageAction}
           />
         </div>
         <label className="flex items-center gap-2 font-body text-sm text-primary">

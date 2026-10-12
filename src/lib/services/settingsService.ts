@@ -20,6 +20,7 @@ const MOCK_SETTINGS: Record<string, unknown> = {
   country: siteConfig.country,
   social_links: siteConfig.socialLinks,
   festival_banner: DEFAULT_FESTIVAL_BANNER,
+  default_hero_image: "",
 };
 
 // This is a public, admin-managed setting read on nearly every page (festival

@@ -15,6 +15,12 @@ export interface PromoCode {
   isActive: boolean;
   description: string;
   createdAt: string;
+  /** Homepage hero photo to show in place of the default model photo while
+   * this code is live (within its starts_at/expires_at window). Uploaded via
+   * the admin form to Supabase Storage (promo-hero-images bucket); null
+   * means the hero keeps showing the default photo during this code's
+   * window. */
+  heroImageUrl: string | null;
 }
 
 /** Shape submitted from the admin create/edit form. */
@@ -30,6 +36,7 @@ export interface AdminPromoCodeInput {
   usageLimitPerCustomer: number | null;
   isActive: boolean;
   description: string;
+  heroImageUrl: string | null;
 }
 
 export interface AdminPromoCodeListItem {
@@ -48,6 +55,7 @@ export interface AdminPromoCodeListItem {
    * the admin form (or seeded by a migration) so the reason behind a
    * scheduled campaign isn't just a bare code string. */
   description: string;
+  heroImageUrl: string | null;
 }
 
 /** Result of validating a code at checkout — never trusted for the final

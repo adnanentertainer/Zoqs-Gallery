@@ -31,6 +31,7 @@ function toListItem(row: PromoCodeRow): AdminPromoCodeListItem {
     isActive: row.is_active,
     createdAt: row.created_at,
     description: row.description ?? "",
+    heroImageUrl: row.hero_image_url,
   };
 }
 
@@ -50,6 +51,7 @@ function toPromoCode(row: PromoCodeRow): PromoCode {
     isActive: row.is_active,
     description: row.description ?? "",
     createdAt: row.created_at,
+    heroImageUrl: row.hero_image_url,
   };
 }
 
@@ -138,6 +140,7 @@ function toRowPayload(input: AdminPromoCodeInput) {
     usage_limit_per_customer: input.usageLimitPerCustomer,
     is_active: input.isActive,
     description: input.description.trim() || null,
+    hero_image_url: input.heroImageUrl,
   };
 }
 
@@ -221,6 +224,48 @@ export async function deletePromoCode(id: string): Promise<{ error?: string }> {
     return { error: "Unable to delete this promo code right now." };
   }
   return {};
+}
+
+const HERO_IMAGE_BUCKET = "promo-hero-images";
+const MAX_HERO_IMAGE_BYTES = 5 * 1024 * 1024;
+
+/**
+ * Uploads a hero banner photo for a specific promo code to Supabase Storage
+ * and returns its public URL. Storage RLS (see
+ * 20261013020000_promo_code_hero_images.sql) only lets an admin write to
+ * this bucket, re-checked here via requireAdmin() too since this is the
+ * trust boundary the "use server" action calls into directly.
+ */
+export async function uploadPromoCodeHeroImage(
+  file: File,
+): Promise<{ url?: string; error?: string }> {
+  await requireAdmin();
+
+  if (!file.type.startsWith("image/")) {
+    return { error: "Please upload an image file." };
+  }
+  if (file.size > MAX_HERO_IMAGE_BYTES) {
+    return { error: "Image must be smaller than 5MB." };
+  }
+
+  const supabase = await getSupabaseServerClient();
+  const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const path = `${crypto.randomUUID()}.${extension}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from(HERO_IMAGE_BUCKET)
+    .upload(path, file, { contentType: file.type, upsert: false });
+
+  if (uploadError) {
+    console.error(
+      "[adminPromoCodeService.uploadPromoCodeHeroImage] failed:",
+      uploadError,
+    );
+    return { error: "Unable to upload this image right now." };
+  }
+
+  const { data } = supabase.storage.from(HERO_IMAGE_BUCKET).getPublicUrl(path);
+  return { url: data.publicUrl };
 }
 
 /** For the "link a promo code" dropdown on the banner form. */

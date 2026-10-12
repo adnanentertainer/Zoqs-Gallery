@@ -92,3 +92,62 @@ export async function hasActivePromoCode(): Promise<boolean> {
     return false;
   }
 }
+
+export interface ActiveHeroImage {
+  imageUrl: string;
+  /** The code's description (e.g. "Eid-ul-Fitr sale") — used as the hero
+   * photo's alt text so it stays meaningful instead of a bare code string. */
+  imageAlt: string;
+}
+
+// Same cache tag as hasActivePromoCode — an admin create/update/delete
+// already calls revalidateTag(CACHE_TAGS.activePromoCode) (see
+// app/admin/promo-codes/actions.ts), so a newly uploaded hero image shows up
+// on the homepage immediately instead of waiting out the window below.
+const getActiveHeroImageUncached = unstable_cache(
+  async (): Promise<ActiveHeroImage | null> => {
+    const supabase = getSupabasePublicClient();
+    const now = new Date().toISOString();
+    const { data, error } = await supabase
+      .from("promo_codes")
+      .select("description, hero_image_url")
+      .eq("is_active", true)
+      .not("hero_image_url", "is", null)
+      .or(`starts_at.is.null,starts_at.lte.${now}`)
+      .or(`expires_at.is.null,expires_at.gte.${now}`)
+      .order("starts_at", { ascending: true, nullsFirst: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data?.hero_image_url) return null;
+
+    return {
+      imageUrl: data.hero_image_url,
+      imageAlt: data.description || "Current promotion",
+    };
+  },
+  ["promo-codes:active-hero-image"],
+  { tags: [CACHE_TAGS.activePromoCode], revalidate: 3600 },
+);
+
+/**
+ * The live promo code's hero banner image, if any code currently running
+ * has one uploaded — used to swap the homepage hero's default model photo
+ * for a festive one while that code's window is open. Returns null outside
+ * any code's window, or when the live code never had an image uploaded for
+ * it (admin left the hero banner field empty on purpose).
+ */
+export async function getActiveHeroImage(): Promise<ActiveHeroImage | null> {
+  if (!isSupabaseConfigured()) return null;
+
+  try {
+    return await getActiveHeroImageUncached();
+  } catch (error) {
+    console.error(
+      "[promoCodeService.getActiveHeroImage] Supabase query failed:",
+      error,
+    );
+    return null;
+  }
+}

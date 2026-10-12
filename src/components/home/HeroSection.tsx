@@ -12,7 +12,15 @@ const trustBadges = [
   { icon: ShieldCheck, label: "Authentic Quality" },
 ];
 
-export function HeroSection() {
+interface HeroSectionProps {
+  /** Overrides the default model photo — passed down when a scheduled
+   * promo code currently has a hero banner uploaded for it. See
+   * lib/services/promoCodeService.ts's getActiveHeroImage(). */
+  imageUrl?: string;
+  imageAlt?: string;
+}
+
+export function HeroSection({ imageUrl, imageAlt }: HeroSectionProps) {
   return (
     <section className="relative flex items-center overflow-hidden bg-secondary lg:min-h-[85vh]">
       <div
@@ -32,8 +40,11 @@ export function HeroSection() {
             />
             <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-[0_25px_60px_-15px_rgba(31,31,31,0.35)] ring-1 ring-gold/30">
               <Image
-                src={heroImage}
-                alt="Bride wearing a gold statement necklace, drop earrings and maang tikka"
+                src={imageUrl || heroImage}
+                alt={
+                  imageAlt ||
+                  "Bride wearing a gold statement necklace, drop earrings and maang tikka"
+                }
                 fill
                 preload
                 sizes="(max-width: 1024px) 100vw, 448px"

@@ -41,6 +41,7 @@ export default async function AdminPromoCodeDetailPage({
           usageLimitPerCustomer: promoCode.usageLimitPerCustomer,
           isActive: promoCode.isActive,
           description: promoCode.description,
+          heroImageUrl: promoCode.heroImageUrl,
         }}
       />
     </div>
