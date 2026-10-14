@@ -317,6 +317,27 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["product_reels"]["Insert"]>;
         Relationships: [];
       };
+      product_social_repost_queue: {
+        Row: {
+          id: string;
+          product_id: string;
+          reason: "price_change";
+          status: "pending" | "posted" | "skipped";
+          created_at: string;
+          processed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          product_id: string;
+          reason?: "price_change";
+          status?: "pending" | "posted" | "skipped";
+          processed_at?: string | null;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["product_social_repost_queue"]["Insert"]
+        >;
+        Relationships: [];
+      };
       site_settings: {
         Row: {
           id: string;

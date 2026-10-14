@@ -1,7 +1,10 @@
 import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
-import { publishProductToSocialMedia } from "@/lib/services/admin/socialPostingService";
+import {
+  publishProductToSocialMedia,
+  enqueuePriceChangeRepost,
+} from "@/lib/services/admin/socialPostingService";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 import type {
   AdminProductDetail,
@@ -379,6 +382,16 @@ export async function updateProduct(
   }
 
   const supabase = await getSupabaseServerClient();
+
+  // Read before writing so a price change can be detected after the update
+  // commits -- this is purely additive (see enqueuePriceChangeRepost below)
+  // and never gates or delays the update itself.
+  const { data: existingProduct } = await supabase
+    .from("products")
+    .select("price")
+    .eq("id", id)
+    .maybeSingle();
+
   const { error } = await supabase
     .from("products")
     .update({
@@ -437,6 +450,22 @@ export async function updateProduct(
         "[adminProductService.updateProduct] social media posting failed:",
         socialError,
       );
+    }
+
+    // Additive only: a genuine price change on an already-active product
+    // queues a throttled repost (see socialPostingService's
+    // processNextScheduledRepost). This never fires on a brand-new product
+    // or an unchanged price, and never affects the immediate-post call
+    // above.
+    if (existingProduct && existingProduct.price !== input.price) {
+      try {
+        await enqueuePriceChangeRepost(id);
+      } catch (socialError) {
+        console.error(
+          "[adminProductService.updateProduct] price-change repost queueing failed:",
+          socialError,
+        );
+      }
     }
   }
 
