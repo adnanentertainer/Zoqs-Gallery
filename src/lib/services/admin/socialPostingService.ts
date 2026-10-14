@@ -36,6 +36,8 @@ interface ProductRow {
   slug: string;
   short_description: string | null;
   price: number;
+  stock: number;
+  force_unavailable: boolean;
   categories: { name: string } | null;
   product_images: { image_url: string; display_order: number }[];
   product_variants: { option_type: string; option_value: string; is_active: boolean }[];
@@ -153,13 +155,17 @@ export async function publishProductToSocialMedia(
     const { data: product } = await supabase
       .from("products")
       .select(
-        "id, sku, name, slug, short_description, price, categories(name), product_images(image_url, display_order), product_variants(option_type, option_value, is_active)",
+        "id, sku, name, slug, short_description, price, stock, force_unavailable, categories(name), product_images(image_url, display_order), product_variants(option_type, option_value, is_active)",
       )
       .eq("id", productId)
       .maybeSingle();
 
     const typedProduct = product as unknown as ProductRow | null;
     if (!typedProduct) return;
+
+    if (typedProduct.force_unavailable || typedProduct.stock <= 0) {
+      return;
+    }
 
     const image = [...typedProduct.product_images].sort(
       (a, b) => a.display_order - b.display_order,
