@@ -72,14 +72,31 @@ export function ProductGallery({
     [images, variantThumbs],
   );
 
+  // Every variant option's photo, even ones that double as the product's
+  // main image and so were deduped out of `variantThumbs` above. The jump
+  // effect below needs the full map, not just the deduped thumbnail list,
+  // or reselecting a color whose photo is already the main image is a no-op.
+  const variantImagesByOption = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const group of variants ?? []) {
+      for (const option of group.options) {
+        if (option.image) map.set(`${group.type}:${option.value}`, option.image);
+      }
+    }
+    return map;
+  }, [variants]);
+
   // Picking a color swatch in ProductActions should jump the gallery to that
   // variant's own photo. Browsing thumbnails manually (below) doesn't feed
   // back into `selections`, so this only reacts to the swatches themselves.
   useEffect(() => {
-    for (const thumb of variantThumbs) {
-      if (selections[thumb.groupType] === thumb.value) {
-        const index = displayImages.indexOf(thumb.image);
-        if (index !== -1) setActiveIndex(index);
+    for (const group of variants ?? []) {
+      const value = selections[group.type];
+      const image = value && variantImagesByOption.get(`${group.type}:${value}`);
+      if (!image) continue;
+      const index = displayImages.indexOf(image);
+      if (index !== -1) {
+        setActiveIndex(index);
         return;
       }
     }
