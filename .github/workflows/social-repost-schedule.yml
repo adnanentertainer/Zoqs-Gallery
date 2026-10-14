@@ -1,9 +1,9 @@
 name: Social Repost Schedule
 
-# Calls /api/cron/social-repost up to 4x/day so price-change posts trickle
+# Calls /api/cron/social-repost up to 3x/day so price-change posts trickle
 # out gradually instead of all at once. Runs here instead of Vercel's own
 # Cron Jobs because Vercel's free Hobby plan only allows cron jobs to fire
-# once a day -- GitHub Actions runs this for free (a few seconds, 4x/day)
+# once a day -- GitHub Actions runs this for free (a few seconds, 3x/day)
 # without needing a paid plan anywhere.
 #
 # Requires two repository secrets (Settings -> Secrets and variables ->
@@ -12,9 +12,8 @@ name: Social Repost Schedule
 on:
   schedule:
     - cron: "0 5 * * *" # ~10:00 PKT
-    - cron: "0 8 * * *" # ~13:00 PKT
-    - cron: "0 12 * * *" # ~17:00 PKT
-    - cron: "0 15 * * *" # ~20:00 PKT
+    - cron: "0 9 * * *" # ~14:00 PKT
+    - cron: "0 14 * * *" # ~19:00 PKT
   workflow_dispatch: {}
 
 jobs:

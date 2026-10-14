@@ -293,7 +293,7 @@ export async function publishProductToSocialMedia(
  * change announcements trickling out gradually instead of bursting. Counted
  * against product_social_repost_queue rows actually posted "today", not
  * against the separate, unthrottled immediate-post flow above. */
-const DAILY_REPOST_CAP = 4;
+const DAILY_REPOST_CAP = 3;
 
 /**
  * Queues a product for a throttled repost after its price changes. Purely
@@ -339,7 +339,7 @@ interface ScheduledRepostResult {
  * service-role client (bypassing RLS), the same pattern the inbound
  * WhatsApp webhook uses for the same reason. Posts at most one random
  * pending product per call, and refuses once DAILY_REPOST_CAP has already
- * been posted "today", so calling this endpoint on a schedule (4x/day via
+ * been posted "today", so calling this endpoint on a schedule (3x/day via
  * .github/workflows/social-repost-schedule.yml) naturally spreads
  * price-change posts out instead of bursting them, with the cap as a
  * backstop if it's ever called more often than that.

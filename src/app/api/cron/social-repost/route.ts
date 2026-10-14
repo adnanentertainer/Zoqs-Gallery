@@ -7,7 +7,7 @@ import { processNextScheduledRepost } from "@/lib/services/admin/socialPostingSe
  * rather than by an admin session, so it authenticates with a shared secret
  * instead of requireAdmin() -- same reasoning as the WhatsApp webhook route.
  * Vercel's own free Cron Jobs can only fire once a day on the Hobby plan, so
- * GitHub Actions (free) hits this 4x/day instead; CRON_SECRET must match the
+ * GitHub Actions (free) hits this 3x/day instead; CRON_SECRET must match the
  * GitHub Actions secret of the same name.
  */
 function isAuthorized(request: NextRequest): boolean {
