@@ -1,4 +1,6 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseServiceRoleClient } from "@/lib/supabase/serviceRole";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { publishFacebookPhotoPost } from "@/lib/meta/facebookPublisher";
 import { publishInstagramPost } from "@/lib/meta/instagramPublisher";
@@ -18,6 +20,9 @@ import type {
   SocialPlatformStatus,
 } from "@/types/socialMedia";
 import type { PaginationResult } from "@/types/admin";
+import type { Database } from "@/types/supabase";
+
+type SocialDbClient = SupabaseClient<Database>;
 
 const baseUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
@@ -105,22 +110,20 @@ async function runInstagram(
 }
 
 /**
- * Publishes a Facebook Page post and an Instagram post for a product, and
- * records the outcome. Never throws -- this is called from createProduct /
- * updateProduct / setProductActive and must never break a product save.
- *
- * Dedup relies entirely on the product_social_posts.unique(product_id)
- * lookup below rather than the caller diffing old/new is_active: it's the
- * one thing all three call sites can rely on uniformly, for free.
+ * Shared implementation behind publishProductToSocialMedia() below. Takes
+ * the Supabase client as a parameter so it can run two ways: with a
+ * session-bound admin client (the original createProduct / updateProduct /
+ * setProductActive call sites, unchanged), or with the service-role client
+ * from processNextScheduledRepost() below, which runs from a cron request
+ * with no admin session for RLS to check -- same reasoning as the inbound
+ * WhatsApp webhook's use of getSupabaseServiceRoleClient().
  */
-export async function publishProductToSocialMedia(
+async function publishProductToSocialMediaCore(
+  supabase: SocialDbClient,
   productId: string,
   options: { forceRepost?: boolean } = {},
 ): Promise<void> {
-  try {
-    await requireAdmin();
-    const supabase = await getSupabaseServerClient();
-
+  {
     const { data: settings } = await supabase
       .from("social_media_settings")
       .select("*")
@@ -256,12 +259,145 @@ export async function publishProductToSocialMedia(
         upsertError,
       );
     }
+  }
+}
+
+/**
+ * Publishes a Facebook Page post and an Instagram post for a product, and
+ * records the outcome. Never throws -- this is called from createProduct /
+ * updateProduct / setProductActive and must never break a product save.
+ *
+ * Dedup relies entirely on the product_social_posts.unique(product_id)
+ * lookup in the core function above rather than the caller diffing old/new
+ * is_active: it's the one thing all three call sites can rely on
+ * uniformly, for free.
+ */
+export async function publishProductToSocialMedia(
+  productId: string,
+  options: { forceRepost?: boolean } = {},
+): Promise<void> {
+  try {
+    await requireAdmin();
+    const supabase = await getSupabaseServerClient();
+    await publishProductToSocialMediaCore(supabase, productId, options);
   } catch (error) {
     console.error(
       "[socialPostingService.publishProductToSocialMedia] failed:",
       error,
     );
   }
+}
+
+/** How many queued price-change reposts the scheduled worker will publish
+ * per day, across all products combined -- the hard cap that keeps price-
+ * change announcements trickling out gradually instead of bursting. Counted
+ * against product_social_repost_queue rows actually posted "today", not
+ * against the separate, unthrottled immediate-post flow above. */
+const DAILY_REPOST_CAP = 4;
+
+/**
+ * Queues a product for a throttled repost after its price changes. Purely
+ * additive: unlike publishProductToSocialMedia(), this never posts anything
+ * itself -- it only adds a row for processNextScheduledRepost() (invoked by
+ * the /api/cron/social-repost route) to pick up later. Call-site decides
+ * whether the price actually changed; this just records the request.
+ */
+export async function enqueuePriceChangeRepost(productId: string): Promise<void> {
+  try {
+    await requireAdmin();
+    const supabase = await getSupabaseServerClient();
+    const { error } = await supabase
+      .from("product_social_repost_queue")
+      .insert({ product_id: productId, reason: "price_change" });
+
+    // 23505 = unique_violation: a repost for this product is already
+    // pending, which is fine -- the next scheduled run will cover this
+    // latest price too, no need for a second queue row.
+    if (error && error.code !== "23505") {
+      console.error(
+        "[socialPostingService.enqueuePriceChangeRepost] failed:",
+        error,
+      );
+    }
+  } catch (error) {
+    console.error(
+      "[socialPostingService.enqueuePriceChangeRepost] failed:",
+      error,
+    );
+  }
+}
+
+interface ScheduledRepostResult {
+  posted: boolean;
+  productId?: string;
+  reason?: "daily_cap_reached" | "queue_empty";
+}
+
+/**
+ * Called from /api/cron/social-repost, which authenticates the request with
+ * a shared secret rather than an admin session -- so this runs with the
+ * service-role client (bypassing RLS), the same pattern the inbound
+ * WhatsApp webhook uses for the same reason. Posts at most one random
+ * pending product per call, and refuses once DAILY_REPOST_CAP has already
+ * been posted "today", so calling this endpoint on a schedule (e.g. 4x/day
+ * via an external cron) naturally spreads price-change posts out instead of
+ * bursting them, with the cap as a backstop if it's ever called more often
+ * than that.
+ */
+export async function processNextScheduledRepost(): Promise<ScheduledRepostResult> {
+  const supabase = getSupabaseServiceRoleClient();
+
+  const startOfToday = new Date();
+  startOfToday.setUTCHours(0, 0, 0, 0);
+
+  const { count: postedToday } = await supabase
+    .from("product_social_repost_queue")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "posted")
+    .gte("processed_at", startOfToday.toISOString());
+
+  if ((postedToday ?? 0) >= DAILY_REPOST_CAP) {
+    return { posted: false, reason: "daily_cap_reached" };
+  }
+
+  // Fetches the oldest pending rows (bounded, since this queue is small --
+  // a handful of pending rows at most between runs) and picks one at
+  // random client-side, rather than always posting strict-FIFO.
+  const { data: pendingRows } = await supabase
+    .from("product_social_repost_queue")
+    .select("id, product_id")
+    .eq("status", "pending")
+    .order("created_at", { ascending: true })
+    .limit(20);
+
+  if (!pendingRows || pendingRows.length === 0) {
+    return { posted: false, reason: "queue_empty" };
+  }
+
+  const picked =
+    pendingRows[Math.floor(Math.random() * pendingRows.length)];
+
+  try {
+    await publishProductToSocialMediaCore(supabase, picked.product_id, {
+      forceRepost: true,
+    });
+  } catch (error) {
+    console.error(
+      "[socialPostingService.processNextScheduledRepost] publish failed:",
+      error,
+    );
+  }
+
+  // Marked "posted" regardless of the underlying Graph API outcome (visible
+  // per-platform in product_social_posts via the admin's existing history
+  // list) -- a queue row's job is just "don't try this product again every
+  // run", not to track success itself.
+  await supabase
+    .from("product_social_repost_queue")
+    .update({ status: "posted", processed_at: new Date().toISOString() })
+    .eq("id", picked.id);
+
+  return { posted: true, productId: picked.product_id };
 }
 
 export async function retryProductSocialPost(
