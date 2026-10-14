@@ -289,13 +289,11 @@ export async function publishProductToSocialMedia(
 }
 
 /** How many queued price-change reposts the scheduled worker will publish
- * per day, across all products combined. Vercel's own free Cron Jobs (see
- * vercel.json) only call /api/cron/social-repost once a day, so this is 1 --
- * a backstop in case that endpoint is ever invoked more than once in the
- * same day, not the thing enforcing "once a day" by itself. Counted against
- * product_social_repost_queue rows actually posted "today", not against the
- * separate, unthrottled immediate-post flow above. */
-const DAILY_REPOST_CAP = 1;
+ * per day, across all products combined -- the hard cap that keeps price-
+ * change announcements trickling out gradually instead of bursting. Counted
+ * against product_social_repost_queue rows actually posted "today", not
+ * against the separate, unthrottled immediate-post flow above. */
+const DAILY_REPOST_CAP = 4;
 
 /**
  * Queues a product for a throttled repost after its price changes. Purely
@@ -341,10 +339,10 @@ interface ScheduledRepostResult {
  * service-role client (bypassing RLS), the same pattern the inbound
  * WhatsApp webhook uses for the same reason. Posts at most one random
  * pending product per call, and refuses once DAILY_REPOST_CAP has already
- * been posted "today" -- Vercel's own Cron Jobs call this once a day (see
- * vercel.json), so price-change posts naturally trickle out one at a time
- * instead of bursting, with the cap as a backstop if it's ever invoked more
- * than once in the same day.
+ * been posted "today", so calling this endpoint on a schedule (4x/day via
+ * .github/workflows/social-repost-schedule.yml) naturally spreads
+ * price-change posts out instead of bursting them, with the cap as a
+ * backstop if it's ever called more often than that.
  */
 export async function processNextScheduledRepost(): Promise<ScheduledRepostResult> {
   const supabase = getSupabaseServiceRoleClient();

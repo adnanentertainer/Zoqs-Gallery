@@ -3,12 +3,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { processNextScheduledRepost } from "@/lib/services/admin/socialPostingService";
 
 /**
- * Called by Vercel's own Cron Jobs (see the "crons" entry in vercel.json),
- * not by an admin session, so it authenticates with a shared secret instead
- * of requireAdmin() -- same reasoning as the WhatsApp webhook route. Vercel
- * automatically sends `Authorization: Bearer $CRON_SECRET` when it invokes a
- * configured cron job, as long as a CRON_SECRET environment variable is set
- * on the project -- no separate scheduler or secret needed.
+ * Called on a schedule (see .github/workflows/social-repost-schedule.yml)
+ * rather than by an admin session, so it authenticates with a shared secret
+ * instead of requireAdmin() -- same reasoning as the WhatsApp webhook route.
+ * Vercel's own free Cron Jobs can only fire once a day on the Hobby plan, so
+ * GitHub Actions (free) hits this 4x/day instead; CRON_SECRET must match the
+ * GitHub Actions secret of the same name.
  */
 function isAuthorized(request: NextRequest): boolean {
   const secret = process.env.CRON_SECRET;
@@ -36,8 +36,9 @@ async function handle(request: NextRequest) {
   }
 }
 
-// Vercel Cron Jobs invoke the configured path with GET; POST is kept too so
-// this can still be triggered manually (e.g. a one-off curl) during testing.
+// GitHub Actions calls this with POST (see the workflow above); GET is kept
+// too in case this is ever pointed at Vercel's own Cron Jobs instead, which
+// invoke via GET.
 export async function GET(request: NextRequest) {
   return handle(request);
 }
