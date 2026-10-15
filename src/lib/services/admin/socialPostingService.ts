@@ -408,6 +408,34 @@ export async function retryProductSocialPost(
   return {};
 }
 
+/**
+ * Reads back the per-platform outcome of the most recent publish attempt
+ * for a product, so a caller that just triggered one (e.g. the manual
+ * "Share" button on the products list) can tell the admin what happened.
+ */
+export async function getProductSocialPostStatus(productId: string): Promise<{
+  facebookStatus?: SocialPlatformStatus;
+  instagramStatus?: SocialPlatformStatus;
+  facebookError?: string | null;
+  instagramError?: string | null;
+}> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+  const { data } = await supabase
+    .from("product_social_posts")
+    .select("facebook_status, instagram_status, facebook_error, instagram_error")
+    .eq("product_id", productId)
+    .maybeSingle();
+
+  if (!data) return {};
+  return {
+    facebookStatus: data.facebook_status,
+    instagramStatus: data.instagram_status,
+    facebookError: data.facebook_error,
+    instagramError: data.instagram_error,
+  };
+}
+
 export async function getSocialMediaSettings(): Promise<SocialMediaSettings> {
   await requireAdmin();
   const supabase = await getSupabaseServerClient();

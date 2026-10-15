@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Plus } from "lucide-react";
 import { AdminPageHeader, Pagination, StatusBadge } from "@/components/admin";
+import { ShareProductButton } from "@/components/admin/ShareProductButton";
 import { Input } from "@/components/ui/Input";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Typography";
@@ -255,12 +256,18 @@ export default async function AdminProductsPage({
                       {new Date(product.createdAt).toLocaleDateString("en-PK")}
                     </td>
                     <td className="px-5 py-3 text-right">
-                      <Link
-                        href={`/admin/products/${product.id}`}
-                        className="font-body text-sm font-medium text-gold hover:underline"
-                      >
-                        Edit
-                      </Link>
+                      <div className="flex items-start justify-end gap-3">
+                        <ShareProductButton
+                          productId={product.id}
+                          productName={product.name}
+                        />
+                        <Link
+                          href={`/admin/products/${product.id}`}
+                          className="font-body text-sm font-medium text-gold hover:underline"
+                        >
+                          Edit
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}

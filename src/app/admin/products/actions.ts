@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { isValidSlug } from "@/lib/admin/slug";
 import {
@@ -8,7 +9,13 @@ import {
   deleteProduct as deleteProductService,
   setProductActive as setProductActiveService,
 } from "@/lib/services/admin/adminProductService";
+import {
+  getSocialMediaSettings,
+  publishProductToSocialMedia,
+  getProductSocialPostStatus,
+} from "@/lib/services/admin/socialPostingService";
 import type { AdminProductInput } from "@/types/admin";
+import type { SocialPlatformStatus } from "@/types/socialMedia";
 
 function validateProductInput(input: AdminProductInput): string | undefined {
   if (input.name.trim().length === 0) return "Product name is required.";
@@ -77,4 +84,25 @@ export async function setProductActiveAction(
 ): Promise<{ error?: string }> {
   await requireAdmin();
   return setProductActiveService(id, isActive);
+}
+
+export async function shareProductToSocialAction(id: string): Promise<{
+  error?: string;
+  facebookStatus?: SocialPlatformStatus;
+  instagramStatus?: SocialPlatformStatus;
+  facebookError?: string | null;
+  instagramError?: string | null;
+}> {
+  await requireAdmin();
+  const settings = await getSocialMediaSettings();
+  if (!settings.autoPostEnabled || (!settings.facebookEnabled && !settings.instagramEnabled)) {
+    return {
+      error:
+        "Turn on Social Auto-Post and enable Facebook or Instagram under Admin → Social Auto-Post first.",
+    };
+  }
+  await publishProductToSocialMedia(id, { forceRepost: true });
+  const result = await getProductSocialPostStatus(id);
+  revalidatePath("/admin/products");
+  return result;
 }
