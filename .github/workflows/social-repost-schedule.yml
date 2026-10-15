@@ -22,8 +22,16 @@ jobs:
     steps:
       - name: Call social repost endpoint
         run: |
-          curl -sf -X POST "${SOCIAL_REPOST_SITE_URL%/}/api/cron/social-repost" \
-            -H "Authorization: Bearer ${CRON_SECRET}"
+          http_status=$(curl -sS -o response.json -w "%{http_code}" -X POST \
+            "${SOCIAL_REPOST_SITE_URL%/}/api/cron/social-repost" \
+            -H "Authorization: Bearer ${CRON_SECRET}")
+          echo "HTTP status: ${http_status}"
+          echo "Response body:"
+          cat response.json
+          echo
+          if [ "${http_status}" -ge 400 ]; then
+            exit 1
+          fi
         env:
           SOCIAL_REPOST_SITE_URL: ${{ secrets.SOCIAL_REPOST_SITE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
