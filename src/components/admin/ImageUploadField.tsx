@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ChangeEvent, type ReactNode } from "react";
+import { Input } from "@/components/ui/Input";
 
 interface ImageUploadFieldProps {
   label: string;
@@ -76,6 +77,15 @@ export function ImageUploadField({
             <p className="font-body text-xs text-muted">Uploading…</p>
           )}
           {error && <p className="font-body text-xs text-error">{error}</p>}
+          <p className="font-body text-xs text-muted">Or paste an image URL</p>
+          <Input
+            type="url"
+            placeholder="https://example.com/image.jpg"
+            value={value}
+            disabled={isUploading}
+            onChange={(event) => onChange(event.target.value)}
+            className="h-9 w-64"
+          />
           {value && !isUploading && (
             <button
               type="button"
