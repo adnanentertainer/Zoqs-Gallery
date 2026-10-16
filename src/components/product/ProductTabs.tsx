@@ -9,6 +9,7 @@ import { CareInstructions } from "@/components/product/CareInstructions";
 import { DeliveryInfo } from "@/components/product/DeliveryInfo";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types";
+import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
 
 const TABS = [
   { id: "description", label: "Description" },
@@ -21,9 +22,10 @@ type TabId = (typeof TABS)[number]["id"];
 
 interface ProductTabsProps {
   product: Product;
+  blessedFridayOffer: BlessedFridayOffer;
 }
 
-export function ProductTabs({ product }: ProductTabsProps) {
+export function ProductTabs({ product, blessedFridayOffer }: ProductTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>("description");
 
   const panels: Record<TabId, ReactNode> = {
@@ -34,7 +36,7 @@ export function ProductTabs({ product }: ProductTabsProps) {
     ),
     details: <ProductSpecifications product={product} />,
     care: <CareInstructions product={product} />,
-    delivery: <DeliveryInfo />,
+    delivery: <DeliveryInfo blessedFridayOffer={blessedFridayOffer} />,
   };
 
   return (

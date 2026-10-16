@@ -1,31 +1,48 @@
 import { Banknote, Package, RotateCcw, Truck } from "lucide-react";
 import { siteConfig } from "@/constants/site";
 import { formatPrice } from "@/lib/utils";
+import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
 
-const deliveryItems = [
-  {
-    icon: Truck,
-    title: "Nationwide Delivery",
-    description: `We deliver across ${siteConfig.country}.`,
-  },
-  {
-    icon: Banknote,
-    title: "Cash on Delivery",
-    description: "Available on eligible orders.",
-  },
-  {
-    icon: Package,
-    title: "Free Delivery",
-    description: `On orders above ${formatPrice(siteConfig.freeShippingThreshold)}.`,
-  },
-  {
-    icon: RotateCcw,
-    title: "Easy Returns",
-    description: "7-day return policy.",
-  },
-];
+interface DeliveryInfoProps {
+  blessedFridayOffer: BlessedFridayOffer;
+}
 
-export function DeliveryInfo() {
+export function DeliveryInfo({ blessedFridayOffer }: DeliveryInfoProps) {
+  // While Blessed Friday is on, the evergreen free-delivery perk it
+  // replaces (see CartContext/layout.tsx) no longer applies — show the
+  // offer that's actually live instead of a shipping promise checkout
+  // won't honor.
+  const thirdItem = blessedFridayOffer.enabled
+    ? {
+        icon: Package,
+        title: "Blessed Friday Offer",
+        description: `${blessedFridayOffer.discountPercentage}% off orders above ${formatPrice(blessedFridayOffer.minSpend)}.`,
+      }
+    : {
+        icon: Package,
+        title: "Free Delivery",
+        description: `On orders above ${formatPrice(siteConfig.freeShippingThreshold)}.`,
+      };
+
+  const deliveryItems = [
+    {
+      icon: Truck,
+      title: "Nationwide Delivery",
+      description: `We deliver across ${siteConfig.country}.`,
+    },
+    {
+      icon: Banknote,
+      title: "Cash on Delivery",
+      description: "Available on eligible orders.",
+    },
+    thirdItem,
+    {
+      icon: RotateCcw,
+      title: "Easy Returns",
+      description: "7-day return policy.",
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 gap-4 rounded-sm border border-beige bg-secondary/40 p-5 sm:grid-cols-2">
       {deliveryItems.map(({ icon: Icon, title, description }) => (
