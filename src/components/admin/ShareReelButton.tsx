@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { retryReelAction } from "@/app/admin/reels/actions";
 
-export function RetryReelButton({
+export function ShareReelButton({
   reelId,
   productName,
 }: {
@@ -17,7 +17,7 @@ export function RetryReelButton({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleRetry() {
+  async function handleShare() {
     setIsSubmitting(true);
     setError(null);
     const result = await retryReelAction(reelId);
@@ -38,17 +38,17 @@ export function RetryReelButton({
         onClick={() => setConfirmOpen(true)}
         className="font-body text-sm font-medium text-gold hover:underline"
       >
-        Post Again
+        Share
       </button>
       {error && <p className="mt-1 font-body text-xs text-error">{error}</p>}
       <ConfirmDialog
         open={confirmOpen}
-        title={`Post this reel for "${productName}" again?`}
-        description="This re-publishes the same video to Facebook and Instagram, even if it was already posted before."
-        confirmLabel="Post Again"
+        title={`Share this reel for "${productName}"?`}
+        description="This posts the reel's video to Facebook and Instagram right now, even if it was already posted before."
+        confirmLabel="Share Now"
         isDestructive={false}
         isLoading={isSubmitting}
-        onConfirm={handleRetry}
+        onConfirm={handleShare}
         onCancel={() => setConfirmOpen(false)}
       />
     </>
