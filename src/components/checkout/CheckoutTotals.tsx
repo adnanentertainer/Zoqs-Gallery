@@ -1,4 +1,4 @@
-import { formatPrice } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 
 interface CheckoutTotalsProps {
   subtotal: number;
@@ -13,6 +13,13 @@ interface CheckoutTotalsProps {
    * line came from the automatic Blessed Friday offer rather than an
    * entered promo code. */
   discountLabel?: string;
+  /** The top rule above Subtotal — on by default (it's what separates the
+   * line items from the totals block on the order confirmation and admin
+   * order detail pages, which have nothing else there to do that job).
+   * Turned off where a sibling above already provides that separation (the
+   * live checkout preview's status message + its own gap-4 spacing), so the
+   * card doesn't show two rules stacked close together. */
+  showTopDivider?: boolean;
 }
 
 export function CheckoutTotals({
@@ -22,9 +29,15 @@ export function CheckoutTotals({
   discountAmount = 0,
   promoCode,
   discountLabel,
+  showTopDivider = true,
 }: CheckoutTotalsProps) {
   return (
-    <div className="flex flex-col gap-2 border-t border-beige pt-4">
+    <div
+      className={cn(
+        "flex flex-col gap-2",
+        showTopDivider && "border-t border-beige pt-4",
+      )}
+    >
       <div className="flex items-center justify-between font-body text-sm text-primary">
         <span>Subtotal</span>
         <span>{formatPrice(subtotal)}</span>

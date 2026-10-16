@@ -89,6 +89,7 @@ export function OrderSummary({
         discountAmount={discountAmount}
         promoCode={promoCode}
         discountLabel={discountLabel}
+        showTopDivider={false}
       />
     </div>
   );
