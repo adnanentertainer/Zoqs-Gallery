@@ -163,6 +163,7 @@ interface CartContextValue {
   totalQuantity: number;
   subtotal: number;
   freeShipping: FreeShippingProgress;
+  blessedFridayOfferEnabled: boolean;
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
@@ -191,11 +192,21 @@ interface CartProviderProps {
   /** Same admin-configurable settings checkout uses (see
    * lib/checkout/getShippingSettings.ts) — passed down from the server-
    * rendered root layout so the cart's displayed shipping fee always
-   * matches what checkout will actually charge. */
+   * matches what checkout will actually charge. Already reflects the
+   * Blessed Friday override (see layout.tsx) when that offer is enabled. */
   shippingSettings: ShippingSettings;
+  /** Whether the Blessed Friday offer is currently enabled — used only to
+   * hide the free-shipping progress message (ShippingProgress), since the
+   * shippingSettings override above already makes its own math correct but
+   * would otherwise render a nonsensical "away from free shipping" amount. */
+  blessedFridayOfferEnabled: boolean;
 }
 
-export function CartProvider({ children, shippingSettings }: CartProviderProps) {
+export function CartProvider({
+  children,
+  shippingSettings,
+  blessedFridayOfferEnabled,
+}: CartProviderProps) {
   const items = useSyncExternalStore(
     cartStore.subscribe,
     cartStore.getSnapshot,
@@ -333,6 +344,7 @@ export function CartProvider({ children, shippingSettings }: CartProviderProps) 
       totalQuantity,
       subtotal,
       freeShipping,
+      blessedFridayOfferEnabled,
       isDrawerOpen,
       openDrawer,
       closeDrawer,
@@ -351,6 +363,7 @@ export function CartProvider({ children, shippingSettings }: CartProviderProps) 
       totalQuantity,
       subtotal,
       freeShipping,
+      blessedFridayOfferEnabled,
       isDrawerOpen,
       openDrawer,
       closeDrawer,
