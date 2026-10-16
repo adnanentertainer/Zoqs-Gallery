@@ -95,6 +95,7 @@ export function CartDrawer() {
                 blessedFridayOfferEnabled={blessedFridayOfferEnabled}
                 secondaryAction={{ label: "View Cart", href: "/cart" }}
                 onNavigate={closeDrawer}
+                showTopDivider={false}
               />
             </div>
           </>

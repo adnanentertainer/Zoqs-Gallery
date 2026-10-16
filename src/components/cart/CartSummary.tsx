@@ -11,6 +11,13 @@ interface CartSummaryProps {
   secondaryAction: { label: string; href: string };
   onNavigate?: () => void;
   className?: string;
+  /** The rule above Subtotal — on by default (the full cart page has
+   * nothing else to separate the item-count line from the totals block).
+   * Turned off in the cart drawer, which already wraps this component in
+   * its own top border to separate the scrollable item list from the
+   * footer — showing both left two rules stacked with nothing between them
+   * once ShippingProgress is hidden (see `hidden` below). */
+  showTopDivider?: boolean;
 }
 
 export function CartSummary({
@@ -20,6 +27,7 @@ export function CartSummary({
   secondaryAction,
   onNavigate,
   className,
+  showTopDivider = true,
 }: CartSummaryProps) {
   return (
     <div className={cn("flex flex-col gap-4", className)}>
@@ -28,7 +36,12 @@ export function CartSummary({
         hidden={blessedFridayOfferEnabled}
       />
 
-      <div className="flex flex-col gap-2 border-t border-beige pt-4">
+      <div
+        className={cn(
+          "flex flex-col gap-2",
+          showTopDivider && "border-t border-beige pt-4",
+        )}
+      >
         <div className="flex items-center justify-between">
           <span className="font-body text-sm text-muted">Subtotal</span>
           <span className="font-body text-sm text-primary">
