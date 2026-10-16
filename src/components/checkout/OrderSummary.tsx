@@ -44,7 +44,11 @@ export function OrderSummary({
         ))}
       </div>
 
-      {!qualifiesForFreeShipping && (
+      {qualifiesForFreeShipping ? (
+        <p className="font-body text-xs font-medium text-success">
+          Free shipping unlocked — no promo code needed.
+        </p>
+      ) : (
         <p className="font-body text-xs text-muted">
           Add{" "}
           {formatPrice(
