@@ -7,6 +7,7 @@ import type { FreeShippingProgress } from "@/lib/cart";
 interface CartSummaryProps {
   subtotal: number;
   freeShipping: FreeShippingProgress;
+  blessedFridayOfferEnabled: boolean;
   secondaryAction: { label: string; href: string };
   onNavigate?: () => void;
   className?: string;
@@ -15,13 +16,17 @@ interface CartSummaryProps {
 export function CartSummary({
   subtotal,
   freeShipping,
+  blessedFridayOfferEnabled,
   secondaryAction,
   onNavigate,
   className,
 }: CartSummaryProps) {
   return (
     <div className={cn("flex flex-col gap-4", className)}>
-      <ShippingProgress progress={freeShipping} />
+      <ShippingProgress
+        progress={freeShipping}
+        hidden={blessedFridayOfferEnabled}
+      />
 
       <div className="flex flex-col gap-2 border-t border-beige pt-4">
         <div className="flex items-center justify-between">

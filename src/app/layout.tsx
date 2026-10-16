@@ -14,6 +14,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { PromoStatusProvider } from "@/context/PromoStatusContext";
 import { getShippingSettings } from "@/lib/checkout/getShippingSettings";
 import { hasActivePromoCode } from "@/lib/services/promoCodeService";
+import { getBlessedFridayOffer } from "@/lib/services/blessedFridayOfferService";
 import { META_PIXEL_ID } from "@/constants/meta";
 import { safeJsonLd } from "@/lib/utils";
 import "../styles/globals.css";
@@ -102,8 +103,20 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const shippingSettings = await getShippingSettings();
-  const promoActive = await hasActivePromoCode();
+  const [shippingSettings, promoActive, blessedFridayOffer] =
+    await Promise.all([
+      getShippingSettings(),
+      hasActivePromoCode(),
+      getBlessedFridayOffer(),
+    ]);
+
+  // Same override checkout applies (see CheckoutForm's effectiveShippingSettings)
+  // — while the Blessed Friday offer is on, the evergreen free-shipping perk
+  // is suspended store-wide, so the cart drawer/page must never promise free
+  // shipping it won't actually deliver at checkout.
+  const effectiveShippingSettings = blessedFridayOffer.enabled
+    ? { ...shippingSettings, freeShippingThreshold: Number.MAX_SAFE_INTEGER }
+    : shippingSettings;
 
   return (
     <html
@@ -124,7 +137,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <AuthProvider>
             <WishlistProvider>
               <PromoStatusProvider hasActivePromoCode={promoActive}>
-                <CartProvider shippingSettings={shippingSettings}>
+                <CartProvider
+                  shippingSettings={effectiveShippingSettings}
+                  blessedFridayOfferEnabled={blessedFridayOffer.enabled}
+                >
                   <FestivalCountdownBanner />
                   <AnnouncementBar />
                   <Header />

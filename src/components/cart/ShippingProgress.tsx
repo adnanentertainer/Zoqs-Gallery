@@ -3,9 +3,16 @@ import type { FreeShippingProgress } from "@/lib/cart";
 
 interface ShippingProgressProps {
   progress: FreeShippingProgress;
+  /** While the Blessed Friday offer is enabled, the evergreen free-shipping
+   * perk is suspended store-wide (see CartContext/layout.tsx), so this
+   * message would otherwise claim an unreachable threshold — hide it
+   * entirely rather than show "away from free shipping" nonsense. */
+  hidden?: boolean;
 }
 
-export function ShippingProgress({ progress }: ShippingProgressProps) {
+export function ShippingProgress({ progress, hidden }: ShippingProgressProps) {
+  if (hidden) return null;
+
   return (
     <div className="flex flex-col gap-2">
       <p className="font-body text-sm text-primary">
