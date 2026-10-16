@@ -8,13 +8,21 @@ import {
   calculateShippingCost,
   type ShippingSettings,
 } from "@/lib/checkout/shipping";
+import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
 
 interface OrderSummaryProps {
   items: CheckoutItemData[];
   subtotal: number;
+  /** Already reflects the Blessed Friday override, if enabled — see
+   * CheckoutForm, which raises freeShippingThreshold past reach so the
+   * evergreen perk is suspended while the offer is live. */
   shippingSettings: ShippingSettings;
+  /** The larger of the entered promo code's discount and the automatic
+   * Blessed Friday discount — never both added together. */
   discountAmount?: number;
   promoCode?: string | null;
+  discountLabel?: string;
+  blessedFridayOffer: BlessedFridayOffer;
 }
 
 export function OrderSummary({
@@ -23,6 +31,8 @@ export function OrderSummary({
   shippingSettings,
   discountAmount = 0,
   promoCode,
+  discountLabel,
+  blessedFridayOffer,
 }: OrderSummaryProps) {
   const discountedSubtotal = subtotal - discountAmount;
   const shippingCost = calculateShippingCost(
@@ -44,7 +54,25 @@ export function OrderSummary({
         ))}
       </div>
 
-      {!qualifiesForFreeShipping && (
+      {blessedFridayOffer.enabled ? (
+        discountAmount > 0 ? (
+          <p className="font-body text-xs font-medium text-success">
+            Blessed Friday offer applied — {blessedFridayOffer.discountPercentage}
+            % off on orders above {formatPrice(blessedFridayOffer.minSpend)}.
+          </p>
+        ) : (
+          <p className="font-body text-xs text-muted">
+            Add{" "}
+            {formatPrice(blessedFridayOffer.minSpend - subtotal)} more to
+            unlock {blessedFridayOffer.discountPercentage}% off with our
+            Blessed Friday offer.
+          </p>
+        )
+      ) : qualifiesForFreeShipping ? (
+        <p className="font-body text-xs font-medium text-success">
+          Free shipping unlocked.
+        </p>
+      ) : (
         <p className="font-body text-xs text-muted">
           Add{" "}
           {formatPrice(
@@ -60,6 +88,7 @@ export function OrderSummary({
         total={total}
         discountAmount={discountAmount}
         promoCode={promoCode}
+        discountLabel={discountLabel}
       />
     </div>
   );

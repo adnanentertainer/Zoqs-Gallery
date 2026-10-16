@@ -4,9 +4,11 @@ import { Heading, Text } from "@/components/ui/Typography";
 import { SettingsForm } from "@/components/admin/SettingsForm";
 import { FestivalBannerForm } from "@/components/admin/FestivalBannerForm";
 import { DefaultHeroImageForm } from "@/components/admin/DefaultHeroImageForm";
+import { BlessedFridayOfferForm } from "@/components/admin/BlessedFridayOfferForm";
 import { getAdminStoreSettings } from "@/lib/services/admin/adminSettingsService";
 import { getAdminFestivalBanner } from "@/lib/services/admin/adminFestivalBannerService";
 import { getAdminDefaultHeroImage } from "@/lib/services/admin/adminHeroImageService";
+import { getAdminBlessedFridayOffer } from "@/lib/services/admin/adminBlessedFridayOfferService";
 
 export const metadata: Metadata = {
   title: "Settings | Admin | ZOQ's Gallery",
@@ -14,11 +16,13 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminSettingsPage() {
-  const [settings, festivalBanner, defaultHeroImage] = await Promise.all([
-    getAdminStoreSettings(),
-    getAdminFestivalBanner(),
-    getAdminDefaultHeroImage(),
-  ]);
+  const [settings, festivalBanner, defaultHeroImage, blessedFridayOffer] =
+    await Promise.all([
+      getAdminStoreSettings(),
+      getAdminFestivalBanner(),
+      getAdminDefaultHeroImage(),
+      getAdminBlessedFridayOffer(),
+    ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -27,6 +31,17 @@ export default async function AdminSettingsPage() {
         description="These settings control the public storefront."
       />
       <SettingsForm initialValues={settings} />
+
+      <div className="mt-4">
+        <Heading variant="h3" as="h2">
+          Blessed Friday Offer
+        </Heading>
+        <Text variant="bodySm" className="mt-1 text-muted">
+          An automatic, no-promo-code discount applied at checkout on orders
+          above a minimum spend.
+        </Text>
+      </div>
+      <BlessedFridayOfferForm initialValues={blessedFridayOffer} />
 
       <div className="mt-4">
         <Heading variant="h3" as="h2">

@@ -8,6 +8,7 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { mapProfileRow } from "@/lib/supabase/mappers";
 import { getShippingSettings } from "@/lib/checkout/getShippingSettings";
 import { hasActivePromoCode } from "@/lib/services/promoCodeService";
+import { getBlessedFridayOffer } from "@/lib/services/blessedFridayOfferService";
 
 export const metadata: Metadata = {
   title: "Checkout | ZOQ's Gallery",
@@ -22,11 +23,13 @@ export default async function CheckoutPage() {
   // auth check instead of waiting on it — for a signed-in visitor this takes
   // it off the critical path entirely (only the profile lookup still has to
   // wait on `user`).
-  const [user, shippingSettings, showPromoCode] = await Promise.all([
-    getServerUser(),
-    getShippingSettings(),
-    hasActivePromoCode(),
-  ]);
+  const [user, shippingSettings, showPromoCode, blessedFridayOffer] =
+    await Promise.all([
+      getServerUser(),
+      getShippingSettings(),
+      hasActivePromoCode(),
+      getBlessedFridayOffer(),
+    ]);
 
   let profile = null;
   if (user) {
@@ -56,6 +59,7 @@ export default async function CheckoutPage() {
         }}
         shippingSettings={shippingSettings}
         showPromoCode={showPromoCode}
+        blessedFridayOffer={blessedFridayOffer}
       />
     </Container>
   );

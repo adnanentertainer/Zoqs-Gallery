@@ -37,7 +37,9 @@ import {
   calculateShippingCost,
   type ShippingSettings,
 } from "@/lib/checkout/shipping";
+import { calculateBlessedFridayDiscount } from "@/lib/checkout/blessedFriday";
 import type { PaymentMethod, ShippingAddress } from "@/types/order";
+import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
 
 interface CheckoutFormProps {
   initialShipping: Pick<ShippingAddress, "fullName" | "email" | "phone">;
@@ -45,12 +47,14 @@ interface CheckoutFormProps {
   /** Hide the "Have a promo code?" field entirely when no promo code is
    * currently active — see promoCodeService.hasActivePromoCode(). */
   showPromoCode: boolean;
+  blessedFridayOffer: BlessedFridayOffer;
 }
 
 export function CheckoutForm({
   initialShipping,
   shippingSettings,
   showPromoCode,
+  blessedFridayOffer,
 }: CheckoutFormProps) {
   const router = useRouter();
   const cart = useCart();
@@ -110,6 +114,31 @@ export function CheckoutForm({
       />
     );
   }
+
+  // While the Blessed Friday offer is enabled, the evergreen free-shipping
+  // perk is suspended store-wide in favor of it (admin's own choice — see
+  // BlessedFridayOfferForm) — raising the threshold past any reachable
+  // subtotal reuses calculateShippingCost() unchanged everywhere it's called
+  // below instead of branching shipping logic in three different places.
+  const effectiveShippingSettings: ShippingSettings = blessedFridayOffer.enabled
+    ? { ...shippingSettings, freeShippingThreshold: Number.MAX_SAFE_INTEGER }
+    : shippingSettings;
+
+  // The automatic discount and an entered promo code never stack — the
+  // customer gets whichever saves them more, never both at once.
+  // create_order() independently makes the same choice server-side from the
+  // same settings, so this is a preview that always matches what's charged.
+  const blessedFridayDiscount = calculateBlessedFridayDiscount(
+    cart.subtotal,
+    blessedFridayOffer,
+  );
+  const promoDiscount = appliedPromo?.discountAmount ?? 0;
+  const useBlessedFriday = blessedFridayDiscount > promoDiscount;
+  const effectiveDiscountAmount = Math.max(blessedFridayDiscount, promoDiscount);
+  const effectiveDiscountLabel = useBlessedFriday
+    ? `Blessed Friday Offer (${blessedFridayOffer.discountPercentage}% off)`
+    : undefined;
+  const effectivePromoCode = useBlessedFriday ? null : appliedPromo?.code;
 
   function updateField(field: keyof ShippingAddress, value: string) {
     setShipping((prev) => ({ ...prev, [field]: value }));
@@ -206,8 +235,8 @@ export function CheckoutForm({
             }}
             error={paymentError}
             shippingCost={calculateShippingCost(
-              cart.subtotal - (appliedPromo?.discountAmount ?? 0),
-              shippingSettings,
+              cart.subtotal - effectiveDiscountAmount,
+              effectiveShippingSettings,
             )}
           />
         </section>
@@ -266,9 +295,11 @@ export function CheckoutForm({
             lineTotal: item.lineSubtotal,
           }))}
           subtotal={cart.subtotal}
-          shippingSettings={shippingSettings}
-          discountAmount={appliedPromo?.discountAmount}
-          promoCode={appliedPromo?.code}
+          shippingSettings={effectiveShippingSettings}
+          discountAmount={effectiveDiscountAmount}
+          promoCode={effectivePromoCode}
+          discountLabel={effectiveDiscountLabel}
+          blessedFridayOffer={blessedFridayOffer}
         />
         <CheckoutTrustBadges />
         <div className="lg:hidden">

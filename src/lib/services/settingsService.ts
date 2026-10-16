@@ -4,6 +4,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getSupabasePublicClient } from "@/lib/supabase/server";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 import { DEFAULT_FESTIVAL_BANNER } from "@/types/festivalBanner";
+import { DEFAULT_BLESSED_FRIDAY_OFFER } from "@/types/blessedFridayOffer";
 
 // Mirrors the site_settings rows seeded by scripts/seed.ts. Used as the mock
 // fallback so getSiteSetting() behaves identically whether or not Supabase is
@@ -21,6 +22,7 @@ const MOCK_SETTINGS: Record<string, unknown> = {
   social_links: siteConfig.socialLinks,
   festival_banner: DEFAULT_FESTIVAL_BANNER,
   default_hero_image: "",
+  blessed_friday_offer: DEFAULT_BLESSED_FRIDAY_OFFER,
 };
 
 // This is a public, admin-managed setting read on nearly every page (festival

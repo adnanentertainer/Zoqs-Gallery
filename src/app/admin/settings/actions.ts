@@ -11,7 +11,9 @@ import {
   updateAdminDefaultHeroImage,
   uploadDefaultHeroImage,
 } from "@/lib/services/admin/adminHeroImageService";
+import { updateAdminBlessedFridayOffer } from "@/lib/services/admin/adminBlessedFridayOfferService";
 import type { FestivalBanner } from "@/types/festivalBanner";
+import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
 
 export async function updateAdminStoreSettingsAction(
   input: AdminStoreSettings,
@@ -35,6 +37,19 @@ export async function updateAdminFestivalBannerAction(
     // The banner renders in the root layout, so every route needs revalidating.
     revalidatePath("/", "layout");
     revalidatePath("/admin/settings");
+  }
+  return result;
+}
+
+export async function updateAdminBlessedFridayOfferAction(
+  input: BlessedFridayOffer,
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const result = await updateAdminBlessedFridayOffer(input);
+  if (!result.error) {
+    revalidatePath("/admin/settings");
+    revalidatePath("/checkout");
+    revalidatePath("/cart");
   }
   return result;
 }
