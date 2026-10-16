@@ -29,6 +29,7 @@ import {
 } from "@/lib/services/productService";
 import { getProductReviews } from "@/lib/services/reviewService";
 import { getAverageRating, getReviewBreakdown } from "@/lib/reviews";
+import { getBlessedFridayOffer } from "@/lib/services/blessedFridayOfferService";
 import { buildMetaDescription, categoryLabel, safeJsonLd } from "@/lib/utils";
 import type { ProductBadge as ProductBadgeType } from "@/types";
 
@@ -104,10 +105,12 @@ export default async function ProductPage({
 
   const categoryName = categoryLabel(product.categorySlug);
   const badge = getProductBadge(product);
-  const [productReviews, relatedProducts] = await Promise.all([
-    getProductReviews(product.id, product.name),
-    getRelatedProducts(product, 4),
-  ]);
+  const [productReviews, relatedProducts, blessedFridayOffer] =
+    await Promise.all([
+      getProductReviews(product.id, product.name),
+      getRelatedProducts(product, 4),
+      getBlessedFridayOffer(),
+    ]);
   const breakdown = getReviewBreakdown(productReviews);
   const reviewsCount = productReviews.length;
   const averageRating =
@@ -187,24 +190,32 @@ export default async function ProductPage({
           },
           deliveryTime,
         },
-        {
-          "@type": "OfferShippingDetails",
-          shippingRate: {
-            "@type": "MonetaryAmount",
-            value: 0,
-            currency: siteConfig.currency,
-          },
-          shippingDestination: {
-            "@type": "DefinedRegion",
-            addressCountry: "PK",
-          },
-          eligibleTransactionVolume: {
-            "@type": "PriceSpecification",
-            minPrice: siteConfig.freeShippingThreshold,
-            priceCurrency: siteConfig.currency,
-          },
-          deliveryTime,
-        },
+        // Omitted while Blessed Friday is on — the evergreen free-shipping
+        // threshold it replaces (see CartContext/layout.tsx) isn't actually
+        // honored at checkout during that window, and this feeds Google's
+        // rich-result shipping promise, not just on-page copy.
+        ...(blessedFridayOffer.enabled
+          ? []
+          : [
+              {
+                "@type": "OfferShippingDetails",
+                shippingRate: {
+                  "@type": "MonetaryAmount",
+                  value: 0,
+                  currency: siteConfig.currency,
+                },
+                shippingDestination: {
+                  "@type": "DefinedRegion",
+                  addressCountry: "PK",
+                },
+                eligibleTransactionVolume: {
+                  "@type": "PriceSpecification",
+                  minPrice: siteConfig.freeShippingThreshold,
+                  priceCurrency: siteConfig.currency,
+                },
+                deliveryTime,
+              },
+            ]),
       ],
     },
     aggregateRating:
@@ -309,7 +320,7 @@ export default async function ProductPage({
       </ProductVariantImageProvider>
 
       <Container className="pb-16">
-        <ProductTabs product={product} />
+        <ProductTabs product={product} blessedFridayOffer={blessedFridayOffer} />
       </Container>
 
       <Container

@@ -151,3 +151,64 @@ export async function getActiveHeroImage(): Promise<ActiveHeroImage | null> {
     return null;
   }
 }
+
+export interface ActivePromoCodeSummary {
+  code: string;
+  description: string | null;
+  discountType: "percentage" | "fixed";
+  discountValue: number;
+}
+
+// Same windowing logic and cache tag as getActiveHeroImage — an admin
+// create/update/activate/delete already calls
+// revalidateTag(CACHE_TAGS.activePromoCode), so a newly launched code's
+// announcement shows up immediately instead of waiting out the window below.
+const getActivePromoCodeSummaryUncached = unstable_cache(
+  async (): Promise<ActivePromoCodeSummary | null> => {
+    const supabase = getSupabasePublicClient();
+    const now = new Date().toISOString();
+    const { data, error } = await supabase
+      .from("promo_codes")
+      .select("code, description, discount_type, discount_value")
+      .eq("is_active", true)
+      .or(`starts_at.is.null,starts_at.lte.${now}`)
+      .or(`expires_at.is.null,expires_at.gte.${now}`)
+      .order("starts_at", { ascending: true, nullsFirst: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) return null;
+
+    return {
+      code: data.code,
+      description: data.description,
+      discountType: data.discount_type as "percentage" | "fixed",
+      discountValue: data.discount_value,
+    };
+  },
+  ["promo-codes:active-summary"],
+  { tags: [CACHE_TAGS.activePromoCode], revalidate: 3600 },
+);
+
+/**
+ * The live promo code's own details (code, description, discount), if any
+ * code is currently redeemable — used to advertise it site-wide (see
+ * AnnouncementBar) instead of a generic message when one is actually
+ * running. Doesn't account for usage_limit having been exhausted (same as
+ * hasActivePromoCode()) — a sold-out code briefly still gets announced,
+ * which matches that function's existing behavior.
+ */
+export async function getActivePromoCodeSummary(): Promise<ActivePromoCodeSummary | null> {
+  if (!isSupabaseConfigured()) return null;
+
+  try {
+    return await getActivePromoCodeSummaryUncached();
+  } catch (error) {
+    console.error(
+      "[promoCodeService.getActivePromoCodeSummary] Supabase query failed:",
+      error,
+    );
+    return null;
+  }
+}
