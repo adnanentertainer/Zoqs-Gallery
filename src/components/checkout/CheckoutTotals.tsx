@@ -9,6 +9,10 @@ interface CheckoutTotalsProps {
    * Shipping → Total" layout appears everywhere a total is shown. */
   discountAmount?: number;
   promoCode?: string | null;
+  /** Overrides the default "Promo (CODE)" label — used when the discount
+   * line came from the automatic Blessed Friday offer rather than an
+   * entered promo code. */
+  discountLabel?: string;
 }
 
 export function CheckoutTotals({
@@ -17,6 +21,7 @@ export function CheckoutTotals({
   total,
   discountAmount = 0,
   promoCode,
+  discountLabel,
 }: CheckoutTotalsProps) {
   return (
     <div className="flex flex-col gap-2 border-t border-beige pt-4">
@@ -26,7 +31,7 @@ export function CheckoutTotals({
       </div>
       {discountAmount > 0 && (
         <div className="flex items-center justify-between font-body text-sm text-success">
-          <span>Promo{promoCode ? ` (${promoCode})` : ""}</span>
+          <span>{discountLabel ?? `Promo${promoCode ? ` (${promoCode})` : ""}`}</span>
           <span>-{formatPrice(discountAmount)}</span>
         </div>
       )}
