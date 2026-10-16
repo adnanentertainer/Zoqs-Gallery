@@ -5,8 +5,7 @@ import { AdminPageHeader, Pagination } from "@/components/admin";
 import { Badge } from "@/components/ui/Badge";
 import { Text } from "@/components/ui/Typography";
 import { buttonVariants } from "@/components/ui/Button";
-import { RetryReelButton } from "@/components/admin/RetryReelButton";
-import { ShareProductButton } from "@/components/admin/ShareProductButton";
+import { ShareReelButton } from "@/components/admin/ShareReelButton";
 import { listProductReels } from "@/lib/services/admin/reelPostingService";
 import {
   socialPostStatusLabel,
@@ -118,16 +117,10 @@ export default async function AdminReelsPage({
                           still exist at /admin/reels/[id]/edit) -- re-add
                           `<Link href={`/admin/reels/${reel.id}/edit`}>Edit
                           Caption</Link>` here to bring it back. */}
-                      <div className="flex items-start justify-end gap-3">
-                        <ShareProductButton
-                          productId={reel.productId}
-                          productName={reel.productName ?? "this product"}
-                        />
-                        <RetryReelButton
-                          reelId={reel.id}
-                          productName={reel.productName ?? "this product"}
-                        />
-                      </div>
+                      <ShareReelButton
+                        reelId={reel.id}
+                        productName={reel.productName ?? "this product"}
+                      />
                     </td>
                   </tr>
                 ))}
