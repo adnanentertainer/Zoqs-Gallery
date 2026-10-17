@@ -239,6 +239,7 @@ export function mapProductRow(
     dimensions: row.dimensions ?? undefined,
     careInstructions: row.care_instructions ?? undefined,
     variants: variantGroups.length > 0 ? variantGroups : undefined,
+    minStockLevel: row.min_stock_level,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

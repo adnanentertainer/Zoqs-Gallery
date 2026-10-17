@@ -9,7 +9,7 @@ import { QuantitySelector } from "@/components/product/QuantitySelector";
 import { ProductPrice } from "@/components/product/ProductPrice";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { cn, formatPrice } from "@/lib/utils";
-import { LOW_STOCK_THRESHOLD, isInStock } from "@/lib/products";
+import { isInStock, isLowStock } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
 import { useProductVariantSelection } from "@/context/ProductVariantImageContext";
 import { registerProduct } from "@/lib/productCache";
@@ -138,7 +138,7 @@ export function ProductActions({ product }: ProductActionsProps) {
         />
         {canPurchase &&
           productInStock &&
-          product.stock <= LOW_STOCK_THRESHOLD && (
+          isLowStock(product) && (
             <span className="pb-3 font-body text-sm font-medium text-error">
               Only {product.stock} left in stock
             </span>

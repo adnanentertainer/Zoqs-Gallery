@@ -24,10 +24,12 @@ export function isInStock(product: Product): boolean {
   return product.stock > 0;
 }
 
+// Fallback for products with no admin-set minStockLevel (e.g. mock data).
 export const LOW_STOCK_THRESHOLD = 5;
 
 export function isLowStock(product: Product): boolean {
-  return isInStock(product) && product.stock <= LOW_STOCK_THRESHOLD;
+  const threshold = product.minStockLevel ?? LOW_STOCK_THRESHOLD;
+  return isInStock(product) && product.stock <= threshold;
 }
 
 export function getProductBadge(product: Product): ProductBadge | undefined {
