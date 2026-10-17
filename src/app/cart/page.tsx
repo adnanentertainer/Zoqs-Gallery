@@ -11,7 +11,7 @@ import { CartWhatsAppButton } from "@/components/cart/CartWhatsAppButton";
 import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
-  const { lineItems, subtotal, freeShipping, blessedFridayOfferEnabled, totalQuantity } =
+  const { lineItems, subtotal, freeShipping, freeShippingSuspended, totalQuantity } =
     useCart();
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function CartPage() {
             <CartSummary
               subtotal={subtotal}
               freeShipping={freeShipping}
-              blessedFridayOfferEnabled={blessedFridayOfferEnabled}
+              freeShippingSuspended={freeShippingSuspended}
               secondaryAction={{ label: "Continue Shopping", href: "/shop" }}
             />
           </div>

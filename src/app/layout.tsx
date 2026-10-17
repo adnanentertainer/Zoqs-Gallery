@@ -111,10 +111,13 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     ]);
 
   // Same override checkout applies (see CheckoutForm's effectiveShippingSettings)
-  // — while the Blessed Friday offer is on, the evergreen free-shipping perk
-  // is suspended store-wide, so the cart drawer/page must never promise free
-  // shipping it won't actually deliver at checkout.
-  const effectiveShippingSettings = blessedFridayOffer.enabled
+  // — while the Blessed Friday offer is on, or any promo code campaign is
+  // currently running (even one this shopper hasn't entered yet), the
+  // evergreen free-shipping perk is suspended store-wide, so the cart
+  // drawer/page must never promise free shipping it won't actually deliver
+  // at checkout.
+  const freeShippingSuspended = blessedFridayOffer.enabled || promoActive;
+  const effectiveShippingSettings = freeShippingSuspended
     ? { ...shippingSettings, freeShippingThreshold: Number.MAX_SAFE_INTEGER }
     : shippingSettings;
 
@@ -139,7 +142,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               <PromoStatusProvider hasActivePromoCode={promoActive}>
                 <CartProvider
                   shippingSettings={effectiveShippingSettings}
-                  blessedFridayOfferEnabled={blessedFridayOffer.enabled}
+                  freeShippingSuspended={freeShippingSuspended}
                 >
                   <FestivalCountdownBanner />
                   <AnnouncementBar />

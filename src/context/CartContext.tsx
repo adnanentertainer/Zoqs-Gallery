@@ -163,7 +163,7 @@ interface CartContextValue {
   totalQuantity: number;
   subtotal: number;
   freeShipping: FreeShippingProgress;
-  blessedFridayOfferEnabled: boolean;
+  freeShippingSuspended: boolean;
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
@@ -195,17 +195,18 @@ interface CartProviderProps {
    * matches what checkout will actually charge. Already reflects the
    * Blessed Friday override (see layout.tsx) when that offer is enabled. */
   shippingSettings: ShippingSettings;
-  /** Whether the Blessed Friday offer is currently enabled — used only to
-   * hide the free-shipping progress message (ShippingProgress), since the
-   * shippingSettings override above already makes its own math correct but
-   * would otherwise render a nonsensical "away from free shipping" amount. */
-  blessedFridayOfferEnabled: boolean;
+  /** Whether the Blessed Friday offer is currently enabled, or any promo
+   * code campaign is currently running — used only to hide the free-
+   * shipping progress message (ShippingProgress), since the shippingSettings
+   * override above already makes its own math correct but would otherwise
+   * render a nonsensical "away from free shipping" amount. */
+  freeShippingSuspended: boolean;
 }
 
 export function CartProvider({
   children,
   shippingSettings,
-  blessedFridayOfferEnabled,
+  freeShippingSuspended,
 }: CartProviderProps) {
   const items = useSyncExternalStore(
     cartStore.subscribe,
@@ -344,7 +345,7 @@ export function CartProvider({
       totalQuantity,
       subtotal,
       freeShipping,
-      blessedFridayOfferEnabled,
+      freeShippingSuspended,
       isDrawerOpen,
       openDrawer,
       closeDrawer,
@@ -363,7 +364,7 @@ export function CartProvider({
       totalQuantity,
       subtotal,
       freeShipping,
-      blessedFridayOfferEnabled,
+      freeShippingSuspended,
       isDrawerOpen,
       openDrawer,
       closeDrawer,
