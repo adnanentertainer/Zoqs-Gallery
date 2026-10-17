@@ -56,6 +56,8 @@ export interface ProductReelRecord {
   productId: string;
   productName: string | null;
   productSlug: string | null;
+  /** null when the product no longer exists. */
+  productAvailable: boolean | null;
   videoUrl: string;
   caption: string;
   facebookVideoId: string | null;

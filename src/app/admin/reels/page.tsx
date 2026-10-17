@@ -54,10 +54,11 @@ export default async function AdminReelsPage({
           </Text>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[860px] text-left">
+            <table className="w-full min-w-[960px] text-left">
               <thead>
                 <tr className="border-b border-beige font-body text-xs uppercase tracking-wide text-muted">
                   <th className="px-5 py-3 font-medium">Product</th>
+                  <th className="px-5 py-3 font-medium">Status</th>
                   <th className="px-5 py-3 font-medium">Video</th>
                   <th className="px-5 py-3 font-medium">Facebook</th>
                   <th className="px-5 py-3 font-medium">Instagram</th>
@@ -73,6 +74,15 @@ export default async function AdminReelsPage({
                   <tr key={reel.id} className="border-b border-beige last:border-b-0">
                     <td className="px-5 py-3 font-body text-sm font-medium text-primary">
                       {reel.productName ?? "Deleted product"}
+                    </td>
+                    <td className="px-5 py-3">
+                      {reel.productAvailable === null ? (
+                        <Badge variant="default">—</Badge>
+                      ) : reel.productAvailable ? (
+                        <Badge variant="success">Available</Badge>
+                      ) : (
+                        <Badge variant="error">Out of Stock</Badge>
+                      )}
                     </td>
                     <td className="max-w-[220px] px-5 py-3">
                       <a

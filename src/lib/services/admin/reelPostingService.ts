@@ -353,7 +353,12 @@ interface ProductReelRow {
   posted_at: string | null;
   retry_count: number;
   created_at: string;
-  products: { name: string; slug: string } | null;
+  products: {
+    name: string;
+    slug: string;
+    stock: number;
+    force_unavailable: boolean;
+  } | null;
 }
 
 function mapProductReelRow(row: ProductReelRow): ProductReelRecord {
@@ -362,6 +367,9 @@ function mapProductReelRow(row: ProductReelRow): ProductReelRecord {
     productId: row.product_id,
     productName: row.products?.name ?? null,
     productSlug: row.products?.slug ?? null,
+    productAvailable: row.products
+      ? !row.products.force_unavailable && row.products.stock > 0
+      : null,
     videoUrl: row.video_url,
     caption: row.caption,
     facebookVideoId: row.facebook_video_id,
@@ -384,7 +392,7 @@ export async function getProductReel(
 
   const { data, error } = await supabase
     .from("product_reels")
-    .select("*, products(name, slug)")
+    .select("*, products(name, slug, stock, force_unavailable)")
     .eq("id", reelId)
     .maybeSingle();
 
@@ -492,7 +500,7 @@ export async function listProductReels(
 
   const { data, error, count } = await supabase
     .from("product_reels")
-    .select("*, products(name, slug)", { count: "exact" })
+    .select("*, products(name, slug, stock, force_unavailable)", { count: "exact" })
     .order("created_at", { ascending: false })
     .range(from, to);
 
