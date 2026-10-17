@@ -6,6 +6,7 @@ import { Heading, Text } from "@/components/ui/Typography";
 import { Badge } from "@/components/ui/Badge";
 import { RatingStars } from "@/components/shared/RatingStars";
 import {
+  DeliveryInfo,
   MetaPixelViewContentTracker,
   ProductActions,
   ProductGallery,
@@ -272,18 +273,20 @@ export default async function ProductPage({
               <Heading variant="h1" as="h1">
                 {product.name}
               </Heading>
-              <a
-                href="#reviews"
-                className="flex w-fit items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-              >
-                <RatingStars rating={averageRating} />
-                <span className="font-body text-sm text-primary">
-                  {averageRating.toFixed(1)}
-                </span>
-                <span className="font-body text-sm text-muted underline-offset-2 hover:underline">
-                  {reviewsCount} Reviews
-                </span>
-              </a>
+              {reviewsCount > 0 && (
+                <a
+                  href="#reviews"
+                  className="flex w-fit items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                >
+                  <RatingStars rating={averageRating} />
+                  <span className="font-body text-sm text-primary">
+                    {averageRating.toFixed(1)}
+                  </span>
+                  <span className="font-body text-sm text-muted underline-offset-2 hover:underline">
+                    {reviewsCount} Reviews
+                  </span>
+                </a>
+              )}
             </div>
 
             <ProductPrice product={product} />
@@ -315,6 +318,8 @@ export default async function ProductPage({
             )}
 
             <ProductActions product={product} />
+
+            <DeliveryInfo />
           </div>
         </Container>
       </ProductVariantImageProvider>
