@@ -259,8 +259,11 @@ export interface Database {
           instagram_media_id: string | null;
           facebook_status: "pending" | "success" | "failed" | "skipped";
           instagram_status: "pending" | "success" | "failed" | "skipped";
+          instagram_story_media_id: string | null;
+          instagram_story_status: "pending" | "success" | "failed" | "skipped";
           facebook_error: string | null;
           instagram_error: string | null;
+          instagram_story_error: string | null;
           posted_at: string | null;
           retry_count: number;
           created_at: string;
@@ -273,13 +276,39 @@ export interface Database {
           instagram_media_id?: string | null;
           facebook_status?: "pending" | "success" | "failed" | "skipped";
           instagram_status?: "pending" | "success" | "failed" | "skipped";
+          instagram_story_media_id?: string | null;
+          instagram_story_status?: "pending" | "success" | "failed" | "skipped";
           facebook_error?: string | null;
           instagram_error?: string | null;
+          instagram_story_error?: string | null;
           posted_at?: string | null;
           retry_count?: number;
         };
         Update: Partial<
           Database["public"]["Tables"]["product_social_posts"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      product_whatsapp_status_queue: {
+        Row: {
+          id: string;
+          product_id: string;
+          reason: "new_product" | "price_change";
+          previous_price: number | null;
+          status: "pending" | "posted" | "dismissed";
+          created_at: string;
+          resolved_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          product_id: string;
+          reason: "new_product" | "price_change";
+          previous_price?: number | null;
+          status?: "pending" | "posted" | "dismissed";
+          resolved_at?: string | null;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["product_whatsapp_status_queue"]["Insert"]
         >;
         Relationships: [];
       };

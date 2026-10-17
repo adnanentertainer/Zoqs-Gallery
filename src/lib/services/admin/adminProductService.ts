@@ -5,6 +5,10 @@ import {
   publishProductToSocialMedia,
   enqueuePriceChangeRepost,
 } from "@/lib/services/admin/socialPostingService";
+import {
+  enqueueNewProductWhatsAppStatus,
+  enqueuePriceChangeWhatsAppStatus,
+} from "@/lib/services/admin/whatsappStatusService";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 import type {
   AdminProductDetail,
@@ -363,6 +367,15 @@ export async function createProduct(
         socialError,
       );
     }
+
+    try {
+      await enqueueNewProductWhatsAppStatus(product.id);
+    } catch (whatsAppError) {
+      console.error(
+        "[adminProductService.createProduct] WhatsApp Status queueing failed:",
+        whatsAppError,
+      );
+    }
   }
 
   return { id: product.id };
@@ -464,6 +477,15 @@ export async function updateProduct(
         console.error(
           "[adminProductService.updateProduct] price-change repost queueing failed:",
           socialError,
+        );
+      }
+
+      try {
+        await enqueuePriceChangeWhatsAppStatus(id, existingProduct.price);
+      } catch (whatsAppError) {
+        console.error(
+          "[adminProductService.updateProduct] WhatsApp Status queueing failed:",
+          whatsAppError,
         );
       }
     }

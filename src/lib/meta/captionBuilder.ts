@@ -47,6 +47,38 @@ function colorLine(colorOptions?: string[]): string | undefined {
   return `Available in: ${colorOptions.join(", ")}`;
 }
 
+export interface WhatsAppStatusCaptionInput {
+  name: string;
+  price: number;
+  reason: "new_product" | "price_change";
+  /** Only meaningful when reason is "price_change". */
+  previousPrice?: number | null;
+}
+
+// Deliberately much shorter than the Facebook/Instagram captions above — a
+// WhatsApp Status caption sits as an overlay on top of a photo with very
+// limited visible room, so this skips the hashtags/hook/description
+// entirely and just states the one thing worth knowing at a glance.
+export function buildWhatsAppStatusCaption(
+  input: WhatsAppStatusCaptionInput,
+): string {
+  if (input.reason === "price_change" && input.previousPrice != null) {
+    return [
+      "🔥 Price Drop!",
+      input.name,
+      `Was ${formatPrice(input.previousPrice)} — now ${formatPrice(input.price)}`,
+      "📩 DM to order",
+    ].join("\n");
+  }
+
+  return [
+    "✨ New Arrival",
+    input.name,
+    formatPrice(input.price),
+    "📩 DM to order",
+  ].join("\n");
+}
+
 export function buildFacebookCaption(input: SocialPostProductInput): string {
   const lines = [
     "✨ New Arrival ✨",

@@ -3,7 +3,10 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { getSupabaseServiceRoleClient } from "@/lib/supabase/serviceRole";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { publishFacebookPhotoPost } from "@/lib/meta/facebookPublisher";
-import { publishInstagramPost } from "@/lib/meta/instagramPublisher";
+import {
+  publishInstagramPost,
+  publishInstagramStory,
+} from "@/lib/meta/instagramPublisher";
 import { getPageAccessToken } from "@/lib/meta/graphClient";
 import {
   findCatalogProductId,
@@ -105,6 +108,32 @@ async function runInstagram(
     return {
       status: "failed",
       error: error instanceof Error ? error.message : "Instagram post failed.",
+    };
+  }
+}
+
+async function runInstagramStory(
+  settings: {
+    instagram_business_account_id: string | null;
+    facebook_access_token: string | null;
+  },
+  imageUrl: string,
+): Promise<PlatformResult> {
+  if (!settings.instagram_business_account_id || !settings.facebook_access_token) {
+    return { status: "skipped" };
+  }
+  try {
+    const { mediaId } = await publishInstagramStory({
+      igUserId: settings.instagram_business_account_id,
+      accessToken: settings.facebook_access_token,
+      imageUrl,
+    });
+    return { status: "success", id: mediaId };
+  } catch (error) {
+    console.error("[socialPostingService.runInstagramStory] failed:", error);
+    return {
+      status: "failed",
+      error: error instanceof Error ? error.message : "Instagram Story post failed.",
     };
   }
 }
@@ -214,7 +243,7 @@ async function publishProductToSocialMediaCore(
         )) ?? undefined;
     }
 
-    const [facebookResult, instagramResult] = await Promise.all([
+    const [facebookResult, instagramResult, instagramStoryResult] = await Promise.all([
       settings.facebook_enabled
         ? runFacebook(
             settings,
@@ -231,10 +260,19 @@ async function publishProductToSocialMediaCore(
             catalogProductId,
           )
         : Promise.resolve<PlatformResult>({ status: "skipped" }),
+      // Rides on the same Instagram toggle as the feed post above -- Meta's
+      // Content Publishing API doesn't charge per call, so there's no cost
+      // reason to post one without the other, and a separate settings
+      // toggle would just be more admin UI for no real benefit.
+      settings.instagram_enabled
+        ? runInstagramStory(settings, image.image_url)
+        : Promise.resolve<PlatformResult>({ status: "skipped" }),
     ]);
 
     const anySuccess =
-      facebookResult.status === "success" || instagramResult.status === "success";
+      facebookResult.status === "success" ||
+      instagramResult.status === "success" ||
+      instagramStoryResult.status === "success";
 
     const { error: upsertError } = await supabase
       .from("product_social_posts")
@@ -247,6 +285,9 @@ async function publishProductToSocialMediaCore(
           instagram_status: instagramResult.status,
           instagram_media_id: instagramResult.id ?? null,
           instagram_error: instagramResult.error ?? null,
+          instagram_story_status: instagramStoryResult.status,
+          instagram_story_media_id: instagramStoryResult.id ?? null,
+          instagram_story_error: instagramStoryResult.error ?? null,
           posted_at: anySuccess ? new Date().toISOString() : null,
           retry_count: options.forceRepost ? existingRetryCount + 1 : 0,
         },
@@ -554,10 +595,13 @@ interface ProductSocialPostRow {
   product_id: string;
   facebook_post_id: string | null;
   instagram_media_id: string | null;
+  instagram_story_media_id: string | null;
   facebook_status: SocialPlatformStatus;
   instagram_status: SocialPlatformStatus;
+  instagram_story_status: SocialPlatformStatus;
   facebook_error: string | null;
   instagram_error: string | null;
+  instagram_story_error: string | null;
   posted_at: string | null;
   retry_count: number;
   created_at: string;
@@ -574,10 +618,13 @@ function mapProductSocialPostRow(
     productSlug: row.products?.slug ?? null,
     facebookPostId: row.facebook_post_id,
     instagramMediaId: row.instagram_media_id,
+    instagramStoryMediaId: row.instagram_story_media_id,
     facebookStatus: row.facebook_status,
     instagramStatus: row.instagram_status,
+    instagramStoryStatus: row.instagram_story_status,
     facebookError: row.facebook_error,
     instagramError: row.instagram_error,
+    instagramStoryError: row.instagram_story_error,
     postedAt: row.posted_at,
     retryCount: row.retry_count,
     createdAt: row.created_at,

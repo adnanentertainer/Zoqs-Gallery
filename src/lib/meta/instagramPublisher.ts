@@ -138,6 +138,43 @@ export async function publishInstagramPost({
   return { mediaId: published.id };
 }
 
+interface PublishInstagramStoryInput {
+  igUserId: string;
+  accessToken: string;
+  imageUrl: string;
+}
+
+/**
+ * Same two-step container/publish flow as publishInstagramPost, with
+ * media_type=STORIES instead of a feed post. Deliberately takes no caption
+ * — Instagram's Content Publishing API does not support captions or text
+ * overlays on Story containers (that's an app-only feature), so a Story
+ * posted this way is the bare product photo with no price/text burned in.
+ */
+export async function publishInstagramStory({
+  igUserId,
+  accessToken,
+  imageUrl,
+}: PublishInstagramStoryInput): Promise<{ mediaId: string }> {
+  const container = await graphApiPost<MediaContainerResponse>(
+    `${igUserId}/media`,
+    accessToken,
+    { image_url: imageUrl, media_type: "STORIES" },
+  );
+  const creationId = container.id;
+
+  await pollMediaContainerUntilReady(
+    creationId,
+    accessToken,
+    STATUS_POLL_ATTEMPTS,
+    STATUS_POLL_DELAY_MS,
+  );
+
+  const published = await publishMediaContainer(igUserId, accessToken, creationId);
+
+  return { mediaId: published.id };
+}
+
 interface PublishInstagramReelInput {
   igUserId: string;
   accessToken: string;

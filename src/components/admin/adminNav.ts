@@ -16,6 +16,7 @@ import {
   Ticket,
   Megaphone,
   Gift,
+  MessageCircle,
   type LucideIcon,
 } from "lucide-react";
 import { SOCIAL_ENGAGEMENT_CAMPAIGNS_ENABLED } from "@/lib/features";
@@ -43,6 +44,11 @@ export const adminNavItems: AdminNavItem[] = [
   { label: "Reviews", href: "/admin/reviews", icon: Star },
   { label: "Follow Our Style", href: "/admin/social-posts", icon: Images },
   { label: "Social Auto-Post", href: "/admin/social-media", icon: Share2 },
+  {
+    label: "WhatsApp Status",
+    href: "/admin/whatsapp-status",
+    icon: MessageCircle,
+  },
   { label: "Reels", href: "/admin/reels", icon: Clapperboard },
   { label: "Customers", href: "/admin/customers", icon: Users },
   { label: "Settings", href: "/admin/settings", icon: Settings },

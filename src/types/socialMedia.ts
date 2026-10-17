@@ -36,12 +36,32 @@ export interface ProductSocialPostRecord {
   productSlug: string | null;
   facebookPostId: string | null;
   instagramMediaId: string | null;
+  instagramStoryMediaId: string | null;
   facebookStatus: SocialPlatformStatus;
   instagramStatus: SocialPlatformStatus;
+  instagramStoryStatus: SocialPlatformStatus;
   facebookError: string | null;
   instagramError: string | null;
+  instagramStoryError: string | null;
   postedAt: string | null;
   retryCount: number;
+  createdAt: string;
+}
+
+export type WhatsAppStatusReason = "new_product" | "price_change";
+
+/** One pending item in the WhatsApp Status helper queue — see
+ * /admin/whatsapp-status. Never posted automatically (no official API for
+ * WhatsApp Status exists); this only prepares the caption/image for the
+ * admin to post manually, then tracks that it was done. */
+export interface WhatsAppStatusQueueItem {
+  id: string;
+  productId: string;
+  productName: string;
+  productSlug: string;
+  imageUrl: string | null;
+  reason: WhatsAppStatusReason;
+  caption: string;
   createdAt: string;
 }
 
