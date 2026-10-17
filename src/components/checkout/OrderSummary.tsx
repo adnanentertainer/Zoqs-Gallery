@@ -13,9 +13,9 @@ import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
 interface OrderSummaryProps {
   items: CheckoutItemData[];
   subtotal: number;
-  /** Already reflects the Blessed Friday override, if enabled — see
-   * CheckoutForm, which raises freeShippingThreshold past reach so the
-   * evergreen perk is suspended while the offer is live. */
+  /** Already reflects the Blessed Friday / promo-code override, if either
+   * applies — see CheckoutForm, which raises freeShippingThreshold past
+   * reach so the evergreen perk is suspended whenever a discount is live. */
   shippingSettings: ShippingSettings;
   /** The larger of the entered promo code's discount and the automatic
    * Blessed Friday discount — never both added together. */
@@ -68,6 +68,10 @@ export function OrderSummary({
             Blessed Friday offer.
           </p>
         )
+      ) : promoCode ? (
+        <p className="font-body text-xs text-muted">
+          Free shipping isn&apos;t available together with a promo code.
+        </p>
       ) : qualifiesForFreeShipping ? (
         <p className="font-body text-xs font-medium text-success">
           Free shipping unlocked.
