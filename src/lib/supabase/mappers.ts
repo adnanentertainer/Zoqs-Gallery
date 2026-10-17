@@ -239,6 +239,7 @@ export function mapProductRow(
     dimensions: row.dimensions ?? undefined,
     careInstructions: row.care_instructions ?? undefined,
     variants: variantGroups.length > 0 ? variantGroups : undefined,
+    createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
 }

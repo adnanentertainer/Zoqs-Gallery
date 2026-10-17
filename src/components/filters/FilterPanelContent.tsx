@@ -13,7 +13,11 @@ import {
   RATING_OPTIONS,
   SPECIAL_FILTER_OPTIONS,
 } from "@/constants/filters";
-import { createEmptyFilterValues, hasActiveFilters } from "@/lib/products";
+import {
+  activeFilterCount,
+  createEmptyFilterValues,
+  hasActiveFilters,
+} from "@/lib/products";
 import type { FilterValues } from "@/types";
 
 const colorOptions = COLOR_OPTIONS.map((value) => ({ value, label: value }));
@@ -50,13 +54,19 @@ export function FilterPanelContent({
   idPrefix,
 }: FilterPanelContentProps) {
   const showClearAll = hasActiveFilters(values);
+  const count = activeFilterCount(values);
 
   return (
     <div className="flex flex-col">
       {showHeader && (
         <div className="mb-2 flex items-center justify-between">
-          <span className="font-heading text-lg font-semibold text-primary">
+          <span className="flex items-center gap-2 font-heading text-lg font-semibold text-primary">
             Filters
+            {count > 0 && (
+              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1 font-body text-xs font-semibold text-white">
+                {count}
+              </span>
+            )}
           </span>
           {showClearAll && (
             <Button

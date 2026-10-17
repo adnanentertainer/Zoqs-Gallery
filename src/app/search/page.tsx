@@ -59,7 +59,8 @@ export default async function SearchPage({
           products={results}
           emptyTitle="No jewellery found"
           emptyDescription={`We couldn't find anything for "${query}". Try a different search term.`}
-          clearFiltersHref="/shop"
+          emptyActionLabel="Browse All Jewellery"
+          emptyActionHref="/shop"
         />
       ) : (
         <EmptyState

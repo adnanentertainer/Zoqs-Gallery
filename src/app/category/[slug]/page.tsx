@@ -5,6 +5,7 @@ import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { Container } from "@/components/ui/Container";
 import { Heading, Text } from "@/components/ui/Typography";
 import {
+  ActiveFilterChips,
   FilterSidebar,
   MobileFilterButton,
   SortDropdown,
@@ -129,6 +130,8 @@ export default async function CategoryPage({
             </div>
             <SortDropdown />
           </div>
+
+          <ActiveFilterChips />
 
           <ProductResults
             key={urlSearchParams.toString()}

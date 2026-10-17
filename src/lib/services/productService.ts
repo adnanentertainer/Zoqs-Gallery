@@ -58,6 +58,11 @@ async function fetchActiveProductRowsUncached(
   if (filters.isNew) query = query.eq("is_new", true);
   if (filters.isBestSeller) query = query.eq("is_best_seller", true);
 
+  // Without an explicit order, Postgres row order is unspecified — this
+  // keeps the default listing (and every sort's internal tie-breaks)
+  // deterministic across requests instead of shuffling on every cache miss.
+  query = query.order("created_at", { ascending: false });
+
   const { data, error } = await query;
   if (error) throw error;
   return (data ?? []) as unknown as ProductRowWithCategory[];

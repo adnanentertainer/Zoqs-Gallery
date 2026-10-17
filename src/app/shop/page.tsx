@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/shared/PageHeader";
 import {
+  ActiveFilterChips,
   FilterSidebar,
   MobileFilterButton,
   SortDropdown,
@@ -73,6 +74,8 @@ export default async function ShopPage({ searchParams }: PageProps<"/shop">) {
             </div>
             <SortDropdown />
           </div>
+
+          <ActiveFilterChips />
 
           <ProductResults
             key={urlSearchParams.toString()}

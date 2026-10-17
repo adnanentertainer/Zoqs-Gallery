@@ -8,6 +8,7 @@ import { FilterPanelContent } from "@/components/filters/FilterPanelContent";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import {
+  activeFilterCount,
   buildFilterSearchParams,
   createEmptyFilterValues,
   hasActiveFilters,
@@ -30,6 +31,7 @@ export function MobileFilterButton({
   const [draft, setDraft] = useState<FilterValues>(() =>
     parseFilterValues(searchParams),
   );
+  const appliedCount = activeFilterCount(parseFilterValues(searchParams));
 
   useEscapeKey(isOpen, () => setIsOpen(false));
   useBodyScrollLock(isOpen);
@@ -58,6 +60,11 @@ export function MobileFilterButton({
       >
         <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
         Filter
+        {appliedCount > 0 && (
+          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1 font-body text-xs font-semibold text-white">
+            {appliedCount}
+          </span>
+        )}
       </Button>
 
       <div

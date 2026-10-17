@@ -14,7 +14,10 @@ import { Search, X } from "lucide-react";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { searchProducts } from "@/lib/products";
-import { recentSearchesStore, recordSearchTerm } from "@/lib/recentSearchesStore";
+import {
+  recentSearchesStore,
+  recordSearchTerm,
+} from "@/lib/recentSearchesStore";
 import { categoryLabel, cn, formatPrice } from "@/lib/utils";
 import type { Product } from "@/types";
 
@@ -53,6 +56,7 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const isMounted = useIsClient();
   const inputRef = useRef<HTMLInputElement>(null);
   const hasFetchedProducts = useRef(false);
@@ -65,6 +69,7 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
   function closeOverlay() {
     setIsOpen(false);
     setQuery("");
+    setActiveIndex(-1);
   }
 
   useEscapeKey(isOpen, closeOverlay);
@@ -99,6 +104,33 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
     router.push(`/search?q=${encodeURIComponent(trimmed)}`);
     closeOverlay();
   }
+
+  function goToProduct(product: Product) {
+    router.push(`/product/${product.slug}`);
+    closeOverlay();
+  }
+
+  // Flat, keyboard-navigable list matching render order below exactly, so
+  // ArrowUp/ArrowDown + Enter can drive whichever list is currently showing
+  // (quick-match suggestions, or popular/recent terms when the box is empty).
+  const navItems = useMemo(() => {
+    if (query.trim()) {
+      if (suggestions.length === 0) return [];
+      return [
+        ...suggestions.map((product) => ({
+          onSelect: () => goToProduct(product),
+        })),
+        { onSelect: () => runSearch(query) },
+      ];
+    }
+    return [
+      ...POPULAR_SEARCHES.map((term) => ({ onSelect: () => runSearch(term) })),
+      ...recentSearches.map((term) => ({ onSelect: () => runSearch(term) })),
+    ];
+    // goToProduct/runSearch close over router, which is referentially stable
+    // across renders — only the data they operate on needs to be tracked.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, suggestions, recentSearches]);
 
   return (
     <>
@@ -148,12 +180,36 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
                       ref={inputRef}
                       type="search"
                       value={query}
-                      onChange={(event) => setQuery(event.target.value)}
+                      onChange={(event) => {
+                        setQuery(event.target.value);
+                        setActiveIndex(-1);
+                      }}
                       onKeyDown={(event) => {
-                        if (event.key === "Enter") runSearch(query);
+                        if (event.key === "ArrowDown") {
+                          if (navItems.length === 0) return;
+                          event.preventDefault();
+                          setActiveIndex((i) => (i + 1) % navItems.length);
+                        } else if (event.key === "ArrowUp") {
+                          if (navItems.length === 0) return;
+                          event.preventDefault();
+                          setActiveIndex((i) =>
+                            i <= 0 ? navItems.length - 1 : i - 1,
+                          );
+                        } else if (event.key === "Enter") {
+                          event.preventDefault();
+                          if (activeIndex >= 0 && navItems[activeIndex]) {
+                            navItems[activeIndex].onSelect();
+                          } else {
+                            runSearch(query);
+                          }
+                        }
                       }}
                       placeholder="Search for jewellery, categories, materials..."
                       aria-label="Search products"
+                      role="combobox"
+                      aria-expanded={isOpen}
+                      aria-autocomplete="list"
+                      aria-controls="search-trigger-results"
                       tabIndex={isOpen ? 0 : -1}
                       className="h-12 w-full rounded-2xl border border-beige bg-white pl-11 pr-10 font-body text-sm text-primary placeholder:text-muted focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
                     />
@@ -162,6 +218,7 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
                         type="button"
                         onClick={() => {
                           setQuery("");
+                          setActiveIndex(-1);
                           inputRef.current?.focus();
                         }}
                         aria-label="Clear search"
@@ -183,90 +240,115 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
                   </button>
                 </div>
 
-                {query.trim() ? (
-                  suggestions.length > 0 ? (
-                    <div className="flex flex-col gap-1">
-                      <span className="font-body text-xs uppercase tracking-wide text-muted">
-                        Suggestions
-                      </span>
-                      {suggestions.map((product) => (
-                        <Link
-                          key={product.id}
-                          href={`/product/${product.slug}`}
-                          onClick={closeOverlay}
-                          tabIndex={isOpen ? 0 : -1}
-                          className="flex items-center justify-between gap-3 rounded-sm px-2 py-2.5 transition-colors hover:bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-                        >
-                          <span className="flex flex-col">
-                            <span className="font-body text-sm text-primary">
-                              {product.name}
-                            </span>
-                            <span className="font-body text-xs text-muted">
-                              {categoryLabel(product.categorySlug)}
-                            </span>
-                          </span>
-                          <span className="font-body text-sm font-medium text-primary">
-                            {formatPrice(product.price)}
-                          </span>
-                        </Link>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => runSearch(query)}
-                        tabIndex={isOpen ? 0 : -1}
-                        className="mt-2 rounded-sm px-2 py-2 text-left font-body text-sm font-medium text-gold transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-                      >
-                        See all results for &ldquo;{query}&rdquo;
-                      </button>
-                    </div>
-                  ) : (
-                    <p className="font-body text-sm text-muted">
-                      No quick matches — press Enter to search all products for
-                      &ldquo;{query}&rdquo;.
-                    </p>
-                  )
-                ) : (
-                  <div className="flex flex-col gap-6">
-                    <div className="flex flex-col gap-2">
-                      <span className="font-body text-xs uppercase tracking-wide text-muted">
-                        Popular Searches
-                      </span>
-                      <div className="flex flex-wrap gap-2">
-                        {POPULAR_SEARCHES.map((term) => (
-                          <button
-                            key={term}
-                            type="button"
-                            onClick={() => runSearch(term)}
+                <div id="search-trigger-results">
+                  {query.trim() ? (
+                    suggestions.length > 0 ? (
+                      <div className="flex flex-col gap-1">
+                        <span className="font-body text-xs uppercase tracking-wide text-muted">
+                          Suggestions
+                        </span>
+                        {suggestions.map((product, index) => (
+                          <Link
+                            key={product.id}
+                            href={`/product/${product.slug}`}
+                            onClick={closeOverlay}
+                            onMouseEnter={() => setActiveIndex(index)}
                             tabIndex={isOpen ? 0 : -1}
-                            className="rounded-full border border-beige px-3 py-1.5 font-body text-sm text-primary transition-colors hover:border-gold hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                            className={cn(
+                              "flex items-center justify-between gap-3 rounded-sm px-2 py-2.5 transition-colors hover:bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
+                              activeIndex === index && "bg-beige",
+                            )}
                           >
-                            {term}
-                          </button>
+                            <span className="flex flex-col">
+                              <span className="font-body text-sm text-primary">
+                                {product.name}
+                              </span>
+                              <span className="font-body text-xs text-muted">
+                                {categoryLabel(product.categorySlug)}
+                              </span>
+                            </span>
+                            <span className="font-body text-sm font-medium text-primary">
+                              {formatPrice(product.price)}
+                            </span>
+                          </Link>
                         ))}
+                        <button
+                          type="button"
+                          onClick={() => runSearch(query)}
+                          onMouseEnter={() =>
+                            setActiveIndex(suggestions.length)
+                          }
+                          tabIndex={isOpen ? 0 : -1}
+                          className={cn(
+                            "mt-2 rounded-sm px-2 py-2 text-left font-body text-sm font-medium text-gold transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
+                            activeIndex === suggestions.length && "underline",
+                          )}
+                        >
+                          See all results for &ldquo;{query}&rdquo;
+                        </button>
                       </div>
-                    </div>
-                    {recentSearches.length > 0 && (
+                    ) : (
+                      <p className="font-body text-sm text-muted">
+                        No quick matches — press Enter to search all products
+                        for &ldquo;{query}&rdquo;.
+                      </p>
+                    )
+                  ) : (
+                    <div className="flex flex-col gap-6">
                       <div className="flex flex-col gap-2">
                         <span className="font-body text-xs uppercase tracking-wide text-muted">
-                          Recent Searches
+                          Popular Searches
                         </span>
                         <div className="flex flex-wrap gap-2">
-                          {recentSearches.map((term) => (
+                          {POPULAR_SEARCHES.map((term, index) => (
                             <button
                               key={term}
                               type="button"
                               onClick={() => runSearch(term)}
+                              onMouseEnter={() => setActiveIndex(index)}
                               tabIndex={isOpen ? 0 : -1}
-                              className="rounded-full bg-beige px-3 py-1.5 font-body text-sm text-primary transition-colors hover:bg-gold hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                              className={cn(
+                                "rounded-full border border-beige px-3 py-1.5 font-body text-sm text-primary transition-colors hover:border-gold hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
+                                activeIndex === index &&
+                                  "border-gold text-gold",
+                              )}
                             >
                               {term}
                             </button>
                           ))}
                         </div>
                       </div>
-                    )}
-                  </div>
-                )}
+                      {recentSearches.length > 0 && (
+                        <div className="flex flex-col gap-2">
+                          <span className="font-body text-xs uppercase tracking-wide text-muted">
+                            Recent Searches
+                          </span>
+                          <div className="flex flex-wrap gap-2">
+                            {recentSearches.map((term, index) => {
+                              const flatIndex = POPULAR_SEARCHES.length + index;
+                              return (
+                                <button
+                                  key={term}
+                                  type="button"
+                                  onClick={() => runSearch(term)}
+                                  onMouseEnter={() => setActiveIndex(flatIndex)}
+                                  tabIndex={isOpen ? 0 : -1}
+                                  className={cn(
+                                    "rounded-full bg-beige px-3 py-1.5 font-body text-sm text-primary transition-colors hover:bg-gold hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
+                                    activeIndex === flatIndex &&
+                                      "bg-gold text-white",
+                                  )}
+                                >
+                                  {term}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>,

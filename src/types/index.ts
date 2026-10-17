@@ -63,6 +63,7 @@ export interface Product {
   dimensions?: string;
   careInstructions?: string[];
   variants?: ProductVariantGroup[];
+  createdAt?: string;
   updatedAt?: string;
 }
 

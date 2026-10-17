@@ -52,16 +52,22 @@ export function createEmptyFilterValues(): FilterValues {
 }
 
 export function hasActiveFilters(filters: FilterValues): boolean {
+  return activeFilterCount(filters) > 0;
+}
+
+// Counts each selected filter value individually (e.g. two categories ticked
+// counts as 2), with price treated as a single filter since min/max are one
+// user choice — used for the filter-count badge on the mobile filter button.
+export function activeFilterCount(filters: FilterValues): number {
   return (
-    filters.category.length > 0 ||
-    filters.color.length > 0 ||
-    filters.material.length > 0 ||
-    filters.occasion.length > 0 ||
-    filters.special.length > 0 ||
-    filters.rating !== undefined ||
-    filters.availability !== undefined ||
-    filters.minPrice !== undefined ||
-    filters.maxPrice !== undefined
+    filters.category.length +
+    filters.color.length +
+    filters.material.length +
+    filters.occasion.length +
+    filters.special.length +
+    (filters.rating !== undefined ? 1 : 0) +
+    (filters.availability !== undefined ? 1 : 0) +
+    (filters.minPrice !== undefined || filters.maxPrice !== undefined ? 1 : 0)
   );
 }
 
@@ -130,7 +136,14 @@ export function sortProducts(products: Product[], sortKey: SortKey): Product[] {
 
   switch (sortKey) {
     case "newest":
-      return sorted.sort((a, b) => Number(b.isNew) - Number(a.isNew));
+      return sorted.sort((a, b) => {
+        if (a.createdAt && b.createdAt) {
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        }
+        return Number(b.isNew) - Number(a.isNew);
+      });
     case "best-selling":
       return sorted.sort((a, b) => {
         if (a.isBestSeller !== b.isBestSeller)
