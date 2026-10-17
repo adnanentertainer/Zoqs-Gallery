@@ -319,7 +319,7 @@ export default async function ProductPage({
 
             <ProductActions product={product} />
 
-            <DeliveryInfo />
+            <DeliveryInfo blessedFridayOffer={blessedFridayOffer} />
           </div>
         </Container>
       </ProductVariantImageProvider>
