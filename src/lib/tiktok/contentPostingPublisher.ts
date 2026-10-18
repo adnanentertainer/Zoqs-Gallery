@@ -1,3 +1,5 @@
+import { isTikTokAppAudited } from "@/lib/tiktok/config";
+
 const API_BASE = "https://open.tiktokapis.com/v2";
 
 export class TikTokApiError extends Error {
@@ -40,17 +42,23 @@ interface CreatorInfo {
 
 /**
  * TikTok requires querying the creator's allowed privacy levels before
- * every Direct Post -- an unaudited app's creator_info always comes back
- * restricted to SELF_ONLY regardless of what's requested below, so this
- * also doubles as the mechanism that keeps posting working the same way
- * before and after the app passes review (no separate sandbox/production
- * branch needed here).
+ * every Direct Post. Critically, an unaudited app's creator_info can still
+ * list PUBLIC_TO_EVERYONE as an option (that's what the connected
+ * account's own settings would otherwise allow) -- but the Content Posting
+ * API rejects an unaudited client's request for anything other than
+ * SELF_ONLY with unaudited_client_can_only_post_to_private_accounts
+ * regardless, so this can't just pick the most-open option from the list
+ * the way it looks like it should. isTikTokAppAudited() is the one place
+ * that needs to flip once TikTok actually approves the Production app.
  */
 async function pickPrivacyLevel(accessToken: string): Promise<string> {
   const info = await tiktokFetch<CreatorInfo>(
     "/post/publish/creator_info/query/",
     accessToken,
   );
+  if (!isTikTokAppAudited()) {
+    return "SELF_ONLY";
+  }
   if (info.privacy_level_options.includes("PUBLIC_TO_EVERYONE")) {
     return "PUBLIC_TO_EVERYONE";
   }

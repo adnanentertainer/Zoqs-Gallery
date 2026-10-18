@@ -16,6 +16,20 @@ export interface TikTokAppCredentials {
   redirectUri: string;
 }
 
+/**
+ * TikTok's Content Sharing Guidelines restrict every unaudited app to
+ * SELF_ONLY-visibility posts, enforced server-side regardless of what the
+ * connected account's own privacy settings would otherwise allow (see
+ * contentPostingPublisher.ts's pickPrivacyLevel) -- requesting anything
+ * else (e.g. PUBLIC_TO_EVERYONE) fails with
+ * unaudited_client_can_only_post_to_private_accounts even if the account
+ * is private. Flip this to true only once TikTok has actually approved
+ * the Production app for review.
+ */
+export function isTikTokAppAudited(): boolean {
+  return process.env.TIKTOK_APP_AUDITED === "true";
+}
+
 export function getTikTokAppCredentials(): TikTokAppCredentials {
   const env = getTikTokEnv();
   const clientKey =
