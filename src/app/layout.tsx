@@ -11,6 +11,7 @@ import { ToastProvider } from "@/context/ToastContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { MetaPixelIdentifyUser } from "@/components/layout/MetaPixelIdentifyUser";
 import { PromoStatusProvider } from "@/context/PromoStatusContext";
 import { getShippingSettings } from "@/lib/checkout/getShippingSettings";
 import { hasActivePromoCode } from "@/lib/services/promoCodeService";
@@ -138,6 +139,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         />
         <ToastProvider>
           <AuthProvider>
+            <MetaPixelIdentifyUser />
             <WishlistProvider>
               <PromoStatusProvider hasActivePromoCode={promoActive}>
                 <CartProvider

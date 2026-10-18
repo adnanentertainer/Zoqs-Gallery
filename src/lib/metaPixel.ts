@@ -62,8 +62,15 @@ export function trackInitiateCheckout(params: {
 }
 
 // Meta's pixel hashes em/ph client-side before sending -- callers must pass
-// raw values here, never pre-hash them.
-function setAdvancedMatchingUserData(user: { email?: string; phone?: string }) {
+// raw values here, never pre-hash them. Exported so callers can identify a
+// visitor as soon as their email/phone is known (e.g. on login), not just at
+// Purchase -- this is what Meta's Events Manager calls "manual advanced
+// matching" and improves match quality on every event tracked afterwards,
+// not only the Purchase call below.
+export function setAdvancedMatchingUserData(user: {
+  email?: string;
+  phone?: string;
+}) {
   const userData: Record<string, string> = {};
   if (user.email) userData.em = user.email.trim().toLowerCase();
   // Phone is required at checkout (unlike email), so this covers every
