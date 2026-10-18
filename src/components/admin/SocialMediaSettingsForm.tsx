@@ -2,13 +2,14 @@
 
 import { useState, type FormEvent } from "react";
 import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonVariants } from "@/components/ui/Button";
 import { AuthMessage } from "@/components/auth";
 import {
   saveSocialMediaSettingsAction,
   testFacebookConnectionAction,
   testInstagramConnectionAction,
   syncProductFeedAction,
+  disconnectTikTokAction,
 } from "@/app/admin/social-media/actions";
 import type { SocialMediaSettings } from "@/types/socialMedia";
 
@@ -34,6 +35,7 @@ export function SocialMediaSettingsForm({
     { variant: "error" | "success"; text: string } | null
   >(null);
   const [feedSyncing, setFeedSyncing] = useState(false);
+  const [disconnectingTikTok, setDisconnectingTikTok] = useState(false);
 
   const feedUrl = `${
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
@@ -94,6 +96,21 @@ export function SocialMediaSettingsForm({
         ? { variant: "error", text: result.error }
         : { variant: "success", text: result.success ?? "Connected." },
     );
+  }
+
+  async function handleDisconnectTikTok() {
+    if (!confirm("Disconnect TikTok? Auto-posting to TikTok will stop until you reconnect.")) {
+      return;
+    }
+    setDisconnectingTikTok(true);
+    await disconnectTikTokAction();
+    setValues((prev) => ({
+      ...prev,
+      tiktokEnabled: false,
+      tiktokDisplayName: null,
+      tiktokConnectedAt: null,
+    }));
+    setDisconnectingTikTok(false);
   }
 
   async function handleSyncFeed() {
@@ -200,6 +217,48 @@ export function SocialMediaSettingsForm({
         {igTestMessage && (
           <AuthMessage variant={igTestMessage.variant} message={igTestMessage.text} />
         )}
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-beige pt-4">
+        <label className="flex items-center gap-2 font-body text-sm font-medium text-primary">
+          <input
+            type="checkbox"
+            checked={values.tiktokEnabled}
+            onChange={(event) => update("tiktokEnabled", event.target.checked)}
+            className="h-4 w-4 accent-gold"
+          />
+          Post to TikTok
+        </label>
+        <p className="font-body text-xs text-muted">
+          TikTok has no photo-post option, so each new product photo is
+          rendered into a short video automatically before posting.
+        </p>
+        {values.tiktokConnectedAt ? (
+          <p className="font-body text-sm text-primary">
+            Connected as{" "}
+            <span className="font-medium">
+              {values.tiktokDisplayName ?? "a TikTok account"}
+            </span>
+          </p>
+        ) : (
+          <p className="font-body text-sm text-muted">Not connected.</p>
+        )}
+        <div className="flex items-center gap-3">
+          <a href="/api/admin/tiktok/auth" className={buttonVariants("outline", "sm")}>
+            {values.tiktokConnectedAt ? "Reconnect TikTok" : "Connect TikTok"}
+          </a>
+          {values.tiktokConnectedAt && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              isLoading={disconnectingTikTok}
+              onClick={handleDisconnectTikTok}
+            >
+              Disconnect
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 border-t border-beige pt-4">

@@ -229,6 +229,13 @@ export interface Database {
           facebook_catalog_id: string | null;
           facebook_product_feed_id: string | null;
           product_tagging_enabled: boolean;
+          tiktok_enabled: boolean;
+          tiktok_open_id: string | null;
+          tiktok_display_name: string | null;
+          tiktok_access_token: string | null;
+          tiktok_refresh_token: string | null;
+          tiktok_token_expires_at: string | null;
+          tiktok_connected_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -245,6 +252,13 @@ export interface Database {
           facebook_catalog_id?: string | null;
           facebook_product_feed_id?: string | null;
           product_tagging_enabled?: boolean;
+          tiktok_enabled?: boolean;
+          tiktok_open_id?: string | null;
+          tiktok_display_name?: string | null;
+          tiktok_access_token?: string | null;
+          tiktok_refresh_token?: string | null;
+          tiktok_token_expires_at?: string | null;
+          tiktok_connected_at?: string | null;
         };
         Update: Partial<
           Database["public"]["Tables"]["social_media_settings"]["Insert"]
@@ -261,9 +275,12 @@ export interface Database {
           instagram_status: "pending" | "success" | "failed" | "skipped";
           instagram_story_media_id: string | null;
           instagram_story_status: "pending" | "success" | "failed" | "skipped";
+          tiktok_video_id: string | null;
+          tiktok_status: "pending" | "success" | "failed" | "skipped";
           facebook_error: string | null;
           instagram_error: string | null;
           instagram_story_error: string | null;
+          tiktok_error: string | null;
           posted_at: string | null;
           retry_count: number;
           created_at: string;
@@ -278,9 +295,12 @@ export interface Database {
           instagram_status?: "pending" | "success" | "failed" | "skipped";
           instagram_story_media_id?: string | null;
           instagram_story_status?: "pending" | "success" | "failed" | "skipped";
+          tiktok_video_id?: string | null;
+          tiktok_status?: "pending" | "success" | "failed" | "skipped";
           facebook_error?: string | null;
           instagram_error?: string | null;
           instagram_story_error?: string | null;
+          tiktok_error?: string | null;
           posted_at?: string | null;
           retry_count?: number;
         };

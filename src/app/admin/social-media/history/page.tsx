@@ -55,13 +55,14 @@ export default async function AdminSocialMediaHistoryPage({
           </Text>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1040px] text-left">
+            <table className="w-full min-w-[1220px] text-left">
               <thead>
                 <tr className="border-b border-beige font-body text-xs uppercase tracking-wide text-muted">
                   <th className="px-5 py-3 font-medium">Product</th>
                   <th className="px-5 py-3 font-medium">Facebook</th>
                   <th className="px-5 py-3 font-medium">Instagram</th>
                   <th className="px-5 py-3 font-medium">Instagram Story</th>
+                  <th className="px-5 py-3 font-medium">TikTok</th>
                   <th className="px-5 py-3 font-medium">Posted At</th>
                   <th className="px-5 py-3 font-medium">Retries</th>
                   <th className="px-5 py-3 font-medium">
@@ -102,6 +103,16 @@ export default async function AdminSocialMediaHistoryPage({
                       {post.instagramStoryError && (
                         <p className="mt-1 max-w-[220px] font-body text-xs text-error">
                           {post.instagramStoryError}
+                        </p>
+                      )}
+                    </td>
+                    <td className="px-5 py-3">
+                      <Badge variant={socialPostStatusVariant(post.tiktokStatus)}>
+                        {socialPostStatusLabel(post.tiktokStatus)}
+                      </Badge>
+                      {post.tiktokError && (
+                        <p className="mt-1 max-w-[220px] font-body text-xs text-error">
+                          {post.tiktokError}
                         </p>
                       )}
                     </td>

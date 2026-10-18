@@ -15,7 +15,12 @@ import {
 import {
   buildFacebookCaption,
   buildInstagramCaption,
+  buildTikTokCaption,
 } from "@/lib/meta/captionBuilder";
+import { getValidTikTokAccessToken } from "@/lib/tiktok/tokenStore";
+import { generateProductVideo } from "@/lib/tiktok/videoGenerator";
+import { publishTikTokVideoDirect } from "@/lib/tiktok/contentPostingPublisher";
+import type { TikTokTokenSet } from "@/lib/tiktok/oauth";
 import type {
   ProductSocialPostRecord,
   SocialMediaSettings,
@@ -139,6 +144,40 @@ async function runInstagramStory(
 }
 
 /**
+ * Unlike runFacebook/runInstagram, this takes the Supabase client directly
+ * (rather than a settings object) because it needs to read and, on expiry,
+ * refresh the stored TikTok OAuth token itself -- see
+ * src/lib/tiktok/tokenStore.ts. TikTok also has no photo-post scope, so the
+ * product photo is rendered into a short video here before upload (see
+ * src/lib/tiktok/videoGenerator.ts) rather than posted directly like the
+ * Facebook/Instagram image flows above.
+ */
+async function runTikTok(
+  supabase: SocialDbClient,
+  imageUrl: string,
+  caption: string,
+): Promise<PlatformResult> {
+  try {
+    const connection = await getValidTikTokAccessToken(supabase);
+    if (!connection) return { status: "skipped" };
+
+    const video = await generateProductVideo(imageUrl);
+    const { publishId } = await publishTikTokVideoDirect({
+      accessToken: connection.accessToken,
+      video,
+      title: caption,
+    });
+    return { status: "success", id: publishId };
+  } catch (error) {
+    console.error("[socialPostingService.runTikTok] failed:", error);
+    return {
+      status: "failed",
+      error: error instanceof Error ? error.message : "TikTok post failed.",
+    };
+  }
+}
+
+/**
  * Shared implementation behind publishProductToSocialMedia() below. Takes
  * the Supabase client as a parameter so it can run two ways: with a
  * session-bound admin client (the original createProduct / updateProduct /
@@ -162,7 +201,7 @@ async function publishProductToSocialMediaCore(
     if (
       !settings ||
       !settings.auto_post_enabled ||
-      (!settings.facebook_enabled && !settings.instagram_enabled)
+      (!settings.facebook_enabled && !settings.instagram_enabled && !settings.tiktok_enabled)
     ) {
       return;
     }
@@ -243,36 +282,41 @@ async function publishProductToSocialMediaCore(
         )) ?? undefined;
     }
 
-    const [facebookResult, instagramResult, instagramStoryResult] = await Promise.all([
-      settings.facebook_enabled
-        ? runFacebook(
-            settings,
-            image.image_url,
-            buildFacebookCaption(captionInput),
-            catalogProductId,
-          )
-        : Promise.resolve<PlatformResult>({ status: "skipped" }),
-      settings.instagram_enabled
-        ? runInstagram(
-            settings,
-            image.image_url,
-            buildInstagramCaption(captionInput),
-            catalogProductId,
-          )
-        : Promise.resolve<PlatformResult>({ status: "skipped" }),
-      // Rides on the same Instagram toggle as the feed post above -- Meta's
-      // Content Publishing API doesn't charge per call, so there's no cost
-      // reason to post one without the other, and a separate settings
-      // toggle would just be more admin UI for no real benefit.
-      settings.instagram_enabled
-        ? runInstagramStory(settings, image.image_url)
-        : Promise.resolve<PlatformResult>({ status: "skipped" }),
-    ]);
+    const [facebookResult, instagramResult, instagramStoryResult, tiktokResult] =
+      await Promise.all([
+        settings.facebook_enabled
+          ? runFacebook(
+              settings,
+              image.image_url,
+              buildFacebookCaption(captionInput),
+              catalogProductId,
+            )
+          : Promise.resolve<PlatformResult>({ status: "skipped" }),
+        settings.instagram_enabled
+          ? runInstagram(
+              settings,
+              image.image_url,
+              buildInstagramCaption(captionInput),
+              catalogProductId,
+            )
+          : Promise.resolve<PlatformResult>({ status: "skipped" }),
+        // Rides on the same Instagram toggle as the feed post above -- Meta's
+        // Content Publishing API doesn't charge per call, so there's no cost
+        // reason to post one without the other, and a separate settings
+        // toggle would just be more admin UI for no real benefit.
+        settings.instagram_enabled
+          ? runInstagramStory(settings, image.image_url)
+          : Promise.resolve<PlatformResult>({ status: "skipped" }),
+        settings.tiktok_enabled
+          ? runTikTok(supabase, image.image_url, buildTikTokCaption(captionInput))
+          : Promise.resolve<PlatformResult>({ status: "skipped" }),
+      ]);
 
     const anySuccess =
       facebookResult.status === "success" ||
       instagramResult.status === "success" ||
-      instagramStoryResult.status === "success";
+      instagramStoryResult.status === "success" ||
+      tiktokResult.status === "success";
 
     const { error: upsertError } = await supabase
       .from("product_social_posts")
@@ -288,6 +332,9 @@ async function publishProductToSocialMediaCore(
           instagram_story_status: instagramStoryResult.status,
           instagram_story_media_id: instagramStoryResult.id ?? null,
           instagram_story_error: instagramStoryResult.error ?? null,
+          tiktok_status: tiktokResult.status,
+          tiktok_video_id: tiktokResult.id ?? null,
+          tiktok_error: tiktokResult.error ?? null,
           posted_at: anySuccess ? new Date().toISOString() : null,
           retry_count: options.forceRepost ? existingRetryCount + 1 : 0,
         },
@@ -499,6 +546,9 @@ export async function getSocialMediaSettings(): Promise<SocialMediaSettings> {
     facebookCatalogId: data?.facebook_catalog_id ?? "",
     facebookProductFeedId: data?.facebook_product_feed_id ?? "",
     productTaggingEnabled: data?.product_tagging_enabled ?? false,
+    tiktokEnabled: data?.tiktok_enabled ?? false,
+    tiktokDisplayName: data?.tiktok_display_name ?? null,
+    tiktokConnectedAt: data?.tiktok_connected_at ?? null,
   };
 }
 
@@ -554,6 +604,7 @@ export async function saveSocialMediaSettings(
     facebook_catalog_id: input.facebookCatalogId.trim() || null,
     facebook_product_feed_id: input.facebookProductFeedId.trim() || null,
     product_tagging_enabled: input.productTaggingEnabled,
+    tiktok_enabled: input.tiktokEnabled,
   };
 
   const { error } = existing
@@ -568,6 +619,69 @@ export async function saveSocialMediaSettings(
     return { error: "Unable to save social media settings right now." };
   }
   return {};
+}
+
+/**
+ * Persists the token set from a completed TikTok Login Kit flow (see
+ * src/app/api/admin/tiktok/callback/route.ts), creating the singleton
+ * social_media_settings row if none exists yet -- the same existing-row
+ * select/update-or-insert shape saveSocialMediaSettings() above uses.
+ * Deliberately does NOT touch tiktok_enabled: connecting an account and
+ * turning auto-posting on are separate decisions, same as Facebook/
+ * Instagram requiring both an access token and its own enabled checkbox.
+ */
+export async function connectTikTokAccount(
+  tokens: TikTokTokenSet,
+  displayName: string | null,
+): Promise<void> {
+  const supabase = await getSupabaseServerClient();
+  const { data: existing } = await supabase
+    .from("social_media_settings")
+    .select("id")
+    .limit(1)
+    .maybeSingle();
+
+  const payload = {
+    tiktok_open_id: tokens.openId,
+    tiktok_display_name: displayName,
+    tiktok_access_token: tokens.accessToken,
+    tiktok_refresh_token: tokens.refreshToken,
+    tiktok_token_expires_at: tokens.expiresAt,
+    tiktok_connected_at: new Date().toISOString(),
+  };
+
+  const { error } = existing
+    ? await supabase.from("social_media_settings").update(payload).eq("id", existing.id)
+    : await supabase.from("social_media_settings").insert(payload);
+
+  if (error) {
+    console.error("[socialPostingService.connectTikTokAccount] failed:", error);
+    throw new Error("Unable to save the TikTok connection.");
+  }
+}
+
+export async function disconnectTikTokAccount(): Promise<void> {
+  await requireAdmin();
+  const supabase = await getSupabaseServerClient();
+  const { data: existing } = await supabase
+    .from("social_media_settings")
+    .select("id")
+    .limit(1)
+    .maybeSingle();
+  if (!existing) return;
+
+  await supabase
+    .from("social_media_settings")
+    .update({
+      tiktok_enabled: false,
+      tiktok_open_id: null,
+      tiktok_display_name: null,
+      tiktok_access_token: null,
+      tiktok_refresh_token: null,
+      tiktok_token_expires_at: null,
+      tiktok_connected_at: null,
+    })
+    .eq("id", existing.id);
 }
 
 export async function syncProductFeed(): Promise<{ error?: string }> {
@@ -596,12 +710,15 @@ interface ProductSocialPostRow {
   facebook_post_id: string | null;
   instagram_media_id: string | null;
   instagram_story_media_id: string | null;
+  tiktok_video_id: string | null;
   facebook_status: SocialPlatformStatus;
   instagram_status: SocialPlatformStatus;
   instagram_story_status: SocialPlatformStatus;
+  tiktok_status: SocialPlatformStatus;
   facebook_error: string | null;
   instagram_error: string | null;
   instagram_story_error: string | null;
+  tiktok_error: string | null;
   posted_at: string | null;
   retry_count: number;
   created_at: string;
@@ -619,12 +736,15 @@ function mapProductSocialPostRow(
     facebookPostId: row.facebook_post_id,
     instagramMediaId: row.instagram_media_id,
     instagramStoryMediaId: row.instagram_story_media_id,
+    tiktokVideoId: row.tiktok_video_id,
     facebookStatus: row.facebook_status,
     instagramStatus: row.instagram_status,
     instagramStoryStatus: row.instagram_story_status,
+    tiktokStatus: row.tiktok_status,
     facebookError: row.facebook_error,
     instagramError: row.instagram_error,
     instagramStoryError: row.instagram_story_error,
+    tiktokError: row.tiktok_error,
     postedAt: row.posted_at,
     retryCount: row.retry_count,
     createdAt: row.created_at,

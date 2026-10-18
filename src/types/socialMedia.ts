@@ -14,6 +14,10 @@ export interface SocialMediaSettings {
   facebookCatalogId: string;
   facebookProductFeedId: string;
   productTaggingEnabled: boolean;
+  tiktokEnabled: boolean;
+  /** Set once an OAuth connect has completed; the account the app will post as. */
+  tiktokDisplayName: string | null;
+  tiktokConnectedAt: string | null;
 }
 
 export interface SocialMediaSettingsInput {
@@ -27,6 +31,10 @@ export interface SocialMediaSettingsInput {
   facebookCatalogId: string;
   facebookProductFeedId: string;
   productTaggingEnabled: boolean;
+  /** TikTok has no field here -- it's connected via OAuth ("Connect
+   * TikTok"), not pasted credentials, so only the on/off toggle is editable
+   * through the settings form. */
+  tiktokEnabled: boolean;
 }
 
 export interface ProductSocialPostRecord {
@@ -37,12 +45,15 @@ export interface ProductSocialPostRecord {
   facebookPostId: string | null;
   instagramMediaId: string | null;
   instagramStoryMediaId: string | null;
+  tiktokVideoId: string | null;
   facebookStatus: SocialPlatformStatus;
   instagramStatus: SocialPlatformStatus;
   instagramStoryStatus: SocialPlatformStatus;
+  tiktokStatus: SocialPlatformStatus;
   facebookError: string | null;
   instagramError: string | null;
   instagramStoryError: string | null;
+  tiktokError: string | null;
   postedAt: string | null;
   retryCount: number;
   createdAt: string;

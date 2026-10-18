@@ -7,6 +7,28 @@ const nextConfig: NextConfig = {
   // into .next/standalone/ when this is set. Vercel ignores this option and
   // is unaffected by it.
   output: "standalone",
+  // @ffmpeg-installer/ffmpeg resolves its platform binary with a runtime
+  // require() whose path depends on which of 3 candidate locations exists
+  // on disk -- webpack's Server Components bundling tries to statically
+  // resolve all 3 require() branches at build time and fails on the ones
+  // that don't exist, even though they're guarded by a runtime fs check.
+  // Opting the package out of bundling (plain Node `require` instead) is
+  // Next's documented fix for exactly this shape of native/platform
+  // dependency; see src/lib/tiktok/videoGenerator.ts.
+  serverExternalPackages: ["@ffmpeg-installer/ffmpeg"],
+  // The TikTok auto-poster renders each product photo into a short video
+  // with the @ffmpeg-installer/ffmpeg binary (src/lib/tiktok/videoGenerator.ts),
+  // invoked from Server Actions (product create/update) and from the
+  // /api/cron/social-repost route -- not one single route file. Next's file
+  // tracing only follows require()/import() calls, not the dynamic fs path
+  // that package resolves its binary from, so without this the binary is
+  // silently dropped from whichever server bundle ends up calling it and
+  // the deployed function 404s on ffmpeg at runtime. '/*' (same pattern
+  // Next's own docs use for sharp/aws-crt) keeps this correct regardless of
+  // which bundle ends up invoking it, rather than chasing every call site.
+  outputFileTracingIncludes: {
+    "/*": ["./node_modules/@ffmpeg-installer/**/*"],
+  },
   images: {
     // Cloudinary and Supabase Storage already serve pre-sized/pre-optimized
     // images, so routing them through Vercel's Image Optimization too is

@@ -23,7 +23,21 @@ const BASE_INSTAGRAM_HASHTAGS = [
   "#JewelryLovers",
   "#OOTD",
 ];
+const BASE_TIKTOK_HASHTAGS = [
+  "#Jewelry",
+  "#JewelryTikTok",
+  "#FashionJewelry",
+  "#ZoqsGallery",
+  "#TikTokMadeMeBuyIt",
+];
 const MAX_HASHTAGS = 6;
+
+// TikTok's Content Posting API technically accepts a much longer title, but
+// TikTok's own UI truncates captions after roughly this many characters --
+// keeping the generated video's caption short means nothing meaningful gets
+// cut off, unlike the much longer Facebook/Instagram captions above which
+// are expected to be expanded with "...more".
+const TIKTOK_CAPTION_LIMIT = 150;
 
 // Instagram caps captions at 2200 characters -- truncate the description
 // (not the whole caption) with headroom to spare, rather than let a long
@@ -134,6 +148,24 @@ export function buildInstagramCaption(input: SocialPostProductInput): string {
   while (caption.length > INSTAGRAM_CAPTION_LIMIT && description.length > 0) {
     description = `${description.slice(0, -1).trimEnd()}…`;
     caption = assemble(description);
+  }
+
+  return caption;
+}
+
+// No product link -- TikTok captions don't render URLs as tappable text
+// (unlike Facebook/Instagram), so including one here would just be dead
+// text eating into the tight TIKTOK_CAPTION_LIMIT for no benefit.
+export function buildTikTokCaption(input: SocialPostProductInput): string {
+  const hashtags = buildHashtags(BASE_TIKTOK_HASHTAGS, input.categoryName);
+  let caption = `✨ New Arrival: ${input.name} — ${formatPrice(input.price)} ${hashtags}`;
+
+  if (caption.length > TIKTOK_CAPTION_LIMIT) {
+    const withoutHashtags = `✨ New Arrival: ${input.name} — ${formatPrice(input.price)}`;
+    caption =
+      withoutHashtags.length > TIKTOK_CAPTION_LIMIT
+        ? `${withoutHashtags.slice(0, TIKTOK_CAPTION_LIMIT - 1).trimEnd()}…`
+        : withoutHashtags;
   }
 
   return caption;

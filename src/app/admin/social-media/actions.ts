@@ -9,12 +9,14 @@ import {
   retryProductSocialPost,
   getFacebookAccessTokenForServerUse,
   syncProductFeed,
+  disconnectTikTokAccount,
 } from "@/lib/services/admin/socialPostingService";
 import type { SocialMediaSettingsInput } from "@/types/socialMedia";
 
 function validateSettingsInput(
   input: SocialMediaSettingsInput,
   hasExistingToken: boolean,
+  tiktokConnected: boolean,
 ): string | undefined {
   const hasToken = !!input.facebookAccessToken.trim() || hasExistingToken;
   if (input.facebookEnabled && (!input.facebookPageId.trim() || !hasToken)) {
@@ -25,6 +27,9 @@ function validateSettingsInput(
     (!input.instagramBusinessAccountId.trim() || !hasToken)
   ) {
     return "Instagram posting needs a Business Account ID and an access token.";
+  }
+  if (input.tiktokEnabled && !tiktokConnected) {
+    return "Connect a TikTok account before enabling TikTok posting.";
   }
   return undefined;
 }
@@ -37,6 +42,7 @@ export async function saveSocialMediaSettingsAction(
   const validationError = validateSettingsInput(
     input,
     current.hasFacebookAccessToken,
+    !!current.tiktokConnectedAt,
   );
   if (validationError) return { error: validationError };
 
@@ -109,6 +115,12 @@ export async function syncProductFeedAction(): Promise<{
   const result = await syncProductFeed();
   if (result.error) return result;
   return { success: "Feed sync requested." };
+}
+
+export async function disconnectTikTokAction(): Promise<void> {
+  await requireAdmin();
+  await disconnectTikTokAccount();
+  revalidatePath("/admin/social-media");
 }
 
 export async function retrySocialPostAction(
