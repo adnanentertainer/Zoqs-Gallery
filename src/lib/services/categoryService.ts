@@ -17,7 +17,12 @@ const getCategoriesUncached = unstable_cache(
       .order("display_order", { ascending: true });
 
     if (error) throw error;
-    return (data ?? []).map(mapCategoryRow);
+    // A category with no active products yet would otherwise show up as a
+    // clickable dead end (homepage card / filter chip leading to an empty
+    // listing) — exclude it until it actually has stock.
+    return (data ?? [])
+      .map(mapCategoryRow)
+      .filter((category) => category.productCount > 0);
   },
   ["categories:active"],
   { tags: [CACHE_TAGS.categories], revalidate: 3600 },
@@ -25,7 +30,7 @@ const getCategoriesUncached = unstable_cache(
 
 export async function getCategories(): Promise<Category[]> {
   if (!isSupabaseConfigured()) {
-    return mockCategories;
+    return mockCategories.filter((category) => category.productCount > 0);
   }
 
   try {
