@@ -7,7 +7,7 @@ export const siteConfig = {
   country: "Pakistan",
   freeShippingThreshold: 3000,
   flatShippingCost: 250,
-  announcement: "Free Delivery on Orders Above Rs. 3,000",
+  announcement: "Free Delivery on Order Rs. 3,000 and above",
   // Displayed on the checkout Easypaisa/JazzCash payment options and the
   // Contact Us page.
   mobileWalletNumber: "0331 6668233",
