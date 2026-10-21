@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { Heading, Text } from "@/components/ui/Typography";
 import { buttonVariants } from "@/components/ui/Button";
 import { galleryImages } from "@/constants/images";
+import { SparkleOverlay } from "@/components/shared/SparkleOverlay";
 import { cn } from "@/lib/utils";
 
 interface WeddingBannerProps {
@@ -53,9 +54,12 @@ export function WeddingBanner({ imageUrl, imageAlt }: WeddingBannerProps) {
             <span className="h-px w-8 bg-gold" aria-hidden="true" />
             Wedding Season
           </span>
-          <Heading variant="h1" as="h2" className="max-w-md">
-            The Wedding Edit
-          </Heading>
+          <div className="relative inline-block">
+            <Heading variant="h1" as="h2" className="max-w-md">
+              The Wedding Edit
+            </Heading>
+            <SparkleOverlay size="lg" />
+          </div>
           <Text variant="bodyLg" className="max-w-md text-muted">
             Beautiful jewellery for your most memorable celebrations.
           </Text>

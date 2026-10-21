@@ -3,8 +3,9 @@
 import { useEffect, useRef, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sparkles, X } from "lucide-react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SparkleOverlay } from "@/components/shared/SparkleOverlay";
 import { mobileNavLinks } from "@/constants/navigation";
 import { siteConfig } from "@/constants/site";
 import { LogoutButton } from "@/components/auth";
@@ -117,15 +118,16 @@ export function MobileNav({
                 href={link.href}
                 onClick={(event) => handleNavLinkClick(event, link.href)}
                 tabIndex={isOpen ? 0 : -1}
-                className={cn(
-                  navLinkStyles,
-                  isWeddingLink && "flex items-center gap-2 font-medium text-gold",
-                )}
+                className={cn(navLinkStyles, isWeddingLink && "font-medium text-gold")}
               >
-                {isWeddingLink && (
-                  <Sparkles className="h-4 w-4 shrink-0" aria-hidden="true" />
+                {isWeddingLink ? (
+                  <span className="relative inline-block">
+                    {link.label}
+                    <SparkleOverlay size="sm" />
+                  </span>
+                ) : (
+                  link.label
                 )}
-                {link.label}
               </Link>
             );
           })}

@@ -49,3 +49,30 @@ body {
   outline: 2px solid var(--color-gold);
   outline-offset: 2px;
 }
+
+/* Twinkling sparkle accents over the "Wedding Collection" nav label and the
+   homepage banner heading — see SparkleOverlay. Slow and low-amplitude by
+   design (not a flashing/blinking effect) to stay a tasteful highlight
+   rather than a distraction. */
+@keyframes sparkle-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(12deg);
+  }
+}
+
+.animate-sparkle-twinkle {
+  animation: sparkle-twinkle 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-sparkle-twinkle {
+    animation: none;
+    opacity: 0.85;
+  }
+}

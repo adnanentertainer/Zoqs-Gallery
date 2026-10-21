@@ -3,9 +3,10 @@
 import { useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Headset, Heart, Menu, ShoppingBag, Sparkles } from "lucide-react";
+import { Headset, Heart, Menu, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
+import { SparkleOverlay } from "@/components/shared/SparkleOverlay";
 import { mainNavLinks } from "@/constants/navigation";
 import { siteConfig } from "@/constants/site";
 import { MobileNav } from "@/components/layout/MobileNav";
@@ -90,19 +91,14 @@ export function Header({ weddingCollectionEnabled }: HeaderProps) {
                     href={link.href}
                     onClick={(event) => handleNavLinkClick(event, link.href)}
                     className={cn(
-                      "group/navlink relative inline-flex items-center gap-1 whitespace-nowrap rounded-sm py-2 font-body text-xs font-semibold uppercase tracking-[0.08em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
+                      "group/navlink relative whitespace-nowrap rounded-sm py-2 font-body text-xs font-semibold uppercase tracking-[0.08em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
                       isWeddingLink
                         ? "text-gold hover:text-maroon"
                         : "text-primary hover:text-gold",
                     )}
                   >
-                    {isWeddingLink && (
-                      <Sparkles
-                        className="h-3.5 w-3.5 shrink-0"
-                        aria-hidden="true"
-                      />
-                    )}
                     {link.label}
+                    {isWeddingLink && <SparkleOverlay size="sm" />}
                     <span
                       aria-hidden="true"
                       className={cn(
