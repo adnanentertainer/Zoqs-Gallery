@@ -24,9 +24,10 @@ const badgeStyles =
 
 interface HeaderProps {
   /** Hides the "Wedding Collection" nav link (desktop and mobile) whenever
-   * the Wedding Season Promotion is turned off in Admin → Settings — the
-   * page itself (/wedding-collection) stays reachable directly either way,
-   * only its nav entry is tied to this toggle. */
+   * its own "Show in navigation" checkbox is off in Admin → Settings →
+   * Wedding Season Promotion — independent of the homepage banner/
+   * favourites toggle, so either can be on while the other is off. The page
+   * itself (/wedding-collection) stays reachable directly regardless. */
   weddingCollectionEnabled: boolean;
 }
 

@@ -14,8 +14,8 @@ import { useAuth } from "@/context/AuthContext";
 interface MobileNavProps {
   isOpen: boolean;
   onClose: () => void;
-  /** Hides the "Wedding Collection" link when the Wedding Season Promotion
-   * is turned off in Admin → Settings — see Header's identical prop. */
+  /** Hides the "Wedding Collection" link when its own "Show in navigation"
+   * checkbox is off in Admin → Settings — see Header's identical prop. */
   weddingCollectionEnabled: boolean;
 }
 

@@ -64,14 +64,26 @@ export function WeddingPromotionForm({
           onChange={(event) => update("enabled", event.target.checked)}
           className="h-4 w-4 accent-gold"
         />
-        Show the Wedding Edit banner, Wedding Season Favourites, and the
-        &quot;Wedding Collection&quot; link in the site navigation
+        Show the Wedding Edit banner and Wedding Season Favourites on the
+        homepage
+      </label>
+
+      <label className="flex items-center gap-2 font-body text-sm text-primary">
+        <input
+          type="checkbox"
+          checked={values.showInNav}
+          onChange={(event) => update("showInNav", event.target.checked)}
+          className="h-4 w-4 accent-gold"
+        />
+        Show &quot;Wedding Collection&quot; in the site navigation (desktop
+        and mobile)
       </label>
       <p className="font-body text-xs text-muted">
-        The /wedding-collection page itself always stays reachable directly —
-        this only controls the homepage promotion and its navigation link.
-        Choose which products appear from Admin → Products → each
-        product&apos;s Wedding Collection section.
+        These two switches are independent — turn either on or off without
+        affecting the other. The /wedding-collection page itself always
+        stays reachable directly, regardless of both. Choose which products
+        appear from Admin → Products → each product&apos;s Wedding
+        Collection section.
       </p>
 
       <ImageUploadField

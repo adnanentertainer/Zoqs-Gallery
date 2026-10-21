@@ -32,6 +32,7 @@ export async function updateAdminWeddingPromotionSettings(
   const supabase = await getSupabaseServerClient();
   const value: WeddingPromotionSettings = {
     enabled: input.enabled,
+    showInNav: input.showInNav,
     imageUrl: input.imageUrl,
   };
 

@@ -150,7 +150,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                 >
                   <FestivalCountdownBanner />
                   <AnnouncementBar />
-                  <Header weddingCollectionEnabled={weddingPromotion.enabled} />
+                  <Header weddingCollectionEnabled={weddingPromotion.showInNav} />
                   <main className="flex flex-1 flex-col">{children}</main>
                   <Footer />
                 </CartProvider>

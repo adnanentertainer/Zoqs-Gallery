@@ -6,9 +6,10 @@ import {
 
 /**
  * Always returns a filled settings object (never null) — same convention as
- * getBlessedFridayOffer(). Callers branch on `.enabled` to decide whether to
- * render the homepage banner/favourites section and the header's "Wedding
- * Collection" nav link (see RootLayout → Header/MobileNav).
+ * getBlessedFridayOffer(). Callers branch on `.enabled` for the homepage
+ * banner/favourites section, and separately on `.showInNav` for the
+ * header's "Wedding Collection" nav link (see RootLayout → Header/
+ * MobileNav) — the two are independent toggles.
  */
 export async function getWeddingPromotionSettings(): Promise<WeddingPromotionSettings> {
   const stored =
