@@ -4,7 +4,11 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { AuthMessage } from "@/components/auth";
-import { updateAdminWeddingPromotionAction } from "@/app/admin/settings/actions";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
+import {
+  updateAdminWeddingPromotionAction,
+  uploadWeddingBannerImageAction,
+} from "@/app/admin/settings/actions";
 import type { WeddingPromotionSettings } from "@/types/weddingPromotion";
 
 export function WeddingPromotionForm({
@@ -16,6 +20,14 @@ export function WeddingPromotionForm({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function update<K extends keyof WeddingPromotionSettings>(
+    key: K,
+    value: WeddingPromotionSettings[K],
+  ) {
+    setValues((prev) => ({ ...prev, [key]: value }));
+    setSuccess(false);
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -49,10 +61,7 @@ export function WeddingPromotionForm({
         <input
           type="checkbox"
           checked={values.enabled}
-          onChange={(event) => {
-            setValues({ enabled: event.target.checked });
-            setSuccess(false);
-          }}
+          onChange={(event) => update("enabled", event.target.checked)}
           className="h-4 w-4 accent-gold"
         />
         Show the Wedding Edit banner and Wedding Season Favourites on the
@@ -64,6 +73,21 @@ export function WeddingPromotionForm({
         promotion. Choose which products appear from Admin → Products → each
         product&apos;s Wedding Collection section.
       </p>
+
+      <ImageUploadField
+        label="Wedding Edit Banner Image (optional)"
+        helpText={
+          <p className="font-body text-xs text-muted">
+            Shown in the homepage banner. Leave empty to keep the built-in
+            default photo. Upload a tall{" "}
+            <strong>portrait photo, cropped to a 4:5 ratio</strong> (e.g.
+            1200&times;1500px) to match the banner&apos;s frame.
+          </p>
+        }
+        value={values.imageUrl}
+        onChange={(url) => update("imageUrl", url)}
+        uploadAction={uploadWeddingBannerImageAction}
+      />
 
       <div className="flex flex-wrap items-center gap-3">
         <Button

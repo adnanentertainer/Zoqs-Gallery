@@ -11,6 +11,8 @@ import {
  */
 export async function getWeddingPromotionSettings(): Promise<WeddingPromotionSettings> {
   const stored =
-    await getSiteSetting<WeddingPromotionSettings>("wedding_promotion");
-  return stored ?? DEFAULT_WEDDING_PROMOTION_SETTINGS;
+    await getSiteSetting<Partial<WeddingPromotionSettings>>("wedding_promotion");
+  // Spread over the defaults (not a bare `?? default`) so a row saved before
+  // `imageUrl` existed still resolves to "" instead of undefined.
+  return { ...DEFAULT_WEDDING_PROMOTION_SETTINGS, ...stored };
 }

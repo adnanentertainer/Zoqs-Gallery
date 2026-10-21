@@ -57,7 +57,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 lg:hidden",
+        "fixed inset-0 z-50 xl:hidden",
         !isOpen && "pointer-events-none",
       )}
     >

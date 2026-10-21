@@ -7,12 +7,19 @@ import { buttonVariants } from "@/components/ui/Button";
 import { galleryImages } from "@/constants/images";
 import { cn } from "@/lib/utils";
 
+interface WeddingBannerProps {
+  /** Overrides the default jewellery photo — set from Admin → Settings →
+   * Wedding Season Promotion. Falls back to the built-in default when empty. */
+  imageUrl?: string;
+  imageAlt?: string;
+}
+
 /** The Wedding Season homepage banner — ivory background with champagne
  * gold and maroon accents, toggled on/off via the "Wedding Season
  * Promotion" setting in Admin → Settings. Copy is fixed, not admin-editable
  * (unlike PromoBannerCarousel), since it's a seasonal brand moment rather
- * than a scheduled sale. */
-export function WeddingBanner() {
+ * than a scheduled sale; the image is admin-uploadable. */
+export function WeddingBanner({ imageUrl, imageAlt }: WeddingBannerProps) {
   return (
     <section className="relative overflow-hidden bg-secondary">
       <div
@@ -28,8 +35,11 @@ export function WeddingBanner() {
           />
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-[0_25px_60px_-15px_rgba(31,31,31,0.3)] ring-1 ring-gold/30">
             <Image
-              src={galleryImages.traditionalGoldSet}
-              alt="Traditional gold-tone wedding jewellery set with a matching necklace, earrings and bangles"
+              src={imageUrl || galleryImages.traditionalGoldSet}
+              alt={
+                imageAlt ||
+                "Traditional gold-tone wedding jewellery set with a matching necklace, earrings and bangles"
+              }
               fill
               loading="lazy"
               sizes="(max-width: 1024px) 100vw, 448px"

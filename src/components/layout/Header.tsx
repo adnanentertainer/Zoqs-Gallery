@@ -51,7 +51,7 @@ export function Header() {
               aria-expanded={isMobileNavOpen}
               aria-controls="mobile-nav"
               aria-label="Open menu"
-              className={cn("inline-flex shrink-0 lg:hidden", iconButtonStyles)}
+              className={cn("inline-flex shrink-0 xl:hidden", iconButtonStyles)}
             >
               <Menu className="h-6 w-6" aria-hidden="true" />
             </button>
@@ -69,14 +69,14 @@ export function Header() {
 
             <nav
               aria-label="Main navigation"
-              className="hidden items-center gap-8 lg:flex"
+              className="hidden items-center gap-5 xl:flex"
             >
               {mainNavLinks.map((link) => (
                 <Link
                   key={link.label}
                   href={link.href}
                   onClick={(event) => handleNavLinkClick(event, link.href)}
-                  className="group/navlink relative rounded-sm py-2 font-body text-xs font-semibold uppercase tracking-[0.14em] text-primary transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                  className="group/navlink relative whitespace-nowrap rounded-sm py-2 font-body text-xs font-semibold uppercase tracking-[0.08em] text-primary transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                 >
                   {link.label}
                   <span
@@ -98,7 +98,7 @@ export function Header() {
               <Headset className="h-5 w-5" aria-hidden="true" />
             </Link>
             <AccountMenu
-              className={cn("hidden lg:inline-flex", iconButtonStyles)}
+              className={cn("hidden xl:inline-flex", iconButtonStyles)}
             />
             <Link
               href="/wishlist"

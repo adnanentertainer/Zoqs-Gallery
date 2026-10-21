@@ -64,7 +64,7 @@ export default async function Home() {
       />
       {showWeddingPromotion && (
         <>
-          <WeddingBanner />
+          <WeddingBanner imageUrl={weddingPromotion.imageUrl || undefined} />
           <ProductSection
             id="wedding-collection"
             title="Wedding Season Favourites"

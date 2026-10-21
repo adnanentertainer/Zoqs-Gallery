@@ -12,7 +12,10 @@ import {
   uploadDefaultHeroImage,
 } from "@/lib/services/admin/adminHeroImageService";
 import { updateAdminBlessedFridayOffer } from "@/lib/services/admin/adminBlessedFridayOfferService";
-import { updateAdminWeddingPromotionSettings } from "@/lib/services/admin/adminWeddingPromotionService";
+import {
+  updateAdminWeddingPromotionSettings,
+  uploadWeddingBannerImage,
+} from "@/lib/services/admin/adminWeddingPromotionService";
 import type { FestivalBanner } from "@/types/festivalBanner";
 import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
 import type { WeddingPromotionSettings } from "@/types/weddingPromotion";
@@ -89,4 +92,15 @@ export async function uploadDefaultHeroImageAction(
     return { error: "No file provided." };
   }
   return uploadDefaultHeroImage(file);
+}
+
+export async function uploadWeddingBannerImageAction(
+  formData: FormData,
+): Promise<{ url?: string; error?: string }> {
+  await requireAdmin();
+  const file = formData.get("file");
+  if (!(file instanceof File)) {
+    return { error: "No file provided." };
+  }
+  return uploadWeddingBannerImage(file);
 }
