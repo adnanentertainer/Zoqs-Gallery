@@ -3,7 +3,7 @@
 import { useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Headset, Heart, Menu, ShoppingBag } from "lucide-react";
+import { Headset, Heart, Menu, ShoppingBag, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
 import { mainNavLinks } from "@/constants/navigation";
@@ -71,20 +71,37 @@ export function Header() {
               aria-label="Main navigation"
               className="hidden items-center gap-5 xl:flex"
             >
-              {mainNavLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  onClick={(event) => handleNavLinkClick(event, link.href)}
-                  className="group/navlink relative whitespace-nowrap rounded-sm py-2 font-body text-xs font-semibold uppercase tracking-[0.08em] text-primary transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-                >
-                  {link.label}
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-x-0 -bottom-0.5 h-px origin-center scale-x-0 bg-gold transition-transform duration-300 group-hover/navlink:scale-x-100"
-                  />
-                </Link>
-              ))}
+              {mainNavLinks.map((link) => {
+                const isWeddingLink = link.href === "/wedding-collection";
+                return (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    onClick={(event) => handleNavLinkClick(event, link.href)}
+                    className={cn(
+                      "group/navlink relative inline-flex items-center gap-1 whitespace-nowrap rounded-sm py-2 font-body text-xs font-semibold uppercase tracking-[0.08em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
+                      isWeddingLink
+                        ? "text-gold hover:text-maroon"
+                        : "text-primary hover:text-gold",
+                    )}
+                  >
+                    {isWeddingLink && (
+                      <Sparkles
+                        className="h-3.5 w-3.5 shrink-0"
+                        aria-hidden="true"
+                      />
+                    )}
+                    {link.label}
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "absolute inset-x-0 -bottom-0.5 h-px origin-center scale-x-0 transition-transform duration-300 group-hover/navlink:scale-x-100",
+                        isWeddingLink ? "bg-maroon" : "bg-gold",
+                      )}
+                    />
+                  </Link>
+                );
+              })}
             </nav>
           </div>
 

@@ -3,7 +3,7 @@
 import { useEffect, useRef, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { X } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mobileNavLinks } from "@/constants/navigation";
 import { siteConfig } from "@/constants/site";
@@ -99,17 +99,26 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           aria-label="Mobile navigation links"
           className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 py-6"
         >
-          {mobileNavLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              onClick={(event) => handleNavLinkClick(event, link.href)}
-              tabIndex={isOpen ? 0 : -1}
-              className={navLinkStyles}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {mobileNavLinks.map((link) => {
+            const isWeddingLink = link.href === "/wedding-collection";
+            return (
+              <Link
+                key={link.label}
+                href={link.href}
+                onClick={(event) => handleNavLinkClick(event, link.href)}
+                tabIndex={isOpen ? 0 : -1}
+                className={cn(
+                  navLinkStyles,
+                  isWeddingLink && "flex items-center gap-2 font-medium text-gold",
+                )}
+              >
+                {isWeddingLink && (
+                  <Sparkles className="h-4 w-4 shrink-0" aria-hidden="true" />
+                )}
+                {link.label}
+              </Link>
+            );
+          })}
 
           <div className="my-3 border-t border-beige" />
 
