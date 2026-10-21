@@ -64,11 +64,16 @@ export default async function Home() {
       />
       {showWeddingPromotion && (
         <>
-          <WeddingBanner imageUrl={weddingPromotion.imageUrl || undefined} />
+          <WeddingBanner
+            imageUrl={weddingPromotion.imageUrl || undefined}
+            heading={weddingPromotion.bannerHeading || undefined}
+            subtext={weddingPromotion.bannerSubtext || undefined}
+            buttonLabel={weddingPromotion.bannerButtonLabel || undefined}
+          />
           <ProductSection
             id="wedding-collection"
             title="Wedding Season Favourites"
-            subtitle="Hand-picked jewellery for your wedding celebrations, from bridal sets to statement earrings."
+            subtitle="Hand-picked jewellery for your wedding celebrations"
             products={weddingPicks.slice(0, 8)}
             viewAllLabel="View Wedding Collection"
             viewAllHref="/wedding-collection"

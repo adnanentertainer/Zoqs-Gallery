@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { Input } from "@/components/ui/Input";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { AuthMessage } from "@/components/auth";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
@@ -9,7 +10,12 @@ import {
   updateAdminWeddingPromotionAction,
   uploadWeddingBannerImageAction,
 } from "@/app/admin/settings/actions";
-import type { WeddingPromotionSettings } from "@/types/weddingPromotion";
+import {
+  DEFAULT_WEDDING_BANNER_BUTTON_LABEL,
+  DEFAULT_WEDDING_BANNER_HEADING,
+  DEFAULT_WEDDING_BANNER_SUBTEXT,
+  type WeddingPromotionSettings,
+} from "@/types/weddingPromotion";
 
 export function WeddingPromotionForm({
   initialValues,
@@ -100,6 +106,30 @@ export function WeddingPromotionForm({
         onChange={(url) => update("imageUrl", url)}
         uploadAction={uploadWeddingBannerImageAction}
       />
+
+      <div className="flex flex-col gap-4 border-t border-beige pt-4">
+        <p className="font-body text-xs text-muted">
+          Banner text (optional) — leave any field blank to keep its default.
+        </p>
+        <Input
+          label="Banner Heading"
+          placeholder={DEFAULT_WEDDING_BANNER_HEADING}
+          value={values.bannerHeading}
+          onChange={(event) => update("bannerHeading", event.target.value)}
+        />
+        <Input
+          label="Banner Supporting Text"
+          placeholder={DEFAULT_WEDDING_BANNER_SUBTEXT}
+          value={values.bannerSubtext}
+          onChange={(event) => update("bannerSubtext", event.target.value)}
+        />
+        <Input
+          label="Banner Button Label"
+          placeholder={DEFAULT_WEDDING_BANNER_BUTTON_LABEL}
+          value={values.bannerButtonLabel}
+          onChange={(event) => update("bannerButtonLabel", event.target.value)}
+        />
+      </div>
 
       <div className="flex flex-wrap items-center gap-3">
         <Button

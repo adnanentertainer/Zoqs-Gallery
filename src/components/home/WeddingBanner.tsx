@@ -6,6 +6,11 @@ import { Heading, Text } from "@/components/ui/Typography";
 import { buttonVariants } from "@/components/ui/Button";
 import { galleryImages } from "@/constants/images";
 import { SparkleOverlay } from "@/components/shared/SparkleOverlay";
+import {
+  DEFAULT_WEDDING_BANNER_BUTTON_LABEL,
+  DEFAULT_WEDDING_BANNER_HEADING,
+  DEFAULT_WEDDING_BANNER_SUBTEXT,
+} from "@/types/weddingPromotion";
 import { cn } from "@/lib/utils";
 
 interface WeddingBannerProps {
@@ -13,14 +18,25 @@ interface WeddingBannerProps {
    * Wedding Season Promotion. Falls back to the built-in default when empty. */
   imageUrl?: string;
   imageAlt?: string;
+  /** Banner copy overrides, same source as imageUrl — empty/undefined falls
+   * back to the built-in default text. */
+  heading?: string;
+  subtext?: string;
+  buttonLabel?: string;
 }
 
 /** The Wedding Season homepage banner — ivory background with champagne
  * gold and maroon accents, toggled on/off via the "Wedding Season
- * Promotion" setting in Admin → Settings. Copy is fixed, not admin-editable
- * (unlike PromoBannerCarousel), since it's a seasonal brand moment rather
- * than a scheduled sale; the image is admin-uploadable. */
-export function WeddingBanner({ imageUrl, imageAlt }: WeddingBannerProps) {
+ * Promotion" setting in Admin → Settings. Copy and image are both
+ * admin-editable from there, falling back to sensible defaults when left
+ * blank. */
+export function WeddingBanner({
+  imageUrl,
+  imageAlt,
+  heading,
+  subtext,
+  buttonLabel,
+}: WeddingBannerProps) {
   return (
     <section className="relative overflow-hidden bg-secondary">
       <div
@@ -56,12 +72,12 @@ export function WeddingBanner({ imageUrl, imageAlt }: WeddingBannerProps) {
           </span>
           <div className="relative inline-block">
             <Heading variant="h1" as="h2" className="max-w-md">
-              The Wedding Edit
+              {heading || DEFAULT_WEDDING_BANNER_HEADING}
             </Heading>
             <SparkleOverlay size="lg" />
           </div>
           <Text variant="bodyLg" className="max-w-md text-muted">
-            Beautiful jewellery for your most memorable celebrations.
+            {subtext || DEFAULT_WEDDING_BANNER_SUBTEXT}
           </Text>
           <Link
             href="/wedding-collection"
@@ -70,7 +86,7 @@ export function WeddingBanner({ imageUrl, imageAlt }: WeddingBannerProps) {
               "group transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-lg",
             )}
           >
-            Shop Wedding Jewellery
+            {buttonLabel || DEFAULT_WEDDING_BANNER_BUTTON_LABEL}
             <ArrowRight
               className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
               aria-hidden="true"

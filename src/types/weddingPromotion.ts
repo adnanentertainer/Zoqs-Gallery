@@ -12,10 +12,25 @@ export interface WeddingPromotionSettings {
    * same convention as default_hero_image, since site_settings.value is a
    * NOT NULL jsonb column. */
   imageUrl: string;
+  /** Banner heading (e.g. "The Wedding Edit"). Empty string falls back to
+   * the built-in default — same "empty means unset" convention as imageUrl. */
+  bannerHeading: string;
+  /** Banner supporting line under the heading. Empty falls back to default. */
+  bannerSubtext: string;
+  /** Banner primary button label. Empty falls back to default. */
+  bannerButtonLabel: string;
 }
+
+export const DEFAULT_WEDDING_BANNER_HEADING = "The Wedding Edit";
+export const DEFAULT_WEDDING_BANNER_SUBTEXT =
+  "Beautiful jewellery for your most memorable celebrations.";
+export const DEFAULT_WEDDING_BANNER_BUTTON_LABEL = "Shop Wedding Jewellery";
 
 export const DEFAULT_WEDDING_PROMOTION_SETTINGS: WeddingPromotionSettings = {
   enabled: true,
   showInNav: true,
   imageUrl: "",
+  bannerHeading: "",
+  bannerSubtext: "",
+  bannerButtonLabel: "",
 };

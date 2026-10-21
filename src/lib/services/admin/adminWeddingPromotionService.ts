@@ -34,6 +34,9 @@ export async function updateAdminWeddingPromotionSettings(
     enabled: input.enabled,
     showInNav: input.showInNav,
     imageUrl: input.imageUrl,
+    bannerHeading: input.bannerHeading,
+    bannerSubtext: input.bannerSubtext,
+    bannerButtonLabel: input.bannerButtonLabel,
   };
 
   const { error } = await supabase
