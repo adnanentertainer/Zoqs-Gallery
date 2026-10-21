@@ -18,7 +18,7 @@ import {
 import { PlaceOrderButton } from "@/components/checkout/PlaceOrderButton";
 import { useCart } from "@/context/CartContext";
 import { CartWhatsAppButton } from "@/components/cart/CartWhatsAppButton";
-import { getVariantSummaryLabel } from "@/lib/cart";
+import { getVariantImage, getVariantSummaryLabel } from "@/lib/cart";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
 import { consumePendingPromoCode } from "@/lib/pendingPromo";
 import { siteConfig } from "@/constants/site";
@@ -288,7 +288,7 @@ export function CheckoutForm({
         <OrderSummary
           items={cart.lineItems.map((item) => ({
             key: item.key,
-            imageUrl: item.product.images[0] ?? null,
+            imageUrl: getVariantImage(item.product, item.selectedVariants) ?? null,
             name: item.product.name,
             variantLabel: getVariantSummaryLabel(
               item.product,

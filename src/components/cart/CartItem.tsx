@@ -3,7 +3,11 @@ import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { QuantitySelector } from "@/components/product/QuantitySelector";
 import { useCart, type CartLineItem } from "@/context/CartContext";
-import { getMaxAddableQuantity, getVariantSummaryLabel } from "@/lib/cart";
+import {
+  getMaxAddableQuantity,
+  getVariantImage,
+  getVariantSummaryLabel,
+} from "@/lib/cart";
 import { formatPrice } from "@/lib/utils";
 
 interface CartItemProps {
@@ -26,6 +30,7 @@ export function CartItem({ item }: CartItemProps) {
     item.selectedVariants,
     item.key,
   );
+  const imageUrl = getVariantImage(item.product, item.selectedVariants);
 
   return (
     <div className="flex gap-4 border-b border-beige py-4 last:border-b-0">
@@ -34,7 +39,7 @@ export function CartItem({ item }: CartItemProps) {
         className="relative h-20 w-20 shrink-0 overflow-hidden rounded-sm bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:h-24 sm:w-24"
       >
         <Image
-          src={item.product.images[0]}
+          src={imageUrl}
           alt={item.product.name}
           fill
           sizes="96px"

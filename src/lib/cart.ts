@@ -121,6 +121,21 @@ export function getVariantSummaryLabel(
   return labels.length > 0 ? labels.join(" / ") : undefined;
 }
 
+/** The selected variant's own photo (e.g. a color swatch with its own
+ * image), falling back to the product's primary image when that variant
+ * has none set. Used wherever a cart/order line shows a thumbnail, so a
+ * Purple line doesn't display the Green photo just because it's first in
+ * the product's gallery. */
+export function getVariantImage(
+  product: Product,
+  selectedVariants?: Record<string, string>,
+): string {
+  const match = getSelectedVariantOptions(product, selectedVariants).find(
+    ({ option }) => option.image,
+  )?.option.image;
+  return match ?? product.images[0];
+}
+
 export interface FreeShippingProgress {
   threshold: number;
   remaining: number;
