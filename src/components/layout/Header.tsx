@@ -21,11 +21,22 @@ const iconButtonStyles =
 const badgeStyles =
   "absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 font-body text-[10px] font-semibold text-white";
 
-export function Header() {
+interface HeaderProps {
+  /** Hides the "Wedding Collection" nav link (desktop and mobile) whenever
+   * the Wedding Season Promotion is turned off in Admin → Settings — the
+   * page itself (/wedding-collection) stays reachable directly either way,
+   * only its nav entry is tied to this toggle. */
+  weddingCollectionEnabled: boolean;
+}
+
+export function Header({ weddingCollectionEnabled }: HeaderProps) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const cart = useCart();
   const wishlist = useWishlist();
   const pathname = usePathname();
+  const visibleNavLinks = weddingCollectionEnabled
+    ? mainNavLinks
+    : mainNavLinks.filter((link) => link.href !== "/wedding-collection");
 
   // Clicking "Home" while already on the home page is otherwise a no-op --
   // Next.js doesn't re-navigate to the current route. Scroll to top instead,
@@ -71,7 +82,7 @@ export function Header() {
               aria-label="Main navigation"
               className="hidden items-center gap-5 xl:flex"
             >
-              {mainNavLinks.map((link) => {
+              {visibleNavLinks.map((link) => {
                 const isWeddingLink = link.href === "/wedding-collection";
                 return (
                   <Link
@@ -159,6 +170,7 @@ export function Header() {
       <MobileNav
         isOpen={isMobileNavOpen}
         onClose={() => setIsMobileNavOpen(false)}
+        weddingCollectionEnabled={weddingCollectionEnabled}
       />
       <CartDrawer />
     </>

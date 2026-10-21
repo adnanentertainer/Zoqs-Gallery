@@ -7,7 +7,8 @@ import {
 /**
  * Always returns a filled settings object (never null) — same convention as
  * getBlessedFridayOffer(). Callers branch on `.enabled` to decide whether to
- * render the homepage banner/favourites section.
+ * render the homepage banner/favourites section and the header's "Wedding
+ * Collection" nav link (see RootLayout → Header/MobileNav).
  */
 export async function getWeddingPromotionSettings(): Promise<WeddingPromotionSettings> {
   const stored =

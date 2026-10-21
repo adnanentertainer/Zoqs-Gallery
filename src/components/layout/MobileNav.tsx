@@ -13,15 +13,25 @@ import { useAuth } from "@/context/AuthContext";
 interface MobileNavProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Hides the "Wedding Collection" link when the Wedding Season Promotion
+   * is turned off in Admin → Settings — see Header's identical prop. */
+  weddingCollectionEnabled: boolean;
 }
 
 const navLinkStyles =
   "rounded-sm px-3 py-3 font-body text-base text-primary transition-colors hover:bg-beige hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold";
 
-export function MobileNav({ isOpen, onClose }: MobileNavProps) {
+export function MobileNav({
+  isOpen,
+  onClose,
+  weddingCollectionEnabled,
+}: MobileNavProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const { isAuthenticated } = useAuth();
   const pathname = usePathname();
+  const visibleNavLinks = weddingCollectionEnabled
+    ? mobileNavLinks
+    : mobileNavLinks.filter((link) => link.href !== "/wedding-collection");
 
   // Clicking "Home" while already on the home page is otherwise a no-op --
   // scroll to top instead, same as the desktop header nav.
@@ -99,7 +109,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           aria-label="Mobile navigation links"
           className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 py-6"
         >
-          {mobileNavLinks.map((link) => {
+          {visibleNavLinks.map((link) => {
             const isWeddingLink = link.href === "/wedding-collection";
             return (
               <Link

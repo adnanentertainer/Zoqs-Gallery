@@ -16,6 +16,7 @@ import { PromoStatusProvider } from "@/context/PromoStatusContext";
 import { getShippingSettings } from "@/lib/checkout/getShippingSettings";
 import { hasActivePromoCode } from "@/lib/services/promoCodeService";
 import { getBlessedFridayOffer } from "@/lib/services/blessedFridayOfferService";
+import { getWeddingPromotionSettings } from "@/lib/services/weddingPromotionService";
 import { META_PIXEL_ID } from "@/constants/meta";
 import { safeJsonLd } from "@/lib/utils";
 import "../styles/globals.css";
@@ -104,11 +105,12 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const [shippingSettings, promoActive, blessedFridayOffer] =
+  const [shippingSettings, promoActive, blessedFridayOffer, weddingPromotion] =
     await Promise.all([
       getShippingSettings(),
       hasActivePromoCode(),
       getBlessedFridayOffer(),
+      getWeddingPromotionSettings(),
     ]);
 
   // Same override checkout applies (see CheckoutForm's effectiveShippingSettings)
@@ -148,7 +150,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                 >
                   <FestivalCountdownBanner />
                   <AnnouncementBar />
-                  <Header />
+                  <Header weddingCollectionEnabled={weddingPromotion.enabled} />
                   <main className="flex flex-1 flex-col">{children}</main>
                   <Footer />
                 </CartProvider>

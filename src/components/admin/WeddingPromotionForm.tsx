@@ -64,13 +64,13 @@ export function WeddingPromotionForm({
           onChange={(event) => update("enabled", event.target.checked)}
           className="h-4 w-4 accent-gold"
         />
-        Show the Wedding Edit banner and Wedding Season Favourites on the
-        homepage
+        Show the Wedding Edit banner, Wedding Season Favourites, and the
+        &quot;Wedding Collection&quot; link in the site navigation
       </label>
       <p className="font-body text-xs text-muted">
-        The /wedding-collection page and its &quot;Wedding Collection&quot;
-        navigation link stay live either way — this only controls the homepage
-        promotion. Choose which products appear from Admin → Products → each
+        The /wedding-collection page itself always stays reachable directly —
+        this only controls the homepage promotion and its navigation link.
+        Choose which products appear from Admin → Products → each
         product&apos;s Wedding Collection section.
       </p>
 
