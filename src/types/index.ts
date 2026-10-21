@@ -30,6 +30,12 @@ export interface ProductVariantOption {
   swatch?: string;
   priceOverride?: number;
   inStock?: boolean;
+  /** This option's own stock count, when the admin tracks it per-variant
+   * (product_variants.stock). Undefined/null means this option draws from
+   * the base product's shared `stock` instead of its own pool — see
+   * getMaxAddableQuantity in lib/cart.ts, which is what actually enforces
+   * this distinction when adding to the cart. */
+  stock?: number | null;
   image?: string;
 }
 

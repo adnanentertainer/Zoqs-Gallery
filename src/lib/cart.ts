@@ -25,6 +25,70 @@ export function makeCartItemKey(
   return `${productSlug}::${entries.map(([type, value]) => `${type}=${value}`).join(",")}`;
 }
 
+/** This selection's own tracked stock (product_variants.stock), or
+ * undefined when no selected option carries one — meaning it draws from
+ * the base product's shared `stock` instead. */
+export function getDedicatedVariantStock(
+  product: Product,
+  selectedVariants?: Record<string, string>,
+): number | undefined {
+  for (const group of product.variants ?? []) {
+    const value = selectedVariants?.[group.type];
+    const option = group.options.find((candidate) => candidate.value === value);
+    if (option && typeof option.stock === "number") return option.stock;
+  }
+  return undefined;
+}
+
+interface CartQuantityLine {
+  productSlug: string;
+  quantity: number;
+  selectedVariants?: Record<string, string>;
+}
+
+/**
+ * How many more units of this exact product+variant selection the cart can
+ * hold right now. A variant with its own tracked stock is capped
+ * independently; a variant with no stock of its own (the common case for
+ * e.g. a plain "Color" swatch with no per-color stock entered) shares the
+ * base product's `stock` with every other cart line of the same product
+ * that *also* has no dedicated stock — two colors both drawing from one
+ * shared unit count as one pool between them, matching exactly what
+ * create_order() enforces at checkout (see the "Insufficient stock"
+ * check there). Without this, two different variants of the same
+ * low-stock product could each look addable on their own, only for
+ * checkout to reject the combined order outright.
+ *
+ * `excludeKey` is the cart key of the line being updated (e.g. the one an
+ * increment/quantity-change applies to), so it isn't double-counted
+ * against its own reservation.
+ */
+export function getMaxAddableQuantity(
+  existingLines: CartQuantityLine[],
+  product: Product,
+  selectedVariants: Record<string, string> | undefined,
+  excludeKey?: string,
+): number {
+  const dedicatedStock = getDedicatedVariantStock(product, selectedVariants);
+  if (dedicatedStock !== undefined) {
+    return Math.max(dedicatedStock, 0);
+  }
+
+  const reservedByOtherLines = existingLines
+    .filter((line) => line.productSlug === product.slug)
+    .filter(
+      (line) =>
+        makeCartItemKey(product.slug, line.selectedVariants) !== excludeKey,
+    )
+    .filter(
+      (line) =>
+        getDedicatedVariantStock(product, line.selectedVariants) === undefined,
+    )
+    .reduce((sum, line) => sum + line.quantity, 0);
+
+  return Math.max(product.stock - reservedByOtherLines, 0);
+}
+
 function getSelectedVariantOptions(
   product: Product,
   selectedVariants?: Record<string, string>,

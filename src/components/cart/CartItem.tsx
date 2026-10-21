@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { QuantitySelector } from "@/components/product/QuantitySelector";
 import { useCart, type CartLineItem } from "@/context/CartContext";
-import { getVariantSummaryLabel } from "@/lib/cart";
+import { getMaxAddableQuantity, getVariantSummaryLabel } from "@/lib/cart";
 import { formatPrice } from "@/lib/utils";
 
 interface CartItemProps {
@@ -11,10 +11,20 @@ interface CartItemProps {
 }
 
 export function CartItem({ item }: CartItemProps) {
-  const { setItemQuantity, removeItem } = useCart();
+  const { items, setItemQuantity, removeItem } = useCart();
   const variantLabel = getVariantSummaryLabel(
     item.product,
     item.selectedVariants,
+  );
+  // The true remaining cap for this exact variant, accounting for shared
+  // stock already reserved by other variants of the same product in the
+  // cart (e.g. a different color already holding the last unit) — not just
+  // this product's raw stock count.
+  const maxQuantity = getMaxAddableQuantity(
+    items,
+    item.product,
+    item.selectedVariants,
+    item.key,
   );
 
   return (
@@ -61,7 +71,7 @@ export function CartItem({ item }: CartItemProps) {
         <div className="mt-1 flex items-center justify-between gap-3">
           <QuantitySelector
             value={item.quantity}
-            max={Math.max(item.product.stock, 1)}
+            max={Math.max(maxQuantity, item.quantity)}
             onChange={(next) => setItemQuantity(item.key, next)}
             label={`Quantity for ${item.product.name}`}
             compact

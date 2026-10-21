@@ -196,6 +196,7 @@ function groupVariantRows(
           ? basePrice + row.price_adjustment
           : undefined,
       inStock: row.stock === 0 ? false : undefined,
+      stock: row.stock,
       image: row.image_url ?? undefined,
     });
   }

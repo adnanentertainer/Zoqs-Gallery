@@ -19,6 +19,8 @@ import {
 } from "@/lib/productCache";
 import {
   getFreeShippingProgress,
+  getMaxAddableQuantity,
+  getVariantSummaryLabel,
   getVariantUnitPrice,
   makeCartItemKey,
   type FreeShippingProgress,
@@ -74,7 +76,16 @@ function applyCartAction(items: CartItem[], action: CartAction): CartItem[] {
       const product = getCachedProduct(action.productSlug);
       if (!product) return items;
       const key = makeCartItemKey(action.productSlug, action.selectedVariants);
-      const maxQuantity = Math.max(product.stock, 1);
+      // Caps this exact variant selection against whatever's already
+      // reserved by *other* cart lines of the same product — two colors
+      // that share one stock pool can't each be added at full quantity
+      // independently (see getMaxAddableQuantity).
+      const maxQuantity = getMaxAddableQuantity(
+        items,
+        product,
+        action.selectedVariants,
+        key,
+      );
       const existing = items.find((item) => item.key === key);
 
       if (existing) {
@@ -90,6 +101,12 @@ function applyCartAction(items: CartItem[], action: CartAction): CartItem[] {
             : item,
         );
       }
+
+      // Nothing left in the shared pool for this selection (e.g. another
+      // color variant of the same low-stock product already claimed it) —
+      // adding a brand-new line here would just fail at checkout, so don't
+      // add it at all; addItem() surfaces why via a toast instead.
+      if (maxQuantity <= 0) return items;
 
       return [
         ...items,
@@ -107,7 +124,13 @@ function applyCartAction(items: CartItem[], action: CartAction): CartItem[] {
       return items.map((item) => {
         if (item.key !== action.key) return item;
         const product = getCachedProduct(item.productSlug);
-        const maxQuantity = Math.max(product?.stock ?? 1, 1);
+        if (!product) return item;
+        const maxQuantity = getMaxAddableQuantity(
+          items,
+          product,
+          item.selectedVariants,
+          item.key,
+        );
         const nextQuantity =
           action.type === "INCREMENT" ? item.quantity + 1 : item.quantity - 1;
         return { ...item, quantity: clampQuantity(nextQuantity, maxQuantity) };
@@ -118,7 +141,13 @@ function applyCartAction(items: CartItem[], action: CartAction): CartItem[] {
       return items.map((item) => {
         if (item.key !== action.key) return item;
         const product = getCachedProduct(item.productSlug);
-        const maxQuantity = Math.max(product?.stock ?? 1, 1);
+        if (!product) return item;
+        const maxQuantity = getMaxAddableQuantity(
+          items,
+          product,
+          item.selectedVariants,
+          item.key,
+        );
         return {
           ...item,
           quantity: clampQuantity(action.quantity, maxQuantity),
@@ -172,12 +201,16 @@ interface CartContextValue {
     productSlug: string,
     selectedVariants?: Record<string, string>,
   ) => boolean;
+  /** Returns false (and shows an explanatory toast, even when `silent`)
+   * when this exact variant has nothing left in its shared stock pool —
+   * e.g. a different color of the same low-stock product already claimed
+   * it — so callers can skip their own "added!" success state. */
   addItem: (
     product: Product,
     quantity?: number,
     selectedVariants?: Record<string, string>,
     options?: { silent?: boolean },
-  ) => void;
+  ) => boolean;
   incrementItem: (key: string) => void;
   decrementItem: (key: string) => void;
   setItemQuantity: (key: string, quantity: number) => void;
@@ -288,6 +321,28 @@ export function CartProvider({
       // the reducer's cache lookup (for stock clamping) hits immediately —
       // no dependency on a background fetch having resolved first.
       registerProduct(product);
+
+      const currentItems = cartStore.getSnapshot();
+      const key = makeCartItemKey(product.slug, selectedVariants);
+      const alreadyInCart = currentItems.some((item) => item.key === key);
+      const maxQuantity = getMaxAddableQuantity(
+        currentItems,
+        product,
+        selectedVariants,
+        key,
+      );
+
+      // This exact variant has nothing left in its shared stock pool — e.g.
+      // a different color of the same low-stock product is already in the
+      // cart and has claimed it. Adding it anyway would just fail outright
+      // at checkout, so say why instead of silently doing nothing.
+      if (!alreadyInCart && maxQuantity <= 0) {
+        showToast(
+          `No more ${getVariantSummaryLabel(product, selectedVariants) ?? "stock"} available right now`,
+        );
+        return false;
+      }
+
       dispatch({
         type: "ADD",
         productSlug: product.slug,
@@ -304,6 +359,7 @@ export function CartProvider({
       if (!options?.silent) {
         showToast(`${product.name} added to cart`);
       }
+      return true;
     },
     [dispatch, showToast],
   );

@@ -69,7 +69,14 @@ export function ProductActions({ product }: ProductActionsProps) {
 
   function handleAddToCart() {
     if (!canPurchase) return;
-    cart.addItem(product, quantity, selections, { silent: true });
+    // silent:false lets addItem's own toast explain a blocked add (e.g. a
+    // different color of this same low-stock product already claimed the
+    // shared stock) instead of the generic success toast — only show the
+    // button's "Added to Cart" animation when it actually went through.
+    const added = cart.addItem(product, quantity, selections, {
+      silent: true,
+    });
+    if (!added) return;
     setCartStatus("loading");
     window.setTimeout(() => {
       setCartStatus("added");
@@ -79,7 +86,10 @@ export function ProductActions({ product }: ProductActionsProps) {
 
   function handleBuyNow() {
     if (!canPurchase) return;
-    cart.addItem(product, quantity, selections, { silent: true });
+    const added = cart.addItem(product, quantity, selections, {
+      silent: true,
+    });
+    if (!added) return;
     // Login/register prompt (/checkout/start) is disabled — go straight to
     // checkout so guests aren't asked to sign in first.
     router.push("/checkout");
