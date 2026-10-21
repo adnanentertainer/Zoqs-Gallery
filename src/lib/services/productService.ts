@@ -29,6 +29,7 @@ interface ProductQueryFilters {
   isFeatured?: boolean;
   isNew?: boolean;
   isBestSeller?: boolean;
+  isWeddingPick?: boolean;
 }
 
 // Public catalog reads never depend on who's signed in (RLS allows public
@@ -57,7 +58,13 @@ async function fetchActiveProductRowsUncached(
   if (filters.isFeatured) query = query.eq("is_featured", true);
   if (filters.isNew) query = query.eq("is_new", true);
   if (filters.isBestSeller) query = query.eq("is_best_seller", true);
+  if (filters.isWeddingPick) query = query.eq("is_wedding_pick", true);
 
+  // Wedding picks have an explicit, admin-set sequence (see ProductForm's
+  // "Wedding Display Order") rather than relying on recency.
+  if (filters.isWeddingPick) {
+    query = query.order("wedding_display_order", { ascending: true });
+  }
   // Without an explicit order, Postgres row order is unspecified — this
   // keeps the default listing (and every sort's internal tie-breaks)
   // deterministic across requests instead of shuffling on every cache miss.
@@ -282,6 +289,27 @@ export async function getBestSellers(): Promise<Product[]> {
       error,
     );
     throw new Error("Unable to load best sellers right now.");
+  }
+}
+
+export async function getWeddingPicks(): Promise<Product[]> {
+  if (!isSupabaseConfigured()) {
+    return mockAllProducts
+      .filter((product) => product.isWeddingPick)
+      .sort(
+        (a, b) => (a.weddingDisplayOrder ?? 0) - (b.weddingDisplayOrder ?? 0),
+      );
+  }
+
+  try {
+    const rows = await fetchActiveProductRows({ isWeddingPick: true });
+    return await hydrateProducts(rows);
+  } catch (error) {
+    console.error(
+      "[productService.getWeddingPicks] Supabase query failed:",
+      error,
+    );
+    throw new Error("Unable to load the wedding collection right now.");
   }
 }
 

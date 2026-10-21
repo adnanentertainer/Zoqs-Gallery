@@ -5,10 +5,12 @@ import { SettingsForm } from "@/components/admin/SettingsForm";
 import { FestivalBannerForm } from "@/components/admin/FestivalBannerForm";
 import { DefaultHeroImageForm } from "@/components/admin/DefaultHeroImageForm";
 import { BlessedFridayOfferForm } from "@/components/admin/BlessedFridayOfferForm";
+import { WeddingPromotionForm } from "@/components/admin/WeddingPromotionForm";
 import { getAdminStoreSettings } from "@/lib/services/admin/adminSettingsService";
 import { getAdminFestivalBanner } from "@/lib/services/admin/adminFestivalBannerService";
 import { getAdminDefaultHeroImage } from "@/lib/services/admin/adminHeroImageService";
 import { getAdminBlessedFridayOffer } from "@/lib/services/admin/adminBlessedFridayOfferService";
+import { getAdminWeddingPromotionSettings } from "@/lib/services/admin/adminWeddingPromotionService";
 
 export const metadata: Metadata = {
   title: "Settings | Admin | ZOQ's Gallery",
@@ -16,13 +18,19 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminSettingsPage() {
-  const [settings, festivalBanner, defaultHeroImage, blessedFridayOffer] =
-    await Promise.all([
-      getAdminStoreSettings(),
-      getAdminFestivalBanner(),
-      getAdminDefaultHeroImage(),
-      getAdminBlessedFridayOffer(),
-    ]);
+  const [
+    settings,
+    festivalBanner,
+    defaultHeroImage,
+    blessedFridayOffer,
+    weddingPromotion,
+  ] = await Promise.all([
+    getAdminStoreSettings(),
+    getAdminFestivalBanner(),
+    getAdminDefaultHeroImage(),
+    getAdminBlessedFridayOffer(),
+    getAdminWeddingPromotionSettings(),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -42,6 +50,16 @@ export default async function AdminSettingsPage() {
         </Text>
       </div>
       <BlessedFridayOfferForm initialValues={blessedFridayOffer} />
+
+      <div className="mt-4">
+        <Heading variant="h3" as="h2">
+          Wedding Season Promotion
+        </Heading>
+        <Text variant="bodySm" className="mt-1 text-muted">
+          The homepage banner and featured section for the wedding collection.
+        </Text>
+      </div>
+      <WeddingPromotionForm initialValues={weddingPromotion} />
 
       <div className="mt-4">
         <Heading variant="h3" as="h2">

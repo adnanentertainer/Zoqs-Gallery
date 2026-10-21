@@ -64,6 +64,14 @@ export interface Product {
   careInstructions?: string[];
   variants?: ProductVariantGroup[];
   minStockLevel?: number;
+  /** Explicit admin selection — never inferred from category/occasion — that
+   * surfaces this product in the homepage "Wedding Season Favourites"
+   * section and the /wedding-collection page. See weddingDisplayOrder for
+   * where it sorts among other picks. */
+  isWeddingPick?: boolean;
+  /** Lower shows first within the wedding collection; ties fall back to
+   * newest first. Irrelevant when isWeddingPick is false. */
+  weddingDisplayOrder?: number;
   createdAt?: string;
   updatedAt?: string;
 }

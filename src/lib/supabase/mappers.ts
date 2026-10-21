@@ -240,6 +240,8 @@ export function mapProductRow(
     careInstructions: row.care_instructions ?? undefined,
     variants: variantGroups.length > 0 ? variantGroups : undefined,
     minStockLevel: row.min_stock_level,
+    isWeddingPick: row.is_wedding_pick,
+    weddingDisplayOrder: row.wedding_display_order,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

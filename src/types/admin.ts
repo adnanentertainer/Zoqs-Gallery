@@ -19,6 +19,10 @@ export interface AdminProductFilters {
   categoryId?: string;
   status?: AdminProductStatus;
   inventory?: AdminInventoryFilter;
+  /** When true, lists only Wedding Pick products, ordered by
+   * weddingDisplayOrder (ascending) instead of the chosen sort — the view
+   * used for rearranging the wedding collection's order. */
+  wedding?: boolean;
   sort: AdminProductSort;
   page: number;
   pageSize: number;
@@ -53,6 +57,8 @@ export interface AdminProductListItem {
   isActive: boolean;
   forceUnavailable: boolean;
   imageUrl: string | null;
+  isWeddingPick: boolean;
+  weddingDisplayOrder: number;
   createdAt: string;
 }
 
@@ -92,6 +98,13 @@ export interface AdminProductInput {
   isNew: boolean;
   /** Shows the product in the storefront's "Best Sellers" section. */
   isBestSeller: boolean;
+  /** Shows the product in the homepage "Wedding Season Favourites" section
+   * and the /wedding-collection page — an explicit selection, never
+   * inferred from category or occasion. */
+  isWeddingPick: boolean;
+  /** Lower shows first within the wedding collection. Only meaningful
+   * alongside isWeddingPick. */
+  weddingDisplayOrder: number;
   images: AdminProductImageInput[];
   variants: AdminProductVariantInput[];
   /** Left blank to auto-generate a category-coded ID (e.g. NEC-0001). */

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PromoBannerSection } from "@/components/home/PromoBannerSection";
 import { HeroSection } from "@/components/home/HeroSection";
+import { WeddingBanner } from "@/components/home/WeddingBanner";
 import { CategorySection } from "@/components/home/CategorySection";
 import { ProductSection } from "@/components/home/ProductSection";
 import { BridalSection } from "@/components/home/BridalSection";
@@ -10,10 +11,15 @@ import { NewsletterSection } from "@/components/home/NewsletterSection";
 import { SocialGallery } from "@/components/home/SocialGallery";
 import { WhatsAppFloatingButton } from "@/components/shared/WhatsAppFloatingButton";
 import { getCategories } from "@/lib/services/categoryService";
-import { getBestSellers, getNewArrivals } from "@/lib/services/productService";
+import {
+  getBestSellers,
+  getNewArrivals,
+  getWeddingPicks,
+} from "@/lib/services/productService";
 import { getSocialPosts } from "@/lib/services/socialPostService";
 import { getActiveHeroImage } from "@/lib/services/promoCodeService";
 import { getSiteSetting } from "@/lib/services/settingsService";
+import { getWeddingPromotionSettings } from "@/lib/services/weddingPromotionService";
 
 export const metadata: Metadata = {
   title: "ZOQ's Gallery | Premium Artificial Jewellery in Pakistan",
@@ -32,6 +38,8 @@ export default async function Home() {
     socialPosts,
     activeHeroImage,
     defaultHeroImage,
+    weddingPromotion,
+    weddingPicks,
   ] = await Promise.all([
     getCategories(),
     getNewArrivals(),
@@ -39,7 +47,12 @@ export default async function Home() {
     getSocialPosts(),
     getActiveHeroImage(),
     getSiteSetting<string>("default_hero_image"),
+    getWeddingPromotionSettings(),
+    getWeddingPicks(),
   ]);
+
+  const showWeddingPromotion =
+    weddingPromotion.enabled && weddingPicks.length > 0;
 
   return (
     <>
@@ -49,6 +62,20 @@ export default async function Home() {
         imageUrl={activeHeroImage?.imageUrl || defaultHeroImage || undefined}
         imageAlt={activeHeroImage?.imageAlt}
       />
+      {showWeddingPromotion && (
+        <>
+          <WeddingBanner />
+          <ProductSection
+            id="wedding-collection"
+            title="Wedding Season Favourites"
+            subtitle="Hand-picked jewellery for your wedding celebrations, from bridal sets to statement earrings."
+            products={weddingPicks.slice(0, 8)}
+            viewAllLabel="View Wedding Collection"
+            viewAllHref="/wedding-collection"
+            background="cream"
+          />
+        </>
+      )}
       <CategorySection categories={categories} />
       <ProductSection
         id="new-arrivals"

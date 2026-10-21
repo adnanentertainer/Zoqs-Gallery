@@ -101,6 +101,8 @@ async function seedProducts(
           is_best_seller: product.isBestSeller,
           is_featured: product.isFeatured,
           is_sale: isOnSale(product),
+          is_wedding_pick: product.isWeddingPick ?? false,
+          wedding_display_order: product.weddingDisplayOrder ?? 0,
           stock: product.stock,
           material: product.material,
           color: product.color,

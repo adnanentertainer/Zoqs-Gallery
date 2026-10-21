@@ -60,6 +60,7 @@ export default async function AdminProductsPage({
       "low-stock",
       "out-of-stock",
     ]),
+    wedding: flat.wedding === "1" ? true : undefined,
     sort:
       parseEnumParam<AdminProductSort>(
         flat.sort,
@@ -92,7 +93,7 @@ export default async function AdminProductsPage({
 
       <form
         method="GET"
-        className="grid grid-cols-1 gap-3 rounded-sm border border-beige bg-white p-4 sm:grid-cols-2 lg:grid-cols-5"
+        className="grid grid-cols-1 gap-3 rounded-sm border border-beige bg-white p-4 sm:grid-cols-2 lg:grid-cols-6"
       >
         <Input
           label="Search"
@@ -178,7 +179,24 @@ export default async function AdminProductsPage({
             ))}
           </select>
         </div>
-        <div className="flex items-end gap-3 sm:col-span-2 lg:col-span-5">
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="wedding"
+            className="font-body text-sm font-medium text-primary"
+          >
+            Wedding Collection
+          </label>
+          <select
+            id="wedding"
+            name="wedding"
+            defaultValue={flat.wedding === "1" ? "1" : ""}
+            className="h-11 rounded-sm border border-beige bg-white px-3 font-body text-sm text-primary focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
+          >
+            <option value="">All products</option>
+            <option value="1">Wedding Picks only (by order)</option>
+          </select>
+        </div>
+        <div className="flex items-end gap-3 sm:col-span-2 lg:col-span-6">
           <Button type="submit" variant="primary" size="md">
             Apply Filters
           </Button>
@@ -206,6 +224,7 @@ export default async function AdminProductsPage({
                   <th className="px-5 py-3 font-medium">Price</th>
                   <th className="px-5 py-3 font-medium">Stock</th>
                   <th className="px-5 py-3 font-medium">Status</th>
+                  <th className="px-5 py-3 font-medium">Wedding</th>
                   <th className="px-5 py-3 font-medium">Created</th>
                   <th className="px-5 py-3 font-medium">
                     <span className="sr-only">Actions</span>
@@ -251,6 +270,15 @@ export default async function AdminProductsPage({
                       <StatusBadge
                         status={product.isActive ? "active" : "inactive"}
                       />
+                    </td>
+                    <td className="px-5 py-3 font-body text-sm text-muted">
+                      {product.isWeddingPick ? (
+                        <span className="font-medium text-gold">
+                          Pick · order {product.weddingDisplayOrder}
+                        </span>
+                      ) : (
+                        "—"
+                      )}
                     </td>
                     <td className="px-5 py-3 font-body text-sm text-muted">
                       {new Date(product.createdAt).toLocaleDateString("en-PK")}

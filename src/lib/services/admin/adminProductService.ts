@@ -101,6 +101,8 @@ function mapProductListRow(row: ProductListRow): AdminProductListItem {
     isActive: row.is_active,
     forceUnavailable: row.force_unavailable,
     imageUrl: sortedImages[0]?.image_url ?? null,
+    isWeddingPick: row.is_wedding_pick,
+    weddingDisplayOrder: row.wedding_display_order,
     createdAt: row.created_at,
   };
 }
@@ -136,27 +138,35 @@ export async function listAdminProducts(
   if (filters.status === "active") query = query.eq("is_active", true);
   if (filters.status === "inactive") query = query.eq("is_active", false);
   if (filters.inventory === "out-of-stock") query = query.eq("stock", 0);
+  if (filters.wedding) query = query.eq("is_wedding_pick", true);
 
-  switch (filters.sort) {
-    case "oldest":
-      query = query.order("created_at", { ascending: true });
-      break;
-    case "name-asc":
-      query = query.order("name", { ascending: true });
-      break;
-    case "name-desc":
-      query = query.order("name", { ascending: false });
-      break;
-    case "price-asc":
-      query = query.order("price", { ascending: true });
-      break;
-    case "price-desc":
-      query = query.order("price", { ascending: false });
-      break;
-    case "newest":
-    default:
-      query = query.order("created_at", { ascending: false });
-      break;
+  if (filters.wedding) {
+    // The Wedding Pick view is for rearranging the collection's order, so it
+    // always reflects that order directly rather than whatever sort is
+    // selected — see the "Wedding Order" column admins edit per product.
+    query = query.order("wedding_display_order", { ascending: true });
+  } else {
+    switch (filters.sort) {
+      case "oldest":
+        query = query.order("created_at", { ascending: true });
+        break;
+      case "name-asc":
+        query = query.order("name", { ascending: true });
+        break;
+      case "name-desc":
+        query = query.order("name", { ascending: false });
+        break;
+      case "price-asc":
+        query = query.order("price", { ascending: true });
+        break;
+      case "price-desc":
+        query = query.order("price", { ascending: false });
+        break;
+      case "newest":
+      default:
+        query = query.order("created_at", { ascending: false });
+        break;
+    }
   }
 
   const from = (filters.page - 1) * filters.pageSize;
@@ -246,6 +256,8 @@ export async function getAdminProductById(
     isFeatured: product.is_featured,
     isNew: product.is_new,
     isBestSeller: product.is_best_seller,
+    isWeddingPick: product.is_wedding_pick,
+    weddingDisplayOrder: product.wedding_display_order,
     sku: product.sku ?? "",
     costPrice: product.cost_price,
     minStockLevel: product.min_stock_level,
@@ -325,6 +337,8 @@ export async function createProduct(
       is_featured: input.isFeatured,
       is_new: input.isNew,
       is_best_seller: input.isBestSeller,
+      is_wedding_pick: input.isWeddingPick,
+      wedding_display_order: input.weddingDisplayOrder,
       // Omitted (undefined) rather than null when blank, so the database's
       // own generate_product_sku() trigger auto-fills a category-coded ID —
       // passing null would bypass that trigger's "already set?" check.
@@ -423,6 +437,8 @@ export async function updateProduct(
       is_featured: input.isFeatured,
       is_new: input.isNew,
       is_best_seller: input.isBestSeller,
+      is_wedding_pick: input.isWeddingPick,
+      wedding_display_order: input.weddingDisplayOrder,
       // On update the row already has a SKU (the insert-time trigger only
       // fires once), so an empty field here means "clear it back to null"
       // rather than "auto-generate" — unlike createProduct, this must be an

@@ -1,4 +1,5 @@
 export { HeroSection } from "@/components/home/HeroSection";
+export { WeddingBanner } from "@/components/home/WeddingBanner";
 export { CategorySection } from "@/components/home/CategorySection";
 export { CategoryCard } from "@/components/home/CategoryCard";
 export { ProductSection } from "@/components/home/ProductSection";

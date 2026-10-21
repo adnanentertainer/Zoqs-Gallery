@@ -38,6 +38,9 @@ function validateProductInput(input: AdminProductInput): string | undefined {
   if (!Number.isInteger(input.stock) || input.stock < 0) {
     return "Stock must be zero or more.";
   }
+  if (!Number.isInteger(input.weddingDisplayOrder)) {
+    return "Wedding Display Order must be a whole number.";
+  }
   for (const variant of input.variants) {
     if (variant.optionValue.trim().length === 0) {
       return "Every variant needs a value (e.g. Gold, Small).";

@@ -11,6 +11,9 @@
   --color-muted: #6f6a61;
   --color-success: #2e7d32;
   --color-error: #c62828;
+  /* Deep maroon accent for the Wedding Collection (ivory/champagne gold/
+     maroon palette) — 7.7:1 on white, well past WCAG AA for small text. */
+  --color-maroon: #6e1423;
 }
 
 @theme inline {
@@ -21,6 +24,7 @@
   --color-muted: var(--color-muted);
   --color-success: var(--color-success);
   --color-error: var(--color-error);
+  --color-maroon: var(--color-maroon);
   --font-heading: var(--font-playfair);
   --font-body: var(--font-inter);
 }

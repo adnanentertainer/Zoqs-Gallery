@@ -168,9 +168,16 @@ export function ProductCard({ product }: ProductCardProps) {
       </Link>
 
       <div className="mt-3 flex flex-col gap-1">
-        <span className="font-body text-xs uppercase tracking-wide text-muted">
-          {categoryLabel(product.categorySlug)}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="font-body text-xs uppercase tracking-wide text-muted">
+            {categoryLabel(product.categorySlug)}
+          </span>
+          {product.isWeddingPick && (
+            <span className="inline-flex items-center rounded-sm border border-gold/40 bg-secondary px-1.5 py-0.5 font-body text-[0.6rem] font-semibold uppercase tracking-[0.06em] text-maroon">
+              Wedding Pick
+            </span>
+          )}
+        </div>
         <Link
           href={`/product/${product.slug}`}
           className="line-clamp-2 rounded-sm font-body text-sm font-medium text-primary transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"

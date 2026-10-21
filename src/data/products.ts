@@ -26,6 +26,8 @@ export const newArrivals: Product[] = [
     tags: ["pearl", "necklace", "gift-box", "bridal"],
     weight: "45g",
     dimensions: "45cm length",
+    isWeddingPick: true,
+    weddingDisplayOrder: 1,
   },
   {
     id: "prod-002",
@@ -156,6 +158,8 @@ export const newArrivals: Product[] = [
     tags: ["earrings", "emerald", "statement", "green"],
     weight: "14g",
     dimensions: "4.5cm drop length",
+    isWeddingPick: true,
+    weddingDisplayOrder: 4,
   },
   {
     id: "prod-006",
@@ -242,6 +246,8 @@ export const newArrivals: Product[] = [
     tags: ["bangle", "set", "charm", "gift"],
     weight: "36g",
     dimensions: "6.5cm diameter, set of 3",
+    isWeddingPick: true,
+    weddingDisplayOrder: 3,
   },
 ];
 
@@ -271,6 +277,8 @@ export const bestSellers: Product[] = [
     tags: ["kundan", "bridal", "necklace", "set", "festive"],
     weight: "95g",
     dimensions: "42cm necklace with matching earrings",
+    isWeddingPick: true,
+    weddingDisplayOrder: 0,
   },
   {
     id: "prod-010",
@@ -321,6 +329,8 @@ export const bestSellers: Product[] = [
     tags: ["ring", "wedding", "band", "bridal"],
     weight: "12g",
     dimensions: "Set of 2 bands",
+    isWeddingPick: true,
+    weddingDisplayOrder: 2,
   },
   {
     id: "prod-012",

@@ -12,8 +12,10 @@ import {
   uploadDefaultHeroImage,
 } from "@/lib/services/admin/adminHeroImageService";
 import { updateAdminBlessedFridayOffer } from "@/lib/services/admin/adminBlessedFridayOfferService";
+import { updateAdminWeddingPromotionSettings } from "@/lib/services/admin/adminWeddingPromotionService";
 import type { FestivalBanner } from "@/types/festivalBanner";
 import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
+import type { WeddingPromotionSettings } from "@/types/weddingPromotion";
 
 export async function updateAdminStoreSettingsAction(
   input: AdminStoreSettings,
@@ -50,6 +52,18 @@ export async function updateAdminBlessedFridayOfferAction(
     revalidatePath("/admin/settings");
     revalidatePath("/checkout");
     revalidatePath("/cart");
+  }
+  return result;
+}
+
+export async function updateAdminWeddingPromotionAction(
+  input: WeddingPromotionSettings,
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const result = await updateAdminWeddingPromotionSettings(input);
+  if (!result.error) {
+    revalidatePath("/admin/settings");
+    revalidatePath("/");
   }
   return result;
 }

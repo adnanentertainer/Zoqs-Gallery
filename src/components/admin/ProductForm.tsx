@@ -52,6 +52,8 @@ function emptyProduct(): AdminProductInput {
     isFeatured: false,
     isNew: false,
     isBestSeller: false,
+    isWeddingPick: false,
+    weddingDisplayOrder: 0,
     images: [],
     variants: [],
     sku: "",
@@ -478,6 +480,45 @@ export function ProductForm({
             Force Unavailable (stays visible, blocks purchase, stock untouched)
           </label>
         </div>
+      </section>
+
+      <section className={sectionStyles}>
+        <h2 className="font-heading text-lg font-semibold text-primary">
+          Wedding Collection
+        </h2>
+        <p className="font-body text-xs text-muted">
+          Shows this product in the homepage &quot;Wedding Season
+          Favourites&quot; section and the /wedding-collection page. This is
+          never inferred from category or occasion — only products checked here
+          appear there.
+        </p>
+        <div className="flex flex-wrap items-end gap-6">
+          <label className="flex items-center gap-2 font-body text-sm text-primary">
+            <input
+              type="checkbox"
+              checked={values.isWeddingPick}
+              onChange={(event) =>
+                update("isWeddingPick", event.target.checked)
+              }
+              className="h-4 w-4 accent-gold"
+            />
+            Wedding Pick
+          </label>
+          <Input
+            label="Wedding Display Order"
+            type="number"
+            value={values.weddingDisplayOrder}
+            onChange={(event) =>
+              update("weddingDisplayOrder", Number(event.target.value))
+            }
+            className="w-48"
+          />
+        </div>
+        <p className="font-body text-xs text-muted">
+          Lower numbers show first in the collection. Only matters while Wedding
+          Pick is checked — use Admin → Products → Wedding Picks Only to see and
+          compare every pick&apos;s order together.
+        </p>
       </section>
 
       <section className={sectionStyles}>

@@ -74,6 +74,8 @@ export interface Database {
           max_stock_level: number | null;
           force_unavailable: boolean;
           primary_supplier_id: string | null;
+          is_wedding_pick: boolean;
+          wedding_display_order: number;
           created_at: string;
           updated_at: string;
         };
@@ -108,6 +110,8 @@ export interface Database {
           max_stock_level?: number | null;
           force_unavailable?: boolean;
           primary_supplier_id?: string | null;
+          is_wedding_pick?: boolean;
+          wedding_display_order?: number;
         };
         Update: Partial<Database["public"]["Tables"]["products"]["Insert"]>;
         Relationships: [];

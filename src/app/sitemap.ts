@@ -9,6 +9,11 @@ const baseUrl =
 const staticRoutes: MetadataRoute.Sitemap = [
   { url: `${baseUrl}/`, changeFrequency: "daily", priority: 1 },
   { url: `${baseUrl}/shop`, changeFrequency: "daily", priority: 0.9 },
+  {
+    url: `${baseUrl}/wedding-collection`,
+    changeFrequency: "daily",
+    priority: 0.8,
+  },
   { url: `${baseUrl}/products`, changeFrequency: "weekly", priority: 0.7 },
   { url: `${baseUrl}/new-arrivals`, changeFrequency: "daily", priority: 0.7 },
   { url: `${baseUrl}/best-sellers`, changeFrequency: "weekly", priority: 0.7 },
