@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
@@ -10,36 +10,16 @@ import { cn } from "@/lib/utils";
 const navButtonStyles =
   "inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold";
 
-// Opens already magnified 1.5x (50%), and the shopper can scroll/pinch to
-// zoom in further, up to MAX_ZOOM -- clamped so it can never zoom back out
-// past the starting point, which is already closer than a plain fit-to-screen.
-//
-// On narrow (mobile) viewports the photo box is width-constrained rather
-// than height-constrained (portrait product photos fill the available
-// width with little to no letterboxing), so there's no slack left to
-// absorb a forced zoom -- opening pre-zoomed there clipped real image
-// content off both sides instead of just eating empty letterbox space
-// like it does on wider screens. Mobile opens at 1x (the full photo,
-// nothing cropped) and can still be zoomed in further from there.
-const BASE_ZOOM = 1.5;
-const MOBILE_BASE_ZOOM = 1;
-const MOBILE_BREAKPOINT_QUERY = "(max-width: 639px)";
+// Always opens fit-to-box (nothing pre-cropped or pre-zoomed) — the shopper
+// can wheel-zoom in or out from there, between MIN_ZOOM and MAX_ZOOM, to
+// inspect detail or pull back out. The viewport this renders into is a real
+// scrollable area (not a CSS transform clipped by overflow-hidden), so once
+// zoomed in past fit, whatever that pushes outside the visible box is still
+// reachable by scrolling/dragging rather than being permanently cropped off.
+const BASE_ZOOM = 1;
+const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 3.5;
 const ZOOM_SENSITIVITY = 0.0015;
-
-function subscribeToMobileViewport(callback: () => void): () => void {
-  const mediaQuery = window.matchMedia(MOBILE_BREAKPOINT_QUERY);
-  mediaQuery.addEventListener("change", callback);
-  return () => mediaQuery.removeEventListener("change", callback);
-}
-
-function getIsMobileViewport(): boolean {
-  return window.matchMedia(MOBILE_BREAKPOINT_QUERY).matches;
-}
-
-function getIsMobileViewportServerSnapshot(): boolean {
-  return false;
-}
 
 interface ProductLightboxProps {
   images: string[];
@@ -61,19 +41,32 @@ export function ProductLightbox({
   useEscapeKey(isOpen, onClose);
   useBodyScrollLock(isOpen);
   const [zoom, setZoom] = useState(BASE_ZOOM);
-  const isMobileViewport = useSyncExternalStore(
-    subscribeToMobileViewport,
-    getIsMobileViewport,
-    getIsMobileViewportServerSnapshot,
-  );
-
-  const baseZoom = isMobileViewport ? MOBILE_BASE_ZOOM : BASE_ZOOM;
+  const scrollViewportRef = useRef<HTMLDivElement>(null);
 
   // Each photo (and each time the viewer reopens) starts back at the same
   // base magnification rather than wherever the shopper last zoomed to.
+  // Adjusted during render (React's recommended pattern for "reset state
+  // when an input changes") rather than in an effect, which would cause an
+  // extra, avoidable re-render on every photo/open-state change.
+  const resetKey = `${activeIndex}:${isOpen}`;
+  const [previousResetKey, setPreviousResetKey] = useState(resetKey);
+  if (resetKey !== previousResetKey) {
+    setPreviousResetKey(resetKey);
+    setZoom(BASE_ZOOM);
+  }
+
+  // The zoomed photo is larger than its viewport (see the sizing below), so
+  // it's a real scrollable area rather than a CSS transform clipped by
+  // `overflow-hidden` — that older approach made the photo's edges (e.g. the
+  // top of a close-up portrait) permanently unreachable once zoomed past fit.
+  // Centering here keeps the zoomed-in view framed the same way regardless
+  // of zoom level; scrolling/dragging from there reaches every edge.
   useEffect(() => {
-    setZoom(baseZoom);
-  }, [activeIndex, isOpen, baseZoom]);
+    const viewport = scrollViewportRef.current;
+    if (!viewport) return;
+    viewport.scrollLeft = (viewport.scrollWidth - viewport.clientWidth) / 2;
+    viewport.scrollTop = (viewport.scrollHeight - viewport.clientHeight) / 2;
+  }, [zoom, activeIndex, isOpen]);
 
   const showPrevious = () =>
     onIndexChange((activeIndex - 1 + images.length) % images.length);
@@ -98,7 +91,7 @@ export function ProductLightbox({
   function handleWheelZoom(event: React.WheelEvent<HTMLDivElement>) {
     event.preventDefault();
     setZoom((previous) =>
-      Math.min(MAX_ZOOM, Math.max(baseZoom, previous - event.deltaY * ZOOM_SENSITIVITY)),
+      Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, previous - event.deltaY * ZOOM_SENSITIVITY)),
     );
   }
 
@@ -155,19 +148,27 @@ export function ProductLightbox({
         )}
 
         <div
+          ref={scrollViewportRef}
           onClick={closeOnBackgroundClick}
           onWheel={handleWheelZoom}
-          className="relative h-[70vh] w-[92vw] max-w-3xl overflow-hidden sm:h-[80vh]"
+          className="flex h-[70vh] w-[92vw] max-w-3xl items-center justify-center overflow-auto sm:h-[80vh]"
         >
-          <Image
-            src={images[activeIndex]}
-            alt={`${productName} — image ${activeIndex + 1} of ${images.length}`}
-            fill
-            sizes="92vw"
-            className="object-contain transition-transform duration-150 ease-out"
-            style={{ transform: `scale(${zoom})` }}
-            preload={isOpen}
-          />
+          <div
+            className="relative shrink-0 transition-[width,height] duration-150 ease-out"
+            style={{
+              width: `${zoom * 100}%`,
+              height: `${zoom * 100}%`,
+            }}
+          >
+            <Image
+              src={images[activeIndex]}
+              alt={`${productName} — image ${activeIndex + 1} of ${images.length}`}
+              fill
+              sizes="92vw"
+              className="object-contain"
+              preload={isOpen}
+            />
+          </div>
         </div>
 
         {images.length > 1 && (
