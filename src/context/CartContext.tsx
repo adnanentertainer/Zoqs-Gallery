@@ -236,18 +236,17 @@ interface CartProviderProps {
   /** Same admin-configurable settings checkout uses (see
    * lib/checkout/getShippingSettings.ts) — passed down from the server-
    * rendered root layout so the cart's displayed shipping fee always
-   * matches what checkout will actually charge. Already reflects the
-   * Blessed Friday override (see layout.tsx) when that offer is enabled. */
+   * matches what checkout will actually charge. */
   shippingSettings: ShippingSettings;
-  /** Whether the Blessed Friday offer is currently enabled, or any promo
-   * code campaign is currently running — used only to hide the free-
-   * shipping progress message (ShippingProgress), since the shippingSettings
-   * override above already makes its own math correct but would otherwise
-   * render a nonsensical "away from free shipping" amount. */
+  /** Whether the Blessed Friday offer is currently enabled — used only to
+   * hide the generic free-shipping progress message (ShippingProgress)
+   * while Blessed Friday's own "X% off orders of Rs. Y and above" message is
+   * shown in its place instead (same threshold, so showing both would be
+   * redundant). Free shipping itself still applies normally either way. */
   freeShippingSuspended: boolean;
-  /** Same offer object layout.tsx already fetches for the shipping-override
-   * calculation above — passed through so the cart can show its own
-   * "Blessed Friday offer applied" messaging and discount line. */
+  /** Same offer object layout.tsx already fetches above — passed through so
+   * the cart can show its own "Blessed Friday offer applied" messaging and
+   * discount line. */
   blessedFridayOffer: BlessedFridayOffer;
 }
 

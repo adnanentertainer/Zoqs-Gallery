@@ -113,16 +113,15 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       getWeddingPromotionSettings(),
     ]);
 
-  // Same override checkout applies (see CheckoutForm's effectiveShippingSettings)
-  // — while the Blessed Friday offer is on, or any promo code campaign is
-  // currently running (even one this shopper hasn't entered yet), the
-  // evergreen free-shipping perk is suspended store-wide, so the cart
-  // drawer/page must never promise free shipping it won't actually deliver
-  // at checkout.
-  const freeShippingSuspended = blessedFridayOffer.enabled || promoActive;
-  const effectiveShippingSettings = freeShippingSuspended
-    ? { ...shippingSettings, freeShippingThreshold: Number.MAX_SAFE_INTEGER }
-    : shippingSettings;
+  // Free shipping at the threshold now applies alongside the Blessed Friday
+  // offer or a promo code (create_order() applies the same rule server-side)
+  // instead of one suspending the other. `freeShippingSuspended` only hides
+  // the cart's generic "add X more for free shipping" nudge while Blessed
+  // Friday's own threshold message (same number) is shown in its place —
+  // a promo code has no such message of its own, so it no longer suspends
+  // anything here.
+  const freeShippingSuspended = blessedFridayOffer.enabled;
+  const effectiveShippingSettings = shippingSettings;
 
   return (
     <html

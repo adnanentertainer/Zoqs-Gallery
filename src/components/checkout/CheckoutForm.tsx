@@ -115,17 +115,11 @@ export function CheckoutForm({
     );
   }
 
-  // The evergreen free-shipping perk is suspended whenever a discount is
-  // already in play — either the Blessed Friday offer (admin's own choice —
-  // see BlessedFridayOfferForm) or a customer-entered promo code — so an
-  // order is never both discounted and given free shipping. Raising the
-  // threshold past any reachable subtotal reuses calculateShippingCost()
-  // unchanged everywhere it's called below instead of branching shipping
-  // logic in three different places.
-  const effectiveShippingSettings: ShippingSettings =
-    blessedFridayOffer.enabled || appliedPromo !== null
-      ? { ...shippingSettings, freeShippingThreshold: Number.MAX_SAFE_INTEGER }
-      : shippingSettings;
+  // Free shipping at the threshold applies alongside the Blessed Friday
+  // offer or a promo code (create_order() applies the same rule
+  // server-side) rather than one suspending the other, so this is just the
+  // plain settings now.
+  const effectiveShippingSettings: ShippingSettings = shippingSettings;
 
   // The automatic discount and an entered promo code never stack — the
   // customer gets whichever saves them more, never both at once.

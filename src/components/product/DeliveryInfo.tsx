@@ -8,10 +8,10 @@ interface DeliveryInfoProps {
 }
 
 export function DeliveryInfo({ blessedFridayOffer }: DeliveryInfoProps) {
-  // While Blessed Friday is on, the evergreen free-delivery perk it
-  // replaces (see CartContext/layout.tsx) no longer applies — show the
-  // offer that's actually live instead of a shipping promise checkout
-  // won't honor.
+  // Free delivery still applies at the same threshold while Blessed Friday
+  // is on (see create_order() / layout.tsx) — this just swaps which single
+  // badge shows in this slot, favoring the more informative "X% off" offer
+  // over the plainer free-delivery one since they share the same threshold.
   const thirdItem = blessedFridayOffer.enabled
     ? {
         icon: Package,

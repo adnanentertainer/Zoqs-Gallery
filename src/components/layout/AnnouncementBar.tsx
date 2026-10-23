@@ -14,12 +14,11 @@ function promoCodeMessage(
 }
 
 export async function AnnouncementBar() {
-  // Blessed Friday takes priority — it's the bigger, code-free promise, and
-  // while it's on the evergreen free-delivery perk it replaces (see
-  // CartContext/layout.tsx) isn't honored at checkout, so that message
-  // would be false. A running promo code is announced next, ahead of the
-  // generic default, since there's otherwise nowhere on the site that tells
-  // a visitor a code exists at all.
+  // Blessed Friday takes priority — it's the bigger, code-free promise (free
+  // delivery still applies at the same threshold alongside it — see
+  // create_order() / layout.tsx). A running promo code is announced next,
+  // ahead of the generic default, since there's otherwise nowhere on the
+  // site that tells a visitor a code exists at all.
   const [blessedFridayOffer, activePromoCode] = await Promise.all([
     getBlessedFridayOffer(),
     getActivePromoCodeSummary(),
