@@ -22,6 +22,7 @@ export const MATERIAL_OPTIONS: ProductMaterial[] = [
   "Crystal",
   "Stainless Steel",
   "Alloy",
+  "Beaded",
 ];
 
 export const OCCASION_OPTIONS: ProductOccasion[] = [

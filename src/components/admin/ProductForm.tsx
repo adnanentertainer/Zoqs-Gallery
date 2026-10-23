@@ -30,6 +30,7 @@ const MATERIALS = [
   "Crystal",
   "Stainless Steel",
   "Alloy",
+  "Beaded",
 ];
 const COLORS = ["Gold", "Silver", "Rose Gold", "Pearl", "Multicolor", "Black"];
 const OCCASIONS = ["Everyday", "Party", "Wedding", "Bridal", "Festive", "Gift"];

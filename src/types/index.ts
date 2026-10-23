@@ -19,7 +19,8 @@ export type ProductMaterial =
   | "Pearl"
   | "Crystal"
   | "Stainless Steel"
-  | "Alloy";
+  | "Alloy"
+  | "Beaded";
 
 export type ProductOccasion =
   "Everyday" | "Party" | "Wedding" | "Bridal" | "Festive" | "Gift";
