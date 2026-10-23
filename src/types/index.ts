@@ -37,7 +37,21 @@ export type ProductMaterial =
   | "Crystal"
   | "Stainless Steel"
   | "Alloy"
-  | "Beaded";
+  | "Beaded"
+  | "Brass"
+  | "Copper"
+  | "Oxidized Silver"
+  | "Antique Gold"
+  | "Antique Silver"
+  | "Meenakari"
+  | "Thread"
+  | "Resin"
+  | "Rhinestone"
+  | "Cubic Zirconia"
+  | "Enamel"
+  | "Wood"
+  | "Fabric"
+  | "Terracotta";
 
 export type ProductOccasion =
   "Everyday" | "Party" | "Wedding" | "Bridal" | "Festive" | "Gift";
