@@ -60,11 +60,28 @@ const COLOR_SWATCHES: Partial<Record<ProductColor, string>> = {
 };
 
 // Common variant-option spellings admins type in that aren't valid
-// `ProductColor` values (so they can't live in COLOR_SWATCHES above) and
-// aren't close enough to a CSS3 keyword for the fuzzy match below to catch
-// (e.g. "Golden" is 2 letters from "gold" and 3 from "goldenrod").
+// `ProductColor` values (so they can't live in COLOR_SWATCHES above), aren't
+// a single-word CSS3 keyword (so the fallback below can't match them either),
+// and aren't close enough to one for the fuzzy match further down to catch
+// (e.g. "Golden" is 2 letters from "gold" and 3 from "goldenrod"). Covers the
+// jewellery/fashion color names seen in practice so a new product variant
+// rarely needs a code change just to get a proper swatch.
 const COLOR_ALIASES: Record<string, string> = {
   golden: "#B08D57",
+  halfwhite: "#EDE6DA",
+  offwhite: "#F2EDE4",
+  antiquegold: "#C9A769",
+  antiquesilver: "#B8B5AE",
+  copper: "#B87333",
+  bronze: "#CD7F32",
+  champagne: "#F7E7CE",
+  mustard: "#C9A227",
+  blush: "#F3CFC6",
+  dustyrose: "#C9A0A0",
+  dustypink: "#C9A0A0",
+  charcoal: "#36454F",
+  cream: "#FFFDD0",
+  navyblue: "#1F2A44",
 };
 
 // Standard CSS3 named colors. Any color variant typed in by the admin that
