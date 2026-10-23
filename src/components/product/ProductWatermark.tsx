@@ -24,7 +24,7 @@ export function ProductWatermark({ size = "sm" }: ProductWatermarkProps) {
       aria-hidden="true"
       width={112}
       height={112}
-      className={`pointer-events-none absolute ${SIZE_CLASSES[size]} rounded-full opacity-80 shadow-[0_0_0_1px_rgba(255,255,255,0.4)]`}
+      className={`pointer-events-none absolute ${SIZE_CLASSES[size]} rounded-full opacity-30`}
     />
   );
 }
