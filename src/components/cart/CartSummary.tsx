@@ -50,7 +50,8 @@ export function CartSummary({
         (blessedFridayDiscount > 0 ? (
           <p className="font-body text-xs font-medium text-success">
             Blessed Friday offer applied — {blessedFridayOffer.discountPercentage}
-            % off on orders above {formatPrice(blessedFridayOffer.minSpend)}.
+            % off on orders of {formatPrice(blessedFridayOffer.minSpend)} and
+            above.
           </p>
         ) : (
           <p className="font-body text-xs text-muted">
