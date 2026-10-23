@@ -59,6 +59,16 @@ const COLOR_SWATCHES: Partial<Record<ProductColor, string>> = {
   Black: "#1F1F1F",
 };
 
+// Keyed by the same normalized form as `resolveColorSwatch` uses, so a
+// variant typed as "rose gold", "Rose-Gold", or "ROSEGOLD" all match the
+// curated hex above instead of only the exact "Rose Gold" spelling.
+const NORMALIZED_COLOR_SWATCHES: Record<string, string> = Object.fromEntries(
+  Object.entries(COLOR_SWATCHES).map(([name, hex]) => [
+    name.toLowerCase().replace(/[\s-]+/g, ""),
+    hex as string,
+  ]),
+);
+
 // Common variant-option spellings admins type in that aren't valid
 // `ProductColor` values (so they can't live in COLOR_SWATCHES above), aren't
 // a single-word CSS3 keyword (so the fallback below can't match them either),
@@ -82,6 +92,23 @@ const COLOR_ALIASES: Record<string, string> = {
   charcoal: "#36454F",
   cream: "#FFFDD0",
   navyblue: "#1F2A44",
+  // Gemstone names, common on a jewellery site but not CSS3 keywords.
+  emerald: "#50C878",
+  ruby: "#9B111E",
+  sapphire: "#0F52BA",
+  amethyst: "#9966CC",
+  topaz: "#FFC87C",
+  onyx: "#353839",
+  opal: "#E0F0F0",
+  garnet: "#733635",
+  jade: "#00A86B",
+  amber: "#FFBF00",
+  platinum: "#E5E4E2",
+  taupe: "#483C32",
+  nude: "#E3BC9A",
+  mint: "#AAF0D1",
+  peach: "#FFCBA4",
+  lilac: "#C8A2C8",
 };
 
 // Standard CSS3 named colors. Any color variant typed in by the admin that
@@ -163,7 +190,7 @@ function resolveColorSwatch(value: string): string | undefined {
     return MULTICOLOR_SWATCH;
   }
 
-  const curated = COLOR_SWATCHES[value.trim() as ProductColor];
+  const curated = NORMALIZED_COLOR_SWATCHES[normalized];
   if (curated) return curated;
 
   const aliased = COLOR_ALIASES[normalized];
