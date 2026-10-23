@@ -10,6 +10,7 @@ import { ProductPrice } from "@/components/product/ProductPrice";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { cn, formatPrice } from "@/lib/utils";
 import { isInStock, isLowStock } from "@/lib/products";
+import { getMaxAddableQuantity, makeCartItemKey } from "@/lib/cart";
 import { useCart } from "@/context/CartContext";
 import { useProductVariantSelection } from "@/context/ProductVariantImageContext";
 import { registerProduct } from "@/lib/productCache";
@@ -65,7 +66,28 @@ export function ProductActions({ product }: ProductActionsProps) {
   const currentPrice = priceOverride ?? product.price;
   const productInStock = isInStock(product);
   const canPurchase = productInStock && !variantOutOfStock;
-  const maxQuantity = Math.max(1, product.stock);
+  // A variant with its own tracked stock (e.g. only 1 "Half white" left)
+  // must cap the stepper on its own number, not the base product's shared
+  // stock -- otherwise switching to a near-sold-out color still let a
+  // shopper dial up a quantity no color variant could actually fulfill.
+  const maxQuantity = Math.max(
+    1,
+    getMaxAddableQuantity(
+      cart.items,
+      product,
+      selections,
+      makeCartItemKey(product.slug, selections),
+    ),
+  );
+
+  // Re-clamp the stepper the moment a variant switch lowers maxQuantity
+  // (e.g. from 2 "Black" down to 1 "Half white") instead of leaving a
+  // stale, now-unfulfillable quantity selected.
+  const [previousMaxQuantity, setPreviousMaxQuantity] = useState(maxQuantity);
+  if (maxQuantity !== previousMaxQuantity) {
+    setPreviousMaxQuantity(maxQuantity);
+    if (quantity > maxQuantity) setQuantity(maxQuantity);
+  }
 
   function handleAddToCart() {
     if (!canPurchase) return;
