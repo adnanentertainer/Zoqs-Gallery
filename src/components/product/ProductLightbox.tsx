@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import { ProductWatermark } from "@/components/product/ProductWatermark";
 import { cn } from "@/lib/utils";
 
 const navButtonStyles =
@@ -168,6 +169,7 @@ export function ProductLightbox({
               className="object-contain"
               preload={isOpen}
             />
+            <ProductWatermark size="lg" />
           </div>
         </div>
 

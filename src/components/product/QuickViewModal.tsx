@@ -8,6 +8,7 @@ import { Button, buttonVariants } from "@/components/ui/Button";
 import { Heading, Text } from "@/components/ui/Typography";
 import { RatingStars } from "@/components/shared/RatingStars";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
+import { ProductWatermark } from "@/components/product/ProductWatermark";
 import { categoryLabel, cn, formatPrice } from "@/lib/utils";
 import { getDefaultVariantSelections } from "@/lib/cart";
 import {
@@ -104,6 +105,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
               {badge}
             </Badge>
           )}
+          <ProductWatermark />
         </div>
 
         <div className="flex flex-col gap-3 overflow-y-auto p-6 sm:w-1/2">

@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { ZoomIn } from "lucide-react";
 import { useProductVariantSelection } from "@/context/ProductVariantImageContext";
+import { ProductWatermark } from "@/components/product/ProductWatermark";
 import { cn } from "@/lib/utils";
 import type { ProductVariantGroup } from "@/types";
 
@@ -161,6 +162,7 @@ export function ProductGallery({
         <span className="absolute bottom-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-primary opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
           <ZoomIn className="h-4 w-4" aria-hidden="true" />
         </span>
+        <ProductWatermark size="md" />
       </div>
 
       {displayImages.length > 1 && (
