@@ -54,7 +54,20 @@ export type ProductMaterial =
   | "Terracotta";
 
 export type ProductOccasion =
-  "Everyday" | "Party" | "Wedding" | "Bridal" | "Festive" | "Gift";
+  | "Everyday"
+  | "Party"
+  | "Wedding"
+  | "Bridal"
+  | "Festive"
+  | "Gift"
+  | "Engagement"
+  | "Mehndi"
+  | "Valima"
+  | "Eid"
+  | "Anniversary"
+  | "Formal"
+  | "Casual"
+  | "Office Wear";
 
 export interface ProductVariantOption {
   value: string;

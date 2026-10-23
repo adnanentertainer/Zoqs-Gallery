@@ -66,7 +66,22 @@ const COLORS = [
   "Turquoise",
   "Champagne",
 ];
-const OCCASIONS = ["Everyday", "Party", "Wedding", "Bridal", "Festive", "Gift"];
+const OCCASIONS = [
+  "Everyday",
+  "Party",
+  "Wedding",
+  "Bridal",
+  "Festive",
+  "Gift",
+  "Engagement",
+  "Mehndi",
+  "Valima",
+  "Eid",
+  "Anniversary",
+  "Formal",
+  "Casual",
+  "Office Wear",
+];
 const VARIANT_TYPES = ["color", "size", "style"] as const;
 
 function emptyProduct(): AdminProductInput {

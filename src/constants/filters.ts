@@ -58,6 +58,14 @@ export const OCCASION_OPTIONS: ProductOccasion[] = [
   "Bridal",
   "Festive",
   "Gift",
+  "Engagement",
+  "Mehndi",
+  "Valima",
+  "Eid",
+  "Anniversary",
+  "Formal",
+  "Casual",
+  "Office Wear",
 ];
 
 export const RATING_OPTIONS = [4, 3, 2] as const;
