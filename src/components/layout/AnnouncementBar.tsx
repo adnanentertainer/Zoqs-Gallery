@@ -25,7 +25,7 @@ export async function AnnouncementBar() {
   ]);
 
   const message = blessedFridayOffer.enabled
-    ? `Blessed Friday Offer — ${blessedFridayOffer.discountPercentage}% Off Orders ${formatPrice(blessedFridayOffer.minSpend)} and Above`
+    ? `Blessed Friday Offer — ${blessedFridayOffer.discountPercentage}% Off Orders ${formatPrice(blessedFridayOffer.minSpend)} and Above + Free Shipping`
     : activePromoCode
       ? promoCodeMessage(activePromoCode)
       : siteConfig.announcement;

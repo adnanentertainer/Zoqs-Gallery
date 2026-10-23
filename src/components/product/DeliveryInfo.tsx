@@ -16,7 +16,7 @@ export function DeliveryInfo({ blessedFridayOffer }: DeliveryInfoProps) {
     ? {
         icon: Package,
         title: "Blessed Friday Offer",
-        description: `${blessedFridayOffer.discountPercentage}% off orders of ${formatPrice(blessedFridayOffer.minSpend)} and above.`,
+        description: `${blessedFridayOffer.discountPercentage}% off + free shipping on orders of ${formatPrice(blessedFridayOffer.minSpend)} and above.`,
       }
     : {
         icon: Package,

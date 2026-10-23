@@ -57,21 +57,17 @@ export function OrderSummary({
         discountAmount > 0 ? (
           <p className="font-body text-xs font-medium text-success">
             Blessed Friday offer applied — {blessedFridayOffer.discountPercentage}
-            % off on orders of {formatPrice(blessedFridayOffer.minSpend)} and
+            % off + free shipping on orders of {formatPrice(blessedFridayOffer.minSpend)} and
             above.
           </p>
         ) : (
           <p className="font-body text-xs text-muted">
             Add{" "}
             {formatPrice(blessedFridayOffer.minSpend - subtotal)} more to
-            unlock {blessedFridayOffer.discountPercentage}% off with our
+            unlock {blessedFridayOffer.discountPercentage}% off + free shipping with our
             Blessed Friday offer.
           </p>
         )
-      ) : promoCode ? (
-        <p className="font-body text-xs text-muted">
-          Free shipping isn&apos;t available together with a promo code.
-        </p>
       ) : qualifiesForFreeShipping ? (
         <p className="font-body text-xs font-medium text-success">
           Free shipping unlocked.
