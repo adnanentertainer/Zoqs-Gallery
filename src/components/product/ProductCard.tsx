@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/Badge";
 import { RatingStars } from "@/components/shared/RatingStars";
 import { WishlistButton } from "@/components/wishlist/WishlistButton";
 import { QuickViewModal } from "@/components/product/QuickViewModal";
-import { ProductWatermark } from "@/components/product/ProductWatermark";
 import { categoryLabel, cn, formatPrice } from "@/lib/utils";
 import { getDefaultVariantSelections } from "@/lib/cart";
 import {
@@ -166,8 +165,6 @@ export function ProductCard({ product }: ProductCardProps) {
             <ShoppingBag className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
-
-        <ProductWatermark />
       </Link>
 
       <div className="mt-3 flex flex-col gap-1">
