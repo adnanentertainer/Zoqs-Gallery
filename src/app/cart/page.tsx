@@ -11,8 +11,15 @@ import { CartWhatsAppButton } from "@/components/cart/CartWhatsAppButton";
 import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
-  const { lineItems, subtotal, freeShipping, freeShippingSuspended, totalQuantity } =
-    useCart();
+  const {
+    lineItems,
+    subtotal,
+    freeShipping,
+    freeShippingSuspended,
+    blessedFridayOffer,
+    blessedFridayDiscount,
+    totalQuantity,
+  } = useCart();
 
   useEffect(() => {
     document.title = "Your Cart | ZOQ's Gallery";
@@ -51,6 +58,8 @@ export default function CartPage() {
               subtotal={subtotal}
               freeShipping={freeShipping}
               freeShippingSuspended={freeShippingSuspended}
+              blessedFridayOffer={blessedFridayOffer}
+              blessedFridayDiscount={blessedFridayDiscount}
               secondaryAction={{ label: "Continue Shopping", href: "/shop" }}
             />
           </div>

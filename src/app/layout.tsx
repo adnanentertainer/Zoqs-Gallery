@@ -147,6 +147,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                 <CartProvider
                   shippingSettings={effectiveShippingSettings}
                   freeShippingSuspended={freeShippingSuspended}
+                  blessedFridayOffer={blessedFridayOffer}
                 >
                   <FestivalCountdownBanner />
                   <AnnouncementBar />

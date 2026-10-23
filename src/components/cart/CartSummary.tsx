@@ -3,11 +3,17 @@ import { buttonVariants } from "@/components/ui/Button";
 import { ShippingProgress } from "@/components/cart/ShippingProgress";
 import { cn, formatPrice } from "@/lib/utils";
 import type { FreeShippingProgress } from "@/lib/cart";
+import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
 
 interface CartSummaryProps {
   subtotal: number;
   freeShipping: FreeShippingProgress;
   freeShippingSuspended: boolean;
+  /** Same settings/amount checkout's OrderSummary already shows — so the
+   * cart previews the exact same discount before the shopper even reaches
+   * checkout, instead of only revealing it there. */
+  blessedFridayOffer: BlessedFridayOffer;
+  blessedFridayDiscount: number;
   secondaryAction: { label: string; href: string };
   onNavigate?: () => void;
   className?: string;
@@ -24,17 +30,35 @@ export function CartSummary({
   subtotal,
   freeShipping,
   freeShippingSuspended,
+  blessedFridayOffer,
+  blessedFridayDiscount,
   secondaryAction,
   onNavigate,
   className,
   showTopDivider = true,
 }: CartSummaryProps) {
+  const total = subtotal - blessedFridayDiscount + freeShipping.shippingCost;
+
   return (
     <div className={cn("flex flex-col gap-4", className)}>
       <ShippingProgress
         progress={freeShipping}
         hidden={freeShippingSuspended}
       />
+
+      {blessedFridayOffer.enabled &&
+        (blessedFridayDiscount > 0 ? (
+          <p className="font-body text-xs font-medium text-success">
+            Blessed Friday offer applied — {blessedFridayOffer.discountPercentage}
+            % off on orders above {formatPrice(blessedFridayOffer.minSpend)}.
+          </p>
+        ) : (
+          <p className="font-body text-xs text-muted">
+            Add {formatPrice(blessedFridayOffer.minSpend - subtotal)} more to
+            unlock {blessedFridayOffer.discountPercentage}% off with our
+            Blessed Friday offer.
+          </p>
+        ))}
 
       <div
         className={cn(
@@ -48,6 +72,16 @@ export function CartSummary({
             {formatPrice(subtotal)}
           </span>
         </div>
+        {blessedFridayDiscount > 0 && (
+          <div className="flex items-center justify-between">
+            <span className="font-body text-sm text-success">
+              Blessed Friday Offer ({blessedFridayOffer.discountPercentage}% off)
+            </span>
+            <span className="font-body text-sm text-success">
+              -{formatPrice(blessedFridayDiscount)}
+            </span>
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <span className="font-body text-sm text-muted">Shipping</span>
           <span className="font-body text-sm text-primary">
@@ -61,7 +95,7 @@ export function CartSummary({
             Total
           </span>
           <span className="font-heading text-xl font-semibold text-primary">
-            {formatPrice(subtotal + freeShipping.shippingCost)}
+            {formatPrice(total)}
           </span>
         </div>
       </div>

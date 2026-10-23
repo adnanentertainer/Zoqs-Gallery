@@ -30,6 +30,8 @@ import { trackAddToCart } from "@/lib/metaPixel";
 import { useToast } from "@/context/ToastContext";
 import { siteConfig } from "@/constants/site";
 import type { ShippingSettings } from "@/lib/checkout/shipping";
+import { calculateBlessedFridayDiscount } from "@/lib/checkout/blessedFriday";
+import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
 import type { Product } from "@/types";
 
 const STORAGE_KEY = "zoqs-gallery-cart";
@@ -193,6 +195,15 @@ interface CartContextValue {
   subtotal: number;
   freeShipping: FreeShippingProgress;
   freeShippingSuspended: boolean;
+  /** Passed straight through from RootLayout — lets CartSummary (and any
+   * other cart UI) show the same "Blessed Friday offer applied" messaging
+   * and discount line that checkout already shows, using the same offer
+   * settings. */
+  blessedFridayOffer: BlessedFridayOffer;
+  /** The Blessed Friday discount on the current subtotal, computed the same
+   * way checkout computes its own preview (see lib/checkout/blessedFriday) —
+   * 0 whenever the offer is off or the cart doesn't meet its minimum spend. */
+  blessedFridayDiscount: number;
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
@@ -234,12 +245,17 @@ interface CartProviderProps {
    * override above already makes its own math correct but would otherwise
    * render a nonsensical "away from free shipping" amount. */
   freeShippingSuspended: boolean;
+  /** Same offer object layout.tsx already fetches for the shipping-override
+   * calculation above — passed through so the cart can show its own
+   * "Blessed Friday offer applied" messaging and discount line. */
+  blessedFridayOffer: BlessedFridayOffer;
 }
 
 export function CartProvider({
   children,
   shippingSettings,
   freeShippingSuspended,
+  blessedFridayOffer,
 }: CartProviderProps) {
   const items = useSyncExternalStore(
     cartStore.subscribe,
@@ -300,6 +316,11 @@ export function CartProvider({
   const freeShipping = useMemo(
     () => getFreeShippingProgress(subtotal, shippingSettings),
     [subtotal, shippingSettings],
+  );
+
+  const blessedFridayDiscount = useMemo(
+    () => calculateBlessedFridayDiscount(subtotal, blessedFridayOffer),
+    [subtotal, blessedFridayOffer],
   );
 
   const isInCart = useCallback(
@@ -402,6 +423,8 @@ export function CartProvider({
       subtotal,
       freeShipping,
       freeShippingSuspended,
+      blessedFridayOffer,
+      blessedFridayDiscount,
       isDrawerOpen,
       openDrawer,
       closeDrawer,
@@ -421,6 +444,8 @@ export function CartProvider({
       subtotal,
       freeShipping,
       freeShippingSuspended,
+      blessedFridayOffer,
+      blessedFridayDiscount,
       isDrawerOpen,
       openDrawer,
       closeDrawer,
