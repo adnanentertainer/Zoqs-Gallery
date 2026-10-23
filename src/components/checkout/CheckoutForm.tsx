@@ -71,7 +71,7 @@ export function CheckoutForm({
     country: "Pakistan",
   });
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(
-    null,
+    "cod",
   );
   const [customerNotes, setCustomerNotes] = useState("");
   const [errors, setErrors] = useState<ShippingFieldErrors>({});
