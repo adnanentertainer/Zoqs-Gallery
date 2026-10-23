@@ -10,7 +10,24 @@ export type ProductBadge =
   "New" | "Best Seller" | "Sale" | "Limited Stock" | "Out of Stock";
 
 export type ProductColor =
-  "Gold" | "Silver" | "Rose Gold" | "Pearl" | "Multicolor" | "Black";
+  | "Gold"
+  | "Silver"
+  | "Rose Gold"
+  | "Pearl"
+  | "Multicolor"
+  | "Black"
+  | "White"
+  | "Red"
+  | "Pink"
+  | "Blue"
+  | "Green"
+  | "Purple"
+  | "Maroon"
+  | "Beige"
+  | "Bronze"
+  | "Copper"
+  | "Turquoise"
+  | "Champagne";
 
 export type ProductMaterial =
   | "Artificial Gold"

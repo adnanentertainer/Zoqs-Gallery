@@ -32,7 +32,26 @@ const MATERIALS = [
   "Alloy",
   "Beaded",
 ];
-const COLORS = ["Gold", "Silver", "Rose Gold", "Pearl", "Multicolor", "Black"];
+const COLORS = [
+  "Gold",
+  "Silver",
+  "Rose Gold",
+  "Pearl",
+  "Multicolor",
+  "Black",
+  "White",
+  "Red",
+  "Pink",
+  "Blue",
+  "Green",
+  "Purple",
+  "Maroon",
+  "Beige",
+  "Bronze",
+  "Copper",
+  "Turquoise",
+  "Champagne",
+];
 const OCCASIONS = ["Everyday", "Party", "Wedding", "Bridal", "Festive", "Gift"];
 const VARIANT_TYPES = ["color", "size", "style"] as const;
 

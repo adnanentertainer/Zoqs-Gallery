@@ -12,6 +12,18 @@ export const COLOR_OPTIONS: ProductColor[] = [
   "Pearl",
   "Multicolor",
   "Black",
+  "White",
+  "Red",
+  "Pink",
+  "Blue",
+  "Green",
+  "Purple",
+  "Maroon",
+  "Beige",
+  "Bronze",
+  "Copper",
+  "Turquoise",
+  "Champagne",
 ];
 
 export const MATERIAL_OPTIONS: ProductMaterial[] = [
