@@ -85,21 +85,18 @@ export function ShippingAddressForm({
           htmlFor="province"
           className="font-body text-sm font-medium text-primary"
         >
-          Province
+          Province (optional)
         </label>
         <select
           id="province"
           name="province"
-          required
           value={values.province}
           onChange={(event) => onChange("province", event.target.value)}
           aria-invalid={!!errors.province || undefined}
           aria-describedby={errors.province ? "province-error" : undefined}
           className={selectStyles}
         >
-          <option value="" disabled>
-            Select a province
-          </option>
+          <option value="">Select a province</option>
           {PAKISTAN_PROVINCES.map((province) => (
             <option key={province} value={province}>
               {province}
@@ -112,14 +109,6 @@ export function ShippingAddressForm({
           </p>
         )}
       </div>
-      <Input
-        label="Postal Code (optional)"
-        name="postalCode"
-        autoComplete="postal-code"
-        value={values.postalCode}
-        onChange={(event) => onChange("postalCode", event.target.value)}
-        error={errors.postalCode}
-      />
       <Input
         label="Country"
         name="country"

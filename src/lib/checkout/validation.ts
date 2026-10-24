@@ -37,8 +37,8 @@ export function validateCity(value: string): string | undefined {
   return value.trim().length === 0 ? "City is required." : undefined;
 }
 
-export function validateProvince(value: string): string | undefined {
-  return value.trim().length === 0 ? "Province is required." : undefined;
+export function validateProvince(_value: string): string | undefined {
+  return undefined;
 }
 
 export function validateCustomerNotes(value: string): string | undefined {
