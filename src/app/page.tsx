@@ -7,7 +7,6 @@ import { ProductSection } from "@/components/home/ProductSection";
 import { BridalSection } from "@/components/home/BridalSection";
 import { BenefitsSection } from "@/components/home/BenefitsSection";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
-import { NewsletterSection } from "@/components/home/NewsletterSection";
 import { SocialGallery } from "@/components/home/SocialGallery";
 import { WhatsAppFloatingButton } from "@/components/shared/WhatsAppFloatingButton";
 import { getCategories } from "@/lib/services/categoryService";
@@ -101,7 +100,6 @@ export default async function Home() {
       <BridalSection />
       <BenefitsSection />
       <ReviewsSection />
-      <NewsletterSection />
       <SocialGallery posts={socialPosts} />
     </>
   );
