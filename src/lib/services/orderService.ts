@@ -1,5 +1,8 @@
+import { revalidateTag } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { mapOrderRow } from "@/lib/supabase/mappers";
+import { CACHE_TAGS } from "@/lib/cache/tags";
+import { LOW_STOCK_THRESHOLD } from "@/lib/products";
 import type { CheckoutCartLine, Order, PaymentMethod } from "@/types/order";
 import type { Database } from "@/types/supabase";
 
@@ -88,13 +91,39 @@ export async function createOrder(
   }
 
   // create_order() decrements stock atomically in the database. We do NOT
-  // force-revalidate the product cache here — every order would otherwise
-  // bust the shared "products" tag and regenerate every storefront page
-  // (home/shop/category/every product), which is what blew through Vercel's
-  // ISR write quota. Stale stock/availability on the storefront self-heals
-  // within the service's 120s revalidate window, and checkout itself is
-  // never affected by this cache — create_order always re-validates stock
-  // server-side regardless.
+  // force-revalidate the product cache on every order — that would bust the
+  // shared "products" tag and regenerate every storefront page (home/shop/
+  // category/every product), which is what blew through Vercel's ISR write
+  // quota once already (see aeaa910). Ordinary stale stock numbers self-heal
+  // within the service's revalidate window regardless, and checkout itself
+  // is never affected by this cache — create_order always re-validates stock
+  // server-side.
+  //
+  // The one case that can't wait out that window: a product actually running
+  // low or selling out, where admin and the storefront showing different
+  // availability is customer-facing (risk of someone buying something the
+  // badge still calls "Limited Stock" when it's really gone). So only then —
+  // checked with one cheap query against just the ordered slugs — do we pay
+  // for the full-tag revalidation.
+  try {
+    const slugs = [...new Set(input.items.map((item) => item.productSlug))];
+    const { data: stockRows } = await supabase
+      .from("products")
+      .select("stock, min_stock_level")
+      .in("slug", slugs);
+    const nowLowOrOutOfStock = stockRows?.some(
+      (row) => row.stock <= (row.min_stock_level ?? LOW_STOCK_THRESHOLD),
+    );
+    if (nowLowOrOutOfStock) {
+      revalidateTag(CACHE_TAGS.products, { expire: 0 });
+    }
+  } catch (revalidateError) {
+    // Never let a cache-freshness nicety fail an already-placed order.
+    console.error(
+      "[orderService.createOrder] post-order stock revalidation check failed:",
+      revalidateError,
+    );
+  }
 
   return {
     orderNumber: data.order_number,
