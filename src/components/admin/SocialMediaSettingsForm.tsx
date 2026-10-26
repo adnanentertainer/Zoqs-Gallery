@@ -231,7 +231,12 @@ export function SocialMediaSettingsForm({
         </label>
         <p className="font-body text-xs text-muted">
           TikTok has no photo-post option, so each new product photo is
-          rendered into a short video automatically before posting.
+          rendered into a short video automatically before posting. TikTok
+          rejected our app for Production review (it only approves apps that
+          post to many separate businesses&apos; accounts, not one
+          business&apos;s own account), so each video lands as a draft in the
+          TikTok inbox —
+          open the TikTok app and tap Post to publish it.
         </p>
         {values.tiktokConnectedAt ? (
           <p className="font-body text-sm text-primary">

@@ -15,11 +15,10 @@ import {
 import {
   buildFacebookCaption,
   buildInstagramCaption,
-  buildTikTokCaption,
 } from "@/lib/meta/captionBuilder";
 import { getValidTikTokAccessToken } from "@/lib/tiktok/tokenStore";
 import { generateProductVideo } from "@/lib/tiktok/videoGenerator";
-import { publishTikTokVideoDirect } from "@/lib/tiktok/contentPostingPublisher";
+import { publishTikTokVideoToInbox } from "@/lib/tiktok/contentPostingPublisher";
 import type { TikTokTokenSet } from "@/lib/tiktok/oauth";
 import type {
   ProductSocialPostRecord,
@@ -151,21 +150,27 @@ async function runInstagramStory(
  * product photo is rendered into a short video here before upload (see
  * src/lib/tiktok/videoGenerator.ts) rather than posted directly like the
  * Facebook/Instagram image flows above.
+ *
+ * Uploads to the creator's TikTok inbox as a draft rather than posting
+ * directly (see publishTikTokVideoToInbox) -- our Content Posting API app
+ * was rejected for Production review (TikTok restricts that tier to apps
+ * serving many separate third-party accounts, not a single business's own
+ * one account), so Direct Post would otherwise be locked to SELF_ONLY
+ * visibility. A draft carries no caption -- the account owner writes one
+ * when they open TikTok and tap "Post" themselves.
  */
 async function runTikTok(
   supabase: SocialDbClient,
   imageUrl: string,
-  caption: string,
 ): Promise<PlatformResult> {
   try {
     const connection = await getValidTikTokAccessToken(supabase);
     if (!connection) return { status: "skipped" };
 
     const video = await generateProductVideo(imageUrl);
-    const { publishId } = await publishTikTokVideoDirect({
+    const { publishId } = await publishTikTokVideoToInbox({
       accessToken: connection.accessToken,
       video,
-      title: caption,
     });
     return { status: "success", id: publishId };
   } catch (error) {
@@ -308,7 +313,7 @@ async function publishProductToSocialMediaCore(
           ? runInstagramStory(settings, image.image_url)
           : Promise.resolve<PlatformResult>({ status: "skipped" }),
         settings.tiktok_enabled
-          ? runTikTok(supabase, image.image_url, buildTikTokCaption(captionInput))
+          ? runTikTok(supabase, image.image_url)
           : Promise.resolve<PlatformResult>({ status: "skipped" }),
       ]);
 
