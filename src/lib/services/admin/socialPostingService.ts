@@ -15,6 +15,8 @@ import {
 import {
   buildFacebookCaption,
   buildInstagramCaption,
+  buildTikTokVideoOverlay,
+  type SocialPostProductInput,
 } from "@/lib/meta/captionBuilder";
 import { getValidTikTokAccessToken } from "@/lib/tiktok/tokenStore";
 import { generateProductVideo } from "@/lib/tiktok/videoGenerator";
@@ -156,18 +158,25 @@ async function runInstagramStory(
  * was rejected for Production review (TikTok restricts that tier to apps
  * serving many separate third-party accounts, not a single business's own
  * one account), so Direct Post would otherwise be locked to SELF_ONLY
- * visibility. A draft carries no caption -- the account owner writes one
- * when they open TikTok and tap "Post" themselves.
+ * visibility. A draft carries no caption field -- the account owner writes
+ * one themselves when they open TikTok and tap "Post" -- so the product's
+ * name/description/price/colors are burned into the video itself as a
+ * bottom-banner overlay instead (see buildTikTokVideoOverlay), the same
+ * product detail the Facebook/Instagram captions carry as text.
  */
 async function runTikTok(
   supabase: SocialDbClient,
   imageUrl: string,
+  captionInput: SocialPostProductInput,
 ): Promise<PlatformResult> {
   try {
     const connection = await getValidTikTokAccessToken(supabase);
     if (!connection) return { status: "skipped" };
 
-    const video = await generateProductVideo(imageUrl);
+    const video = await generateProductVideo(
+      imageUrl,
+      buildTikTokVideoOverlay(captionInput),
+    );
     const { publishId } = await publishTikTokVideoToInbox({
       accessToken: connection.accessToken,
       video,
@@ -313,7 +322,7 @@ async function publishProductToSocialMediaCore(
           ? runInstagramStory(settings, image.image_url)
           : Promise.resolve<PlatformResult>({ status: "skipped" }),
         settings.tiktok_enabled
-          ? runTikTok(supabase, image.image_url)
+          ? runTikTok(supabase, image.image_url, captionInput)
           : Promise.resolve<PlatformResult>({ status: "skipped" }),
       ]);
 

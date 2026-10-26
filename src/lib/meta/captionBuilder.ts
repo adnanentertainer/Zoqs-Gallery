@@ -153,6 +153,48 @@ export function buildInstagramCaption(input: SocialPostProductInput): string {
   return caption;
 }
 
+// Burned into the generated TikTok video itself as a bottom-banner overlay
+// (see src/lib/tiktok/videoGenerator.ts) rather than sent as a caption field
+// -- TikTok's inbox-draft upload has no caption parameter at all (the
+// account owner types their own when they tap "Post"), so this is the only
+// way product detail reaches the video before that happens. Deliberately
+// text-only and emoji-free: the bundled video font has no color-emoji
+// glyphs, and the product URL isn't tappable once burned into pixels, so
+// either would just read as broken/dead text on the video.
+export interface TikTokVideoOverlay {
+  title: string;
+  details: string;
+}
+
+const OVERLAY_TITLE_LIMIT = 48;
+const OVERLAY_DESCRIPTION_LIMIT = 90;
+
+function truncate(text: string, limit: number): string {
+  return text.length > limit ? `${text.slice(0, limit - 1).trimEnd()}…` : text;
+}
+
+export function buildTikTokVideoOverlay(
+  input: SocialPostProductInput,
+): TikTokVideoOverlay {
+  const detailLines: string[] = [];
+
+  if (input.shortDescription) {
+    detailLines.push(truncate(input.shortDescription, OVERLAY_DESCRIPTION_LIMIT));
+  }
+
+  detailLines.push(formatPrice(input.price));
+
+  const color = colorLine(input.colorOptions);
+  if (color) detailLines.push(color);
+
+  detailLines.push(buildHashtags(BASE_TIKTOK_HASHTAGS, input.categoryName));
+
+  return {
+    title: truncate(input.name, OVERLAY_TITLE_LIMIT),
+    details: detailLines.join("\n"),
+  };
+}
+
 // No product link -- TikTok captions don't render URLs as tappable text
 // (unlike Facebook/Instagram), so including one here would just be dead
 // text eating into the tight TIKTOK_CAPTION_LIMIT for no benefit.
