@@ -509,14 +509,18 @@ export async function retryProductSocialPost(
 export async function getProductSocialPostStatus(productId: string): Promise<{
   facebookStatus?: SocialPlatformStatus;
   instagramStatus?: SocialPlatformStatus;
+  tiktokStatus?: SocialPlatformStatus;
   facebookError?: string | null;
   instagramError?: string | null;
+  tiktokError?: string | null;
 }> {
   await requireAdmin();
   const supabase = await getSupabaseServerClient();
   const { data } = await supabase
     .from("product_social_posts")
-    .select("facebook_status, instagram_status, facebook_error, instagram_error")
+    .select(
+      "facebook_status, instagram_status, tiktok_status, facebook_error, instagram_error, tiktok_error",
+    )
     .eq("product_id", productId)
     .maybeSingle();
 
@@ -524,8 +528,10 @@ export async function getProductSocialPostStatus(productId: string): Promise<{
   return {
     facebookStatus: data.facebook_status,
     instagramStatus: data.instagram_status,
+    tiktokStatus: data.tiktok_status,
     facebookError: data.facebook_error,
     instagramError: data.instagram_error,
+    tiktokError: data.tiktok_error,
   };
 }
 

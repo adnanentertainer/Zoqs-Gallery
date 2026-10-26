@@ -93,15 +93,20 @@ export async function shareProductToSocialAction(id: string): Promise<{
   error?: string;
   facebookStatus?: SocialPlatformStatus;
   instagramStatus?: SocialPlatformStatus;
+  tiktokStatus?: SocialPlatformStatus;
   facebookError?: string | null;
   instagramError?: string | null;
+  tiktokError?: string | null;
 }> {
   await requireAdmin();
   const settings = await getSocialMediaSettings();
-  if (!settings.autoPostEnabled || (!settings.facebookEnabled && !settings.instagramEnabled)) {
+  if (
+    !settings.autoPostEnabled ||
+    (!settings.facebookEnabled && !settings.instagramEnabled && !settings.tiktokEnabled)
+  ) {
     return {
       error:
-        "Turn on Social Auto-Post and enable Facebook or Instagram under Admin → Social Auto-Post first.",
+        "Turn on Social Auto-Post and enable Facebook, Instagram, or TikTok under Admin → Social Auto-Post first.",
     };
   }
   await publishProductToSocialMedia(id, { forceRepost: true });
