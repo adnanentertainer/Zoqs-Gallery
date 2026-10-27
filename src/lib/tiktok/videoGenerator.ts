@@ -22,6 +22,8 @@ const BANNER_PADDING_X = 60;
 const TITLE_FONT_SIZE = 58;
 const DETAILS_FONT_SIZE = 38;
 
+declare const __non_webpack_require__: NodeJS.Require | undefined;
+
 /**
  * drawtext needs a real font file on disk -- there are no system fonts in
  * Vercel's Node runtime. Rather than vendoring a new font asset (with its
@@ -29,9 +31,26 @@ const DETAILS_FONT_SIZE = 38;
  * already ships inside its own package for @vercel/og -- `next` is always
  * present at runtime since it's the framework itself, so no extra bundling
  * or file-tracing config is needed to rely on it.
+ *
+ * Uses __non_webpack_require__ rather than plain require(): Next's server
+ * build runs through webpack, which statically rewrites require.resolve()
+ * calls to its own internal numeric module ID instead of leaving Node's
+ * real path-resolution behavior intact -- plain require.resolve() here
+ * returned a bundler module ID (e.g. 33984) in production instead of a
+ * filesystem path, which then blew up every call downstream with "path"
+ * argument must be of type string. __non_webpack_require__ is Next/webpack's
+ * own documented escape hatch for exactly this (see e.g. next/dist/.../
+ * render-result.js), and survives unprocessed through the webpack bundle as
+ * a plain Node require, so require.resolve behaves normally again.
  */
 function resolveFontPath(): string {
-  const nextPackageDir = path.dirname(require.resolve("next/package.json"));
+  const nodeRequire =
+    typeof __non_webpack_require__ === "function"
+      ? __non_webpack_require__
+      : require;
+  const nextPackageDir = path.dirname(
+    nodeRequire.resolve("next/package.json"),
+  );
   return path.join(
     nextPackageDir,
     "dist/compiled/@vercel/og/Geist-Regular.ttf",
