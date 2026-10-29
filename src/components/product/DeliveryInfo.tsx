@@ -2,27 +2,41 @@ import { Banknote, Package, RotateCcw, Truck } from "lucide-react";
 import { siteConfig } from "@/constants/site";
 import { formatPrice } from "@/lib/utils";
 import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
+import type { ShippingSettings } from "@/lib/checkout/shipping";
 
 interface DeliveryInfoProps {
   blessedFridayOffer: BlessedFridayOffer;
+  shippingSettings: ShippingSettings;
 }
 
-export function DeliveryInfo({ blessedFridayOffer }: DeliveryInfoProps) {
-  // Free delivery still applies at the same threshold while Blessed Friday
-  // is on (see create_order() / layout.tsx) — this just swaps which single
-  // badge shows in this slot, favoring the more informative "X% off" offer
-  // over the plainer free-delivery one since they share the same threshold.
+export function DeliveryInfo({
+  blessedFridayOffer,
+  shippingSettings,
+}: DeliveryInfoProps) {
+  // Which toggle governs the "X% off"/"Free Delivery" badge depends on
+  // whether Blessed Friday is on — mirrors create_order()'s
+  // freeShippingEnabledOffers/freeShippingEnabledNormalOrders choice.
+  const freeShippingEnabled = blessedFridayOffer.enabled
+    ? shippingSettings.freeShippingEnabledOffers
+    : shippingSettings.freeShippingEnabledNormalOrders;
+
   const thirdItem = blessedFridayOffer.enabled
     ? {
         icon: Package,
         title: "Blessed Friday Offer",
-        description: `${blessedFridayOffer.discountPercentage}% off + free shipping on orders of ${formatPrice(blessedFridayOffer.minSpend)} and above.`,
+        description: `${blessedFridayOffer.discountPercentage}% off${freeShippingEnabled ? " + free shipping" : ""} on orders of ${formatPrice(blessedFridayOffer.minSpend)} and above.`,
       }
-    : {
-        icon: Package,
-        title: "Free Delivery",
-        description: `On orders above ${formatPrice(siteConfig.freeShippingThreshold)}.`,
-      };
+    : freeShippingEnabled
+      ? {
+          icon: Package,
+          title: "Free Delivery",
+          description: `On orders above ${formatPrice(shippingSettings.freeShippingThreshold)}.`,
+        }
+      : {
+          icon: Package,
+          title: "Delivery Charges",
+          description: `Flat rate of ${formatPrice(shippingSettings.flatShippingCost)} applies.`,
+        };
 
   const deliveryItems = [
     {

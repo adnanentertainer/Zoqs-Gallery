@@ -31,6 +31,7 @@ import {
 import { getProductReviews } from "@/lib/services/reviewService";
 import { getAverageRating, getReviewBreakdown } from "@/lib/reviews";
 import { getBlessedFridayOffer } from "@/lib/services/blessedFridayOfferService";
+import { getShippingSettings } from "@/lib/checkout/getShippingSettings";
 import { buildMetaDescription, categoryLabel, safeJsonLd } from "@/lib/utils";
 import type { ProductBadge as ProductBadgeType } from "@/types";
 
@@ -106,12 +107,20 @@ export default async function ProductPage({
 
   const categoryName = categoryLabel(product.categorySlug);
   const badge = getProductBadge(product);
-  const [productReviews, relatedProducts, blessedFridayOffer] =
+  const [productReviews, relatedProducts, blessedFridayOffer, shippingSettings] =
     await Promise.all([
       getProductReviews(product.id, product.name),
       getRelatedProducts(product, 4),
       getBlessedFridayOffer(),
+      getShippingSettings(),
     ]);
+  // Which toggle governs the free-shipping rich-result entry and the
+  // delivery-tab badge depends on whether Blessed Friday is on — mirrors
+  // create_order()'s freeShippingEnabledOffers/freeShippingEnabledNormalOrders
+  // choice (see 20261029000000_configurable_free_shipping_offers.sql).
+  const freeShippingEnabledHere = blessedFridayOffer.enabled
+    ? shippingSettings.freeShippingEnabledOffers
+    : shippingSettings.freeShippingEnabledNormalOrders;
   const breakdown = getReviewBreakdown(productReviews);
   const reviewsCount = productReviews.length;
   const averageRating =
@@ -182,7 +191,7 @@ export default async function ProductPage({
           "@type": "OfferShippingDetails",
           shippingRate: {
             "@type": "MonetaryAmount",
-            value: siteConfig.flatShippingCost,
+            value: shippingSettings.flatShippingCost,
             currency: siteConfig.currency,
           },
           shippingDestination: {
@@ -191,13 +200,13 @@ export default async function ProductPage({
           },
           deliveryTime,
         },
-        // Omitted while Blessed Friday is on — the evergreen free-shipping
-        // threshold it replaces (see CartContext/layout.tsx) isn't actually
-        // honored at checkout during that window, and this feeds Google's
-        // rich-result shipping promise, not just on-page copy.
-        ...(blessedFridayOffer.enabled
-          ? []
-          : [
+        // Only advertised when the free-shipping-above-threshold perk is
+        // actually enabled for this order's context (see
+        // freeShippingEnabledHere above) — feeds Google's rich-result
+        // shipping promise, not just on-page copy, so it must match what
+        // create_order() actually charges.
+        ...(freeShippingEnabledHere
+          ? [
               {
                 "@type": "OfferShippingDetails",
                 shippingRate: {
@@ -211,12 +220,13 @@ export default async function ProductPage({
                 },
                 eligibleTransactionVolume: {
                   "@type": "PriceSpecification",
-                  minPrice: siteConfig.freeShippingThreshold,
+                  minPrice: shippingSettings.freeShippingThreshold,
                   priceCurrency: siteConfig.currency,
                 },
                 deliveryTime,
               },
-            ]),
+            ]
+          : []),
       ],
     },
     aggregateRating:
@@ -319,13 +329,20 @@ export default async function ProductPage({
 
             <ProductActions product={product} />
 
-            <DeliveryInfo blessedFridayOffer={blessedFridayOffer} />
+            <DeliveryInfo
+              blessedFridayOffer={blessedFridayOffer}
+              shippingSettings={shippingSettings}
+            />
           </div>
         </Container>
       </ProductVariantImageProvider>
 
       <Container className="pb-16">
-        <ProductTabs product={product} blessedFridayOffer={blessedFridayOffer} />
+        <ProductTabs
+          product={product}
+          blessedFridayOffer={blessedFridayOffer}
+          shippingSettings={shippingSettings}
+        />
       </Container>
 
       <Container
