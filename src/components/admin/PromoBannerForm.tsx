@@ -37,6 +37,7 @@ function emptyBanner(): AdminPromoBannerInput {
     endsAt: null,
     isActive: true,
     displayOrder: 0,
+    autoSyncBlessedFriday: false,
   };
 }
 
@@ -93,12 +94,26 @@ export function PromoBannerForm({
           onChange={(event) => update("title", event.target.value)}
           placeholder="10% OFF YOUR FIRST ORDER"
         />
-        <Input
-          label="Subtitle / Description (optional)"
-          className="sm:col-span-2"
-          value={values.subtitle}
-          onChange={(event) => update("subtitle", event.target.value)}
-        />
+        <div className="flex flex-col gap-1.5 sm:col-span-2">
+          <Input
+            label="Subtitle / Description (optional)"
+            value={values.subtitle}
+            disabled={values.autoSyncBlessedFriday}
+            onChange={(event) => update("subtitle", event.target.value)}
+          />
+          <label className="flex items-center gap-2 font-body text-xs text-primary">
+            <input
+              type="checkbox"
+              checked={values.autoSyncBlessedFriday}
+              onChange={(event) =>
+                update("autoSyncBlessedFriday", event.target.checked)
+              }
+              className="h-4 w-4 accent-gold"
+            />
+            Auto-sync subtitle with the Blessed Friday Offer&apos;s discount %
+            and minimum spend (ignores the text above)
+          </label>
+        </div>
         <Input
           label="Promotional Text (optional)"
           value={values.promoText}

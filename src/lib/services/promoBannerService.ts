@@ -2,6 +2,8 @@ import { unstable_cache } from "next/cache";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getSupabasePublicClient } from "@/lib/supabase/server";
 import { CACHE_TAGS } from "@/lib/cache/tags";
+import { getBlessedFridayOffer } from "@/lib/services/blessedFridayOfferService";
+import { formatPrice } from "@/lib/utils";
 import type { PromoBanner } from "@/types/promoBanner";
 import type { Database } from "@/types/supabase";
 
@@ -32,6 +34,7 @@ function mapBannerRow(
     endsAt: row.ends_at,
     isActive: row.is_active,
     displayOrder: row.display_order,
+    autoSyncBlessedFriday: row.auto_sync_blessed_friday,
   };
 }
 
@@ -67,8 +70,9 @@ const getActivePromoBannersUncached = unstable_cache(
 export async function getActivePromoBanners(): Promise<PromoBanner[]> {
   if (!isSupabaseConfigured()) return [];
 
+  let banners: PromoBanner[];
   try {
-    return await getActivePromoBannersUncached();
+    banners = await getActivePromoBannersUncached();
   } catch (error) {
     console.error(
       "[promoBannerService.getActivePromoBanners] Supabase query failed:",
@@ -76,4 +80,20 @@ export async function getActivePromoBanners(): Promise<PromoBanner[]> {
     );
     return [];
   }
+
+  if (!banners.some((banner) => banner.autoSyncBlessedFriday)) return banners;
+
+  // Computed live instead of stored as text, the same reason `promoCode`
+  // above is resolved via a join — so this subtitle can never drift out of
+  // sync with the actual Blessed Friday Offer settings (Admin → Settings),
+  // the bug this flag exists to close.
+  const blessedFridayOffer = await getBlessedFridayOffer();
+  return banners.map((banner) =>
+    banner.autoSyncBlessedFriday
+      ? {
+          ...banner,
+          subtitle: `${blessedFridayOffer.discountPercentage}% off on orders above ${formatPrice(blessedFridayOffer.minSpend)}.`,
+        }
+      : banner,
+  );
 }

@@ -14,6 +14,10 @@ export interface PromoBanner {
   endsAt: string | null;
   isActive: boolean;
   displayOrder: number;
+  /** When true, `subtitle` above is already overridden with text computed
+   * live from the Blessed Friday Offer's discount percentage and minimum
+   * spend (see promoBannerService.ts) — the stored subtitle is ignored. */
+  autoSyncBlessedFriday: boolean;
 }
 
 /** Shape submitted from the admin create/edit form. */
@@ -30,6 +34,9 @@ export interface AdminPromoBannerInput {
   endsAt: string | null;
   isActive: boolean;
   displayOrder: number;
+  /** When true, the public site ignores `subtitle` and computes it live from
+   * the Blessed Friday Offer's discount percentage and minimum spend. */
+  autoSyncBlessedFriday: boolean;
 }
 
 export interface AdminPromoBannerListItem {

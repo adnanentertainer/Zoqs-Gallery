@@ -827,6 +827,7 @@ export interface Database {
           ends_at: string | null;
           is_active: boolean;
           display_order: number;
+          auto_sync_blessed_friday: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -844,6 +845,7 @@ export interface Database {
           ends_at?: string | null;
           is_active?: boolean;
           display_order?: number;
+          auto_sync_blessed_friday?: boolean;
         };
         Update: Partial<
           Database["public"]["Tables"]["promotional_banners"]["Insert"]

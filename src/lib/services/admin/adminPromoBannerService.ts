@@ -41,6 +41,7 @@ function toInput(row: BannerRow): AdminPromoBannerInput {
     endsAt: row.ends_at,
     isActive: row.is_active,
     displayOrder: row.display_order,
+    autoSyncBlessedFriday: row.auto_sync_blessed_friday,
   };
 }
 
@@ -99,6 +100,7 @@ function toRowPayload(input: AdminPromoBannerInput) {
     ends_at: input.endsAt,
     is_active: input.isActive,
     display_order: input.displayOrder,
+    auto_sync_blessed_friday: input.autoSyncBlessedFriday,
   };
 }
 
