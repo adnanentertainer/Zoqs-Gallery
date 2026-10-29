@@ -115,10 +115,6 @@ export function CheckoutForm({
     );
   }
 
-  // Free shipping at the threshold applies alongside the Blessed Friday
-  // offer or a promo code (create_order() applies the same rule
-  // server-side) rather than one suspending the other, so this is just the
-  // plain settings now.
   const effectiveShippingSettings: ShippingSettings = shippingSettings;
 
   // The automatic discount and an entered promo code never stack — the
@@ -132,6 +128,11 @@ export function CheckoutForm({
   const promoDiscount = appliedPromo?.discountAmount ?? 0;
   const useBlessedFriday = blessedFridayDiscount > promoDiscount;
   const effectiveDiscountAmount = Math.max(blessedFridayDiscount, promoDiscount);
+  // Whether an offer is in play for shipping purposes — mirrors
+  // create_order()'s v_bf_enabled or v_promo_id is not null check, which
+  // decides whether freeShippingEnabledOffers or freeShippingEnabledNormalOrders
+  // governs the free-shipping-above-threshold perk.
+  const isOfferActive = blessedFridayOffer.enabled || Boolean(appliedPromo);
   const effectiveDiscountLabel = useBlessedFriday
     ? `Blessed Friday Offer (${blessedFridayOffer.discountPercentage}% off)`
     : undefined;
@@ -234,6 +235,7 @@ export function CheckoutForm({
             shippingCost={calculateShippingCost(
               cart.subtotal - effectiveDiscountAmount,
               effectiveShippingSettings,
+              isOfferActive,
             )}
           />
         </section>
@@ -297,6 +299,7 @@ export function CheckoutForm({
           promoCode={effectivePromoCode}
           discountLabel={effectiveDiscountLabel}
           blessedFridayOffer={blessedFridayOffer}
+          isOfferActive={isOfferActive}
         />
         <CheckoutTrustBadges />
         <div className="lg:hidden">

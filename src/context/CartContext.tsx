@@ -313,8 +313,9 @@ export function CartProvider({
   );
 
   const freeShipping = useMemo(
-    () => getFreeShippingProgress(subtotal, shippingSettings),
-    [subtotal, shippingSettings],
+    () =>
+      getFreeShippingProgress(subtotal, shippingSettings, blessedFridayOffer.enabled),
+    [subtotal, shippingSettings, blessedFridayOffer.enabled],
   );
 
   const blessedFridayDiscount = useMemo(

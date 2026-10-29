@@ -11,6 +11,12 @@ export interface AdminStoreSettings {
   country: string;
   freeShippingThreshold: number;
   flatShippingCost: number;
+  /** Whether the free-shipping-above-threshold perk applies to a normal
+   * order (no offer/promo code active). */
+  freeShippingEnabledNormalOrders: boolean;
+  /** Whether the free-shipping-above-threshold perk applies to an order
+   * with the Blessed Friday offer enabled or a redeemed promo code. */
+  freeShippingEnabledOffers: boolean;
 }
 
 /**
@@ -23,14 +29,23 @@ export interface AdminStoreSettings {
 export async function getAdminStoreSettings(): Promise<AdminStoreSettings> {
   await requireAdmin();
 
-  const [siteName, currency, country, freeShippingThreshold, flatShippingCost] =
-    await Promise.all([
-      getSiteSetting<string>("site_name"),
-      getSiteSetting<string>("currency"),
-      getSiteSetting<string>("country"),
-      getSiteSetting<number>("free_shipping_threshold"),
-      getSiteSetting<number>("flat_shipping_cost"),
-    ]);
+  const [
+    siteName,
+    currency,
+    country,
+    freeShippingThreshold,
+    flatShippingCost,
+    freeShippingEnabledNormalOrders,
+    freeShippingEnabledOffers,
+  ] = await Promise.all([
+    getSiteSetting<string>("site_name"),
+    getSiteSetting<string>("currency"),
+    getSiteSetting<string>("country"),
+    getSiteSetting<number>("free_shipping_threshold"),
+    getSiteSetting<number>("flat_shipping_cost"),
+    getSiteSetting<boolean>("free_shipping_enabled_normal_orders"),
+    getSiteSetting<boolean>("free_shipping_enabled_offers"),
+  ]);
 
   return {
     siteName: siteName ?? siteConfig.name,
@@ -39,6 +54,8 @@ export async function getAdminStoreSettings(): Promise<AdminStoreSettings> {
     freeShippingThreshold:
       freeShippingThreshold ?? siteConfig.freeShippingThreshold,
     flatShippingCost: flatShippingCost ?? siteConfig.flatShippingCost,
+    freeShippingEnabledNormalOrders: freeShippingEnabledNormalOrders ?? true,
+    freeShippingEnabledOffers: freeShippingEnabledOffers ?? true,
   };
 }
 
@@ -67,12 +84,20 @@ export async function updateAdminStoreSettings(
   }
 
   const supabase = await getSupabaseServerClient();
-  const updates: { key: string; value: string | number }[] = [
+  const updates: { key: string; value: string | number | boolean }[] = [
     { key: "site_name", value: input.siteName.trim() },
     { key: "currency", value: input.currency.trim() },
     { key: "country", value: input.country.trim() },
     { key: "free_shipping_threshold", value: input.freeShippingThreshold },
     { key: "flat_shipping_cost", value: input.flatShippingCost },
+    {
+      key: "free_shipping_enabled_normal_orders",
+      value: input.freeShippingEnabledNormalOrders,
+    },
+    {
+      key: "free_shipping_enabled_offers",
+      value: input.freeShippingEnabledOffers,
+    },
   ];
 
   for (const { key, value } of updates) {

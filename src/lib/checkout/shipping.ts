@@ -1,6 +1,15 @@
 export interface ShippingSettings {
   freeShippingThreshold: number;
   flatShippingCost: number;
+  /** Whether the free-shipping-above-threshold perk applies to an order with
+   * no offer/promo code in play. Independently configurable from
+   * freeShippingEnabledOffers (see admin Settings page). */
+  freeShippingEnabledNormalOrders: boolean;
+  /** Whether the free-shipping-above-threshold perk applies to an order that
+   * has the Blessed Friday offer enabled store-wide or redeemed a promo
+   * code. create_order() applies the same rule server-side — this is only
+   * ever used for client-facing preview before submission. */
+  freeShippingEnabledOffers: boolean;
 }
 
 // Takes the amount actually being charged for goods (subtotal minus any
@@ -10,8 +19,12 @@ export interface ShippingSettings {
 export function calculateShippingCost(
   discountedSubtotal: number,
   settings: ShippingSettings,
+  isOfferActive: boolean,
 ): number {
-  return discountedSubtotal >= settings.freeShippingThreshold
+  const freeShippingEnabled = isOfferActive
+    ? settings.freeShippingEnabledOffers
+    : settings.freeShippingEnabledNormalOrders;
+  return freeShippingEnabled && discountedSubtotal >= settings.freeShippingThreshold
     ? 0
     : settings.flatShippingCost;
 }

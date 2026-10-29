@@ -92,6 +92,36 @@ export function SettingsForm({
         />
       </div>
 
+      <div className="flex flex-col gap-2">
+        <label className="flex items-center gap-2 font-body text-sm text-primary">
+          <input
+            type="checkbox"
+            checked={values.freeShippingEnabledNormalOrders}
+            onChange={(event) =>
+              update("freeShippingEnabledNormalOrders", event.target.checked)
+            }
+            className="h-4 w-4 accent-gold"
+          />
+          Enable free shipping for normal orders
+        </label>
+        <label className="flex items-center gap-2 font-body text-sm text-primary">
+          <input
+            type="checkbox"
+            checked={values.freeShippingEnabledOffers}
+            onChange={(event) =>
+              update("freeShippingEnabledOffers", event.target.checked)
+            }
+            className="h-4 w-4 accent-gold"
+          />
+          Enable free shipping during offers (Blessed Friday / promo codes)
+        </label>
+        <p className="font-body text-xs text-muted">
+          Each toggle controls whether the free shipping threshold above
+          applies in that context, independently of the other. When off, the
+          flat shipping cost is always charged instead.
+        </p>
+      </div>
+
       <Button
         type="submit"
         variant="primary"

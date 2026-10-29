@@ -145,16 +145,24 @@ export interface FreeShippingProgress {
    * shown in the cart (not just at checkout) so the flat fee is never a
    * surprise sprung on the customer after they've filled in their address. */
   shippingCost: number;
+  /** False when the admin has disabled the free-shipping-above-threshold
+   * perk for this context (see ShippingSettings) — callers should hide the
+   * progress nudge entirely rather than show an unreachable threshold. */
+  enabled: boolean;
 }
 
 export function getFreeShippingProgress(
   subtotal: number,
   settings: ShippingSettings,
+  isOfferActive: boolean,
 ): FreeShippingProgress {
+  const enabled = isOfferActive
+    ? settings.freeShippingEnabledOffers
+    : settings.freeShippingEnabledNormalOrders;
   const threshold = settings.freeShippingThreshold;
-  const qualifies = subtotal >= threshold;
+  const qualifies = enabled && subtotal >= threshold;
   const remaining = qualifies ? 0 : threshold - subtotal;
   const percentage = Math.min(100, Math.round((subtotal / threshold) * 100));
   const shippingCost = qualifies ? 0 : settings.flatShippingCost;
-  return { threshold, remaining, percentage, qualifies, shippingCost };
+  return { threshold, remaining, percentage, qualifies, shippingCost, enabled };
 }

@@ -14,14 +14,23 @@ import type { ShippingSettings } from "@/lib/checkout/shipping";
  * the Supabase server client's next/headers dependency.
  */
 export async function getShippingSettings(): Promise<ShippingSettings> {
-  const [freeShippingThreshold, flatShippingCost] = await Promise.all([
+  const [
+    freeShippingThreshold,
+    flatShippingCost,
+    freeShippingEnabledNormalOrders,
+    freeShippingEnabledOffers,
+  ] = await Promise.all([
     getSiteSetting<number>("free_shipping_threshold"),
     getSiteSetting<number>("flat_shipping_cost"),
+    getSiteSetting<boolean>("free_shipping_enabled_normal_orders"),
+    getSiteSetting<boolean>("free_shipping_enabled_offers"),
   ]);
 
   return {
     freeShippingThreshold:
       freeShippingThreshold ?? siteConfig.freeShippingThreshold,
     flatShippingCost: flatShippingCost ?? siteConfig.flatShippingCost,
+    freeShippingEnabledNormalOrders: freeShippingEnabledNormalOrders ?? true,
+    freeShippingEnabledOffers: freeShippingEnabledOffers ?? true,
   };
 }

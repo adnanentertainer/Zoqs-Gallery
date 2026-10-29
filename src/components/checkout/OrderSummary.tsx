@@ -22,6 +22,10 @@ interface OrderSummaryProps {
   promoCode?: string | null;
   discountLabel?: string;
   blessedFridayOffer: BlessedFridayOffer;
+  /** Whether an offer (Blessed Friday or a redeemed promo code) governs
+   * this order — decides whether freeShippingEnabledOffers or
+   * freeShippingEnabledNormalOrders applies. See CheckoutForm. */
+  isOfferActive: boolean;
 }
 
 export function OrderSummary({
@@ -32,13 +36,18 @@ export function OrderSummary({
   promoCode,
   discountLabel,
   blessedFridayOffer,
+  isOfferActive,
 }: OrderSummaryProps) {
   const discountedSubtotal = subtotal - discountAmount;
   const shippingCost = calculateShippingCost(
     discountedSubtotal,
     shippingSettings,
+    isOfferActive,
   );
   const total = discountedSubtotal + shippingCost;
+  const freeShippingEnabled = isOfferActive
+    ? shippingSettings.freeShippingEnabledOffers
+    : shippingSettings.freeShippingEnabledNormalOrders;
   const qualifiesForFreeShipping = shippingCost === 0;
 
   return (
@@ -72,7 +81,7 @@ export function OrderSummary({
         <p className="font-body text-xs font-medium text-success">
           Free shipping unlocked.
         </p>
-      ) : (
+      ) : freeShippingEnabled ? (
         <p className="font-body text-xs text-muted">
           Add{" "}
           {formatPrice(
@@ -80,7 +89,7 @@ export function OrderSummary({
           )}{" "}
           more to qualify for free shipping.
         </p>
-      )}
+      ) : null}
 
       <CheckoutTotals
         subtotal={subtotal}

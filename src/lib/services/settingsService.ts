@@ -15,6 +15,8 @@ import { DEFAULT_WEDDING_PROMOTION_SETTINGS } from "@/types/weddingPromotion";
 const MOCK_SETTINGS: Record<string, unknown> = {
   free_shipping_threshold: siteConfig.freeShippingThreshold,
   flat_shipping_cost: siteConfig.flatShippingCost,
+  free_shipping_enabled_normal_orders: true,
+  free_shipping_enabled_offers: true,
   site_name: siteConfig.name,
   site_tagline: siteConfig.tagline,
   announcement_text: siteConfig.announcement,
