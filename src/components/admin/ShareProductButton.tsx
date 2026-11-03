@@ -33,7 +33,7 @@ export function ShareProductButton({
     const posted: string[] = [];
     if (result.facebookStatus === "success") posted.push("Facebook");
     if (result.instagramStatus === "success") posted.push("Instagram");
-    if (result.tiktokStatus === "success") posted.push("TikTok drafts");
+    if (result.tiktokStatus === "success") posted.push("TikTok");
 
     if (posted.length > 0) {
       setSuccess(`Shared to ${posted.join(" & ")}.`);
@@ -72,7 +72,7 @@ export function ShareProductButton({
       <ConfirmDialog
         open={confirmOpen}
         title={`Share "${productName}"?`}
-        description="This posts the product's photo to Facebook and Instagram, and drops a TikTok draft video into your inbox, right now, using the Social Auto-Post settings."
+        description="This posts the product's photo to Facebook and Instagram, and posts a TikTok video directly to your profile, right now, using the Social Auto-Post settings."
         confirmLabel="Share Now"
         isDestructive={false}
         isLoading={isSubmitting}

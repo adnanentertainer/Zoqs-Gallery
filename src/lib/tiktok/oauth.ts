@@ -60,10 +60,20 @@ async function postToken(
   });
 
   const text = await response.text();
-  if (!response.ok) {
-    throw new TikTokOAuthError(response.status, text);
+  const parsed = JSON.parse(text) as Partial<TikTokTokenResponse> & {
+    error?: string;
+  };
+  // TikTok's token endpoint can return HTTP 200 with an OAuth error body
+  // instead of a non-2xx status -- e.g. refreshing a token that was issued
+  // by a different client_key/secret pair than the one now configured
+  // (Sandbox vs Production), which TikTok rejects as an invalid grant.
+  // Normalize that case to the same 400 status a "real" rejection would
+  // carry, so callers (see tokenStore.ts) can tell a genuine rejection from
+  // a transient 5xx/network failure without depending on response.ok alone.
+  if (!response.ok || parsed.error || !parsed.access_token) {
+    throw new TikTokOAuthError(response.ok ? 400 : response.status, text);
   }
-  return JSON.parse(text) as TikTokTokenResponse;
+  return parsed as TikTokTokenResponse;
 }
 
 export interface TikTokTokenSet {
