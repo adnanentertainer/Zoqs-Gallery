@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/supabase";
-import { refreshTikTokToken } from "@/lib/tiktok/oauth";
+import { refreshTikTokToken, TikTokOAuthError } from "@/lib/tiktok/oauth";
 
 type SocialDbClient = SupabaseClient<Database>;
 
@@ -17,8 +17,10 @@ export interface TikTokConnection {
  * publishProductToSocialMediaCore does: the scheduled-repost cron path runs
  * with the service-role client instead of an admin session.
  *
- * Returns null when TikTok isn't connected at all, so callers can treat
- * that the same as "skipped" rather than a refresh failure.
+ * Returns null when TikTok isn't connected at all, or when the refresh
+ * token has been rejected and the stored connection was cleared as a
+ * result, so callers can treat both the same as "skipped" rather than a
+ * refresh failure.
  */
 export async function getValidTikTokAccessToken(
   supabase: SocialDbClient,
@@ -43,7 +45,33 @@ export async function getValidTikTokAccessToken(
     return { accessToken: data.tiktok_access_token, openId: data.tiktok_open_id };
   }
 
-  const refreshed = await refreshTikTokToken(data.tiktok_refresh_token);
+  let refreshed;
+  try {
+    refreshed = await refreshTikTokToken(data.tiktok_refresh_token);
+  } catch (error) {
+    // A 400 here means TikTok rejected the refresh token itself (expired,
+    // revoked, or already rotated away by an earlier refresh) -- no retry
+    // will fix that, so clear the stored connection rather than leaving a
+    // dead token set that the settings page would keep showing as
+    // "Connected" forever. Any other error (5xx, network) is treated as
+    // transient and left alone so a temporary TikTok outage doesn't wipe a
+    // still-valid connection.
+    if (error instanceof TikTokOAuthError && error.status === 400) {
+      await supabase
+        .from("social_media_settings")
+        .update({
+          tiktok_open_id: null,
+          tiktok_display_name: null,
+          tiktok_access_token: null,
+          tiktok_refresh_token: null,
+          tiktok_token_expires_at: null,
+          tiktok_connected_at: null,
+        })
+        .eq("id", data.id);
+      return null;
+    }
+    throw error;
+  }
 
   await supabase
     .from("social_media_settings")

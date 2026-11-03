@@ -11,7 +11,10 @@ const USER_INFO_URL = "https://open.tiktokapis.com/v2/user/info/";
 const SCOPES = ["user.info.basic", "video.publish", "video.upload"];
 
 export class TikTokOAuthError extends Error {
-  constructor(status: number, body: string) {
+  constructor(
+    public readonly status: number,
+    public readonly body: string,
+  ) {
     super(`TikTok OAuth request failed (${status}): ${body}`);
     this.name = "TikTokOAuthError";
   }
