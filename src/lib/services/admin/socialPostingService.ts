@@ -15,12 +15,13 @@ import {
 import {
   buildFacebookCaption,
   buildInstagramCaption,
+  buildTikTokCaption,
   buildTikTokVideoOverlay,
   type SocialPostProductInput,
 } from "@/lib/meta/captionBuilder";
 import { getValidTikTokAccessToken } from "@/lib/tiktok/tokenStore";
 import { generateProductVideo } from "@/lib/tiktok/videoGenerator";
-import { publishTikTokVideoToInbox } from "@/lib/tiktok/contentPostingPublisher";
+import { publishTikTokVideoDirect } from "@/lib/tiktok/contentPostingPublisher";
 import type { TikTokTokenSet } from "@/lib/tiktok/oauth";
 import type {
   ProductSocialPostRecord,
@@ -153,16 +154,14 @@ async function runInstagramStory(
  * src/lib/tiktok/videoGenerator.ts) rather than posted directly like the
  * Facebook/Instagram image flows above.
  *
- * Uploads to the creator's TikTok inbox as a draft rather than posting
- * directly (see publishTikTokVideoToInbox) -- our Content Posting API app
- * was rejected for Production review (TikTok restricts that tier to apps
- * serving many separate third-party accounts, not a single business's own
- * one account), so Direct Post would otherwise be locked to SELF_ONLY
- * visibility. A draft carries no caption field -- the account owner writes
- * one themselves when they open TikTok and tap "Post" -- so the product's
- * name/description/price/colors are burned into the video itself as a
- * bottom-banner overlay instead (see buildTikTokVideoOverlay), the same
- * product detail the Facebook/Instagram captions carry as text.
+ * Posts the video directly to the connected creator's TikTok profile (see
+ * publishTikTokVideoDirect) now that TikTok has approved the app for
+ * Production review -- isTikTokAppAudited() controls the privacy level
+ * Direct Post requests (see pickPrivacyLevel in contentPostingPublisher.ts).
+ * The product's name/description/price/colors are still burned into the
+ * video itself as a bottom-banner overlay (see buildTikTokVideoOverlay) in
+ * addition to the caption, matching the branding the other platforms' posts
+ * carry as an image.
  */
 async function runTikTok(
   supabase: SocialDbClient,
@@ -177,9 +176,10 @@ async function runTikTok(
       imageUrl,
       buildTikTokVideoOverlay(captionInput),
     );
-    const { publishId } = await publishTikTokVideoToInbox({
+    const { publishId } = await publishTikTokVideoDirect({
       accessToken: connection.accessToken,
       video,
+      title: buildTikTokCaption(captionInput),
     });
     return { status: "success", id: publishId };
   } catch (error) {

@@ -94,33 +94,6 @@ async function initDirectPost(
   });
 }
 
-/**
- * Sends the video to the creator's TikTok inbox as a draft instead of
- * posting it -- no post_info/privacy_level, since nothing is actually
- * published yet. This is the only way our unaudited app can get a video in
- * front of the public: Direct Post is hard-restricted to SELF_ONLY (see
- * pickPrivacyLevel), but a draft dropped in the creator's own inbox carries
- * no such restriction once *they* tap "Post" inside the TikTok app -- that
- * action is the account owner's own post, not the API's.
- */
-async function initInboxUpload(
-  accessToken: string,
-  videoSize: number,
-): Promise<InitResponse> {
-  return tiktokFetch<InitResponse>(
-    "/post/publish/inbox/video/init/",
-    accessToken,
-    {
-      source_info: {
-        source: "FILE_UPLOAD",
-        video_size: videoSize,
-        chunk_size: videoSize,
-        total_chunk_count: 1,
-      },
-    },
-  );
-}
-
 async function uploadVideoBytes(
   uploadUrl: string,
   video: Buffer,
@@ -180,9 +153,10 @@ async function pollUntilPublished(
  * publisher (init, then poll until ready) even though the concrete API
  * calls are TikTok's own.
  *
- * Unused while the app is unaudited (see runTikTok in socialPostingService.ts,
- * which calls publishTikTokVideoToInbox instead) -- kept so switching back is
- * a one-line change if TikTok ever approves Production review.
+ * Used by runTikTok in socialPostingService.ts now that TikTok has approved
+ * the app for Production review -- pickPrivacyLevel() picks the actual
+ * visibility (PUBLIC_TO_EVERYONE when available) once isTikTokAppAudited()
+ * is true.
  */
 export async function publishTikTokVideoDirect({
   accessToken,
@@ -194,25 +168,6 @@ export async function publishTikTokVideoDirect({
   title: string;
 }): Promise<{ publishId: string }> {
   const { publish_id, upload_url } = await initDirectPost(accessToken, title, video.length);
-  await uploadVideoBytes(upload_url, video);
-  await pollUntilPublished(accessToken, publish_id);
-  return { publishId: publish_id };
-}
-
-/**
- * Uploads a generated video as a draft to the connected creator's TikTok
- * inbox instead of posting it (see initInboxUpload). The app never requests
- * a privacy level and nothing goes live until the account owner opens the
- * TikTok app and taps "Post" themselves.
- */
-export async function publishTikTokVideoToInbox({
-  accessToken,
-  video,
-}: {
-  accessToken: string;
-  video: Buffer;
-}): Promise<{ publishId: string }> {
-  const { publish_id, upload_url } = await initInboxUpload(accessToken, video.length);
   await uploadVideoBytes(upload_url, video);
   await pollUntilPublished(accessToken, publish_id);
   return { publishId: publish_id };

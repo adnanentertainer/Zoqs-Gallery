@@ -32,12 +32,12 @@ const BASE_TIKTOK_HASHTAGS = [
 ];
 const MAX_HASHTAGS = 6;
 
-// TikTok's Content Posting API technically accepts a much longer title, but
-// TikTok's own UI truncates captions after roughly this many characters --
-// keeping the generated video's caption short means nothing meaningful gets
-// cut off, unlike the much longer Facebook/Instagram captions above which
-// are expected to be expanded with "...more".
-const TIKTOK_CAPTION_LIMIT = 150;
+// Now that Direct Post gives TikTok a real caption field, match the same
+// detail level as the Facebook/Instagram captions above rather than the
+// single-line caption used while the app was unaudited and posting to the
+// inbox as a draft with no caption at all. Same ballpark as Instagram's
+// limit below.
+const TIKTOK_CAPTION_LIMIT = 2150;
 
 // Instagram caps captions at 2200 characters -- truncate the description
 // (not the whole caption) with headroom to spare, rather than let a long
@@ -195,19 +195,34 @@ export function buildTikTokVideoOverlay(
   };
 }
 
-// No product link -- TikTok captions don't render URLs as tappable text
-// (unlike Facebook/Instagram), so including one here would just be dead
-// text eating into the tight TIKTOK_CAPTION_LIMIT for no benefit.
+// Same level of product detail as buildFacebookCaption -- no bare product
+// URL though, since TikTok captions don't render links as tappable text
+// (unlike Facebook/Instagram); a "link in bio" CTA stands in for it instead.
 export function buildTikTokCaption(input: SocialPostProductInput): string {
+  let description = input.shortDescription ?? "";
+  const color = colorLine(input.colorOptions);
   const hashtags = buildHashtags(BASE_TIKTOK_HASHTAGS, input.categoryName);
-  let caption = `✨ New Arrival: ${input.name} — ${formatPrice(input.price)} ${hashtags}`;
 
-  if (caption.length > TIKTOK_CAPTION_LIMIT) {
-    const withoutHashtags = `✨ New Arrival: ${input.name} — ${formatPrice(input.price)}`;
-    caption =
-      withoutHashtags.length > TIKTOK_CAPTION_LIMIT
-        ? `${withoutHashtags.slice(0, TIKTOK_CAPTION_LIMIT - 1).trimEnd()}…`
-        : withoutHashtags;
+  function assemble(desc: string): string {
+    const lines = ["✨ New Arrival ✨", "", input.name, "", desc];
+    if (color) lines.push("", color);
+    lines.push(
+      "",
+      `💰 Price: ${formatPrice(input.price)}`,
+      "",
+      "🛍️ Shop now — link in bio",
+      "",
+      "❤️ Like & Share this post with your friends! 💕",
+      "",
+      hashtags,
+    );
+    return lines.join("\n");
+  }
+
+  let caption = assemble(description);
+  while (caption.length > TIKTOK_CAPTION_LIMIT && description.length > 0) {
+    description = `${description.slice(0, -1).trimEnd()}…`;
+    caption = assemble(description);
   }
 
   return caption;
