@@ -26,8 +26,18 @@ const nextConfig: NextConfig = {
   // the deployed function 404s on ffmpeg at runtime. '/*' (same pattern
   // Next's own docs use for sharp/aws-crt) keeps this correct regardless of
   // which bundle ends up invoking it, rather than chasing every call site.
+  //
+  // Same reasoning applies to the Geist font file that videoGenerator.ts
+  // points ffmpeg's drawtext filter at (see resolveFontPath there) -- it's
+  // resolved via a runtime fs path through next/package.json, not a static
+  // import, so without this line it's pruned from the deployed function
+  // too and drawtext fails with "Cannot find a valid font for the family
+  // Sans" / "No such file or directory" instead of actually rendering text.
   outputFileTracingIncludes: {
-    "/*": ["./node_modules/@ffmpeg-installer/**/*"],
+    "/*": [
+      "./node_modules/@ffmpeg-installer/**/*",
+      "./node_modules/next/dist/compiled/@vercel/og/*.ttf",
+    ],
   },
   images: {
     // Cloudinary and Supabase Storage already serve pre-sized/pre-optimized
