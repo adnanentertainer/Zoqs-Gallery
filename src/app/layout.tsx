@@ -17,6 +17,7 @@ import { getShippingSettings } from "@/lib/checkout/getShippingSettings";
 import { hasActivePromoCode } from "@/lib/services/promoCodeService";
 import { getBlessedFridayOffer } from "@/lib/services/blessedFridayOfferService";
 import { getWeddingPromotionSettings } from "@/lib/services/weddingPromotionService";
+import { getActiveColorTheme } from "@/lib/services/colorThemeService";
 import { META_PIXEL_ID } from "@/constants/meta";
 import { safeJsonLd } from "@/lib/utils";
 import "../styles/globals.css";
@@ -105,13 +106,19 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const [shippingSettings, promoActive, blessedFridayOffer, weddingPromotion] =
-    await Promise.all([
-      getShippingSettings(),
-      hasActivePromoCode(),
-      getBlessedFridayOffer(),
-      getWeddingPromotionSettings(),
-    ]);
+  const [
+    shippingSettings,
+    promoActive,
+    blessedFridayOffer,
+    weddingPromotion,
+    colorTheme,
+  ] = await Promise.all([
+    getShippingSettings(),
+    hasActivePromoCode(),
+    getBlessedFridayOffer(),
+    getWeddingPromotionSettings(),
+    getActiveColorTheme(),
+  ]);
 
   // Free shipping at the threshold now applies alongside the Blessed Friday
   // offer or a promo code (create_order() applies the same rule server-side)
@@ -123,10 +130,26 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const freeShippingSuspended = blessedFridayOffer.enabled;
   const effectiveShippingSettings = shippingSettings;
 
+  // Overrides the matching :root custom properties from globals.css --
+  // an inline style on the document's own root element beats a stylesheet
+  // :root rule for the same property, and every component already reads
+  // color through these tokens (directly or via the @theme inline aliases
+  // text-primary/bg-secondary/etc.), so this one swap re-colors the whole
+  // site without touching any component. Admin → Color Theme picks which
+  // theme's tokens land here; see src/types/colorTheme.ts.
+  const themeStyle = {
+    "--color-charcoal": colorTheme.tokens.primary,
+    "--color-cream": colorTheme.tokens.secondary,
+    "--color-gold": colorTheme.tokens.accent,
+    "--color-beige": colorTheme.tokens.beige,
+    "--color-muted": colorTheme.tokens.muted,
+  } as React.CSSProperties;
+
   return (
     <html
       lang="en"
       data-scroll-behavior="smooth"
+      style={themeStyle}
       className={`${playfairDisplay.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-white font-body text-primary">
@@ -150,7 +173,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                 >
                   <FestivalCountdownBanner />
                   <AnnouncementBar />
-                  <Header weddingCollectionEnabled={weddingPromotion.showInNav} />
+                  <Header
+                    weddingCollectionEnabled={weddingPromotion.showInNav}
+                  />
                   <main className="flex flex-1 flex-col">{children}</main>
                   <Footer />
                 </CartProvider>

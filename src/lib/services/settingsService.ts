@@ -6,6 +6,10 @@ import { CACHE_TAGS } from "@/lib/cache/tags";
 import { DEFAULT_FESTIVAL_BANNER } from "@/types/festivalBanner";
 import { DEFAULT_BLESSED_FRIDAY_OFFER } from "@/types/blessedFridayOffer";
 import { DEFAULT_WEDDING_PROMOTION_SETTINGS } from "@/types/weddingPromotion";
+import {
+  DEFAULT_COLOR_THEME_ID,
+  DEFAULT_COLOR_THEME_SCHEDULE,
+} from "@/types/colorTheme";
 
 // Mirrors the site_settings rows seeded by scripts/seed.ts. Used as the mock
 // fallback so getSiteSetting() behaves identically whether or not Supabase is
@@ -27,6 +31,8 @@ const MOCK_SETTINGS: Record<string, unknown> = {
   default_hero_image: "",
   blessed_friday_offer: DEFAULT_BLESSED_FRIDAY_OFFER,
   wedding_promotion: DEFAULT_WEDDING_PROMOTION_SETTINGS,
+  color_theme: DEFAULT_COLOR_THEME_ID,
+  color_theme_schedule: DEFAULT_COLOR_THEME_SCHEDULE,
 };
 
 // This is a public, admin-managed setting read on nearly every page (festival

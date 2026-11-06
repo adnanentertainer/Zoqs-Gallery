@@ -17,6 +17,7 @@ import {
   Megaphone,
   Gift,
   MessageCircle,
+  Palette,
   type LucideIcon,
 } from "lucide-react";
 import { SOCIAL_ENGAGEMENT_CAMPAIGNS_ENABLED } from "@/lib/features";
@@ -39,7 +40,13 @@ export const adminNavItems: AdminNavItem[] = [
   { label: "Promo Codes", href: "/admin/promo-codes", icon: Ticket },
   { label: "Promo Banners", href: "/admin/promo-banners", icon: Megaphone },
   ...(SOCIAL_ENGAGEMENT_CAMPAIGNS_ENABLED
-    ? [{ label: "Social Campaigns", href: "/admin/social-campaigns", icon: Gift }]
+    ? [
+        {
+          label: "Social Campaigns",
+          href: "/admin/social-campaigns",
+          icon: Gift,
+        },
+      ]
     : []),
   { label: "Reviews", href: "/admin/reviews", icon: Star },
   { label: "Follow Our Style", href: "/admin/social-posts", icon: Images },
@@ -51,5 +58,6 @@ export const adminNavItems: AdminNavItem[] = [
   },
   { label: "Reels", href: "/admin/reels", icon: Clapperboard },
   { label: "Customers", href: "/admin/customers", icon: Users },
+  { label: "Color Theme", href: "/admin/theme", icon: Palette },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
