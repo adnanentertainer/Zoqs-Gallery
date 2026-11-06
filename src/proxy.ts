@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isSupabaseConfigured, getSupabaseEnv } from "@/lib/supabase/env";
+import { getProductBySlug } from "@/lib/services/productService";
+import { getCategoryBySlug } from "@/lib/services/categoryService";
 
 // /checkout and /order-confirmation are deliberately NOT here — guest
 // checkout is allowed (see /checkout/start), and a guest's own order
@@ -26,6 +28,9 @@ const PROTECTED_PREFIXES = ["/account"];
  * was renamed in Next.js 16.
  */
 export async function proxy(request: NextRequest) {
+  const catalogNotFound = await checkCatalogResourceExists(request);
+  if (catalogNotFound) return catalogNotFound;
+
   let response = NextResponse.next({ request: { headers: request.headers } });
 
   const isProtected = PROTECTED_PREFIXES.some(
@@ -94,6 +99,49 @@ export async function proxy(request: NextRequest) {
   }
 
   return response;
+}
+
+/**
+ * /product/[slug] and /category/[slug] both have a loading.tsx, so Next.js
+ * wraps them in an implicit Suspense boundary -- the fallback starts
+ * streaming (as HTTP 200) the moment the page component suspends on its
+ * first `await`, before the component's own `notFound()` check can run.
+ * That locks the status in at 200 even though the page correctly renders
+ * "not found" content (Next adds a noindex meta tag, but the status can
+ * never change once streaming starts -- see node_modules/next/dist/docs/
+ * 01-app/03-api-reference/03-file-conventions/loading.md's "Status Codes"
+ * section, which names this exact proxy check as the fix). Checking
+ * existence here, before the page renders at all, is the only way to still
+ * return a real 404 for a bad product/category slug while keeping those
+ * pages' loading skeletons for everyone else.
+ */
+async function checkCatalogResourceExists(
+  request: NextRequest,
+): Promise<NextResponse | null> {
+  const { pathname } = request.nextUrl;
+
+  const productSlug = pathname.match(/^\/product\/([^/]+)$/)?.[1];
+  if (productSlug) {
+    const product = await getProductBySlug(decodeURIComponent(productSlug));
+    if (!product) {
+      return NextResponse.rewrite(
+        new URL("/not-found-passthrough", request.url),
+      );
+    }
+    return null;
+  }
+
+  const categorySlug = pathname.match(/^\/category\/([^/]+)$/)?.[1];
+  if (categorySlug) {
+    const category = await getCategoryBySlug(decodeURIComponent(categorySlug));
+    if (!category) {
+      return NextResponse.rewrite(
+        new URL("/not-found-passthrough", request.url),
+      );
+    }
+  }
+
+  return null;
 }
 
 export const config = {
