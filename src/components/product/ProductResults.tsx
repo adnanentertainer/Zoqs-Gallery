@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { EmptyState } from "@/components/product/EmptyState";
-import { Button } from "@/components/ui/Button";
 import { PRODUCTS_PER_PAGE } from "@/constants/filters";
 import type { Product } from "@/types";
 
@@ -31,6 +30,35 @@ export function ProductResults({
   emptyActionHref,
 }: ProductResultsProps) {
   const [visibleCount, setVisibleCount] = useState(pageSize);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const hasMore = visibleCount < products.length;
+
+  // Every caller that can actually change `products` at runtime (Shop,
+  // Category, Wedding Collection, Search) already remounts this component
+  // via a `key` tied to the filters/search params, which reinitializes
+  // visibleCount fresh -- so no reset-on-prop-change effect is needed here.
+
+  // Loads the next batch automatically once the sentinel below the grid
+  // scrolls near the viewport -- replaces the old "Load More" button.
+  // rootMargin starts the load a bit before the sentinel is actually
+  // visible, so the next batch is ready by the time the user scrolls to it.
+  useEffect(() => {
+    if (!hasMore) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisibleCount((count) => count + pageSize);
+        }
+      },
+      { rootMargin: "600px" },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, pageSize]);
 
   if (products.length === 0) {
     return (
@@ -46,25 +74,15 @@ export function ProductResults({
   }
 
   const visibleProducts = products.slice(0, visibleCount);
-  const hasMore = visibleCount < products.length;
 
   return (
     <div className="flex flex-col gap-8">
-      <p className="font-body text-sm text-muted">
+      <p className="font-body text-sm text-muted" aria-live="polite">
         Showing 1–{visibleProducts.length} of {products.length} products
       </p>
       <ProductGrid products={visibleProducts} />
       {hasMore && (
-        <div className="flex justify-center">
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            onClick={() => setVisibleCount((count) => count + pageSize)}
-          >
-            Load More
-          </Button>
-        </div>
+        <div ref={sentinelRef} aria-hidden="true" className="h-1 w-full" />
       )}
     </div>
   );
