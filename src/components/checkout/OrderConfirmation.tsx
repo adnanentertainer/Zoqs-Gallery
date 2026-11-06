@@ -178,7 +178,7 @@ export function OrderConfirmation({
         <Link
           href="/shop"
           className={buttonVariants(
-            "outline",
+            "outline-gold",
             "lg",
             "h-14 flex-1 text-base",
           )}

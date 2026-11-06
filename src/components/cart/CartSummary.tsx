@@ -115,7 +115,7 @@ export function CartSummary({
         <Link
           href={secondaryAction.href}
           onClick={onNavigate}
-          className={buttonVariants("outline", "lg", "w-full")}
+          className={buttonVariants("outline-gold", "lg", "w-full")}
         >
           {secondaryAction.label}
         </Link>

@@ -35,7 +35,7 @@ export default async function CheckoutStartPage() {
         </Link>
         <Link
           href={`/signup?redirect=${CHECKOUT_REDIRECT}`}
-          className={buttonVariants("outline", "lg", "w-full justify-center")}
+          className={buttonVariants("outline-gold", "lg", "w-full justify-center")}
         >
           <UserPlus className="h-4 w-4" aria-hidden="true" />
           Create Account

@@ -152,7 +152,7 @@ export function PromoCodeInput({
         </div>
         <Button
           type="button"
-          variant="outline"
+          variant="outline-gold"
           size="md"
           isLoading={isSubmitting}
           disabled={!code.trim()}

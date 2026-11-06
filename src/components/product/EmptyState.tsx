@@ -33,7 +33,7 @@ export function EmptyState({
         <Link
           href={actionHref}
           onClick={onActionClick}
-          className={buttonVariants("outline", "md")}
+          className={buttonVariants("outline-gold", "md")}
         >
           {actionLabel}
         </Link>

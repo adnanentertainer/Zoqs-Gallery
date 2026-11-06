@@ -269,7 +269,7 @@ export function ProductActions({ product }: ProductActionsProps) {
         </div>
         <Button
           type="button"
-          variant="outline"
+          variant="outline-gold"
           size="md"
           className="flex-1"
           tabIndex={showStickyBar ? 0 : -1}

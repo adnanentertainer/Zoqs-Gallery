@@ -26,7 +26,7 @@ export function ProductGridError({
       <Text variant="body" className="max-w-sm text-muted">
         {description}
       </Text>
-      <Button type="button" variant="outline" size="md" onClick={onRetry}>
+      <Button type="button" variant="outline-gold" size="md" onClick={onRetry}>
         Try Again
       </Button>
     </div>

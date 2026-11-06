@@ -93,7 +93,7 @@ export function HeroSection({ imageUrl, imageAlt }: HeroSectionProps) {
             <Link
               href="#categories"
               className={buttonVariants(
-                "outline",
+                "outline-gold",
                 "lg",
                 "transition-transform duration-200 hover:-translate-y-0.5",
               )}

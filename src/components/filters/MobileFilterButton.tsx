@@ -53,7 +53,7 @@ export function MobileFilterButton({
     <>
       <Button
         type="button"
-        variant="outline"
+        variant="outline-gold"
         size="md"
         onClick={openDrawer}
         className="lg:hidden"

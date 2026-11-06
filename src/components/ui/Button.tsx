@@ -4,7 +4,13 @@ import { cn } from "@/lib/utils";
 import { Spinner } from "@/components/ui/Spinner";
 
 export type ButtonVariant =
-  "primary" | "secondary" | "outline" | "ghost" | "gold" | "danger";
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "outline-gold"
+  | "ghost"
+  | "gold"
+  | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const variantStyles: Record<ButtonVariant, string> = {
@@ -13,6 +19,11 @@ const variantStyles: Record<ButtonVariant, string> = {
     "border border-beige bg-secondary text-primary hover:border-gold/50 hover:bg-beige",
   outline:
     "border border-primary text-primary hover:bg-primary hover:text-white",
+  // Same shape as "outline", but hovers/focuses into the theme's accent
+  // color instead of the always-dark ink -- for storefront CTAs paired
+  // next to a "gold" button, so the pair's interactive states match.
+  "outline-gold":
+    "border border-gold text-primary hover:bg-gold hover:text-white",
   ghost: "text-primary hover:bg-beige",
   gold: "bg-gold text-white shadow-sm hover:bg-gold/90 hover:shadow-md",
   danger: "bg-error text-white hover:bg-error/90",
