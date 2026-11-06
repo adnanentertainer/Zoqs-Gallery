@@ -110,7 +110,6 @@ A few client-side, synchronous-by-necessity pieces intentionally keep reading th
 
 - **Cart and wishlist** (`src/context/CartContext.tsx`, `WishlistContext.tsx`) resolve items by **product slug** against the mock catalog. Slugs are identical in both modes (the seed script preserves them), so a product added to the cart from a Supabase-rendered page still resolves correctly.
 - The header's instant-search dropdown (`SearchTrigger`) and the shop/category filter sidebar's category checkboxes read the mock catalog/category list directly for the same reason — they need synchronous, per-keystroke or per-render data.
-- "Recently Viewed" on the product page is an explicitly lightweight mock (no real view-history tracking exists) and stays mock-sourced either way.
 
 None of this affects what's actually _displayed_ as the primary catalog — homepage, shop, category, search results, and the product detail page all go through the service layer and render Supabase data whenever it's configured.
 
