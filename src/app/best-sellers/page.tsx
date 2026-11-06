@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { ProductResults } from "@/components/product";
+import { WhatsAppFloatingButton } from "@/components/shared/WhatsAppFloatingButton";
 import { getBestSellers } from "@/lib/services/productService";
 import { buildOpenGraph } from "@/lib/utils";
 
@@ -38,6 +39,8 @@ export default async function BestSellersPage() {
           emptyActionHref="/shop"
         />
       </Container>
+
+      <WhatsAppFloatingButton ariaLabel="Chat with ZOQ's Gallery on WhatsApp" />
     </>
   );
 }

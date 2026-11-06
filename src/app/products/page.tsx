@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { CategoryCard } from "@/components/home/CategoryCard";
+import { WhatsAppFloatingButton } from "@/components/shared/WhatsAppFloatingButton";
 import { getCategories } from "@/lib/services/categoryService";
 import { buildOpenGraph } from "@/lib/utils";
 
@@ -36,6 +37,8 @@ export default async function ProductsPage() {
           ))}
         </div>
       </Container>
+
+      <WhatsAppFloatingButton ariaLabel="Chat with ZOQ's Gallery on WhatsApp" />
     </>
   );
 }
