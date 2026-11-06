@@ -105,7 +105,7 @@ export function ContactForm() {
           </p>
         )}
       </div>
-      <Button type="submit" variant="primary" size="lg" className="mt-2">
+      <Button type="submit" variant="gold" size="lg" className="mt-2">
         <MessageCircle className="h-4 w-4" aria-hidden="true" />
         Send via WhatsApp
       </Button>

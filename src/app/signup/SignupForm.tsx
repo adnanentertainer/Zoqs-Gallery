@@ -94,7 +94,7 @@ export function SignupForm() {
         />
         <Link
           href={loginHref}
-          className={buttonVariants("primary", "lg", "mt-6 w-full")}
+          className={buttonVariants("gold", "lg", "mt-6 w-full")}
         >
           Go to Login
         </Link>
@@ -192,7 +192,7 @@ export function SignupForm() {
 
         <Button
           type="submit"
-          variant="primary"
+          variant="gold"
           size="lg"
           isLoading={isSubmitting}
           className="w-full"

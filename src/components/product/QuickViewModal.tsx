@@ -150,14 +150,14 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
               <Link
                 href={`/product/${product.slug}`}
                 onClick={onClose}
-                className={buttonVariants("primary", "md", "flex-1")}
+                className={buttonVariants("gold", "md", "flex-1")}
               >
                 Select Options
               </Link>
             ) : (
               <Button
                 type="button"
-                variant="primary"
+                variant="gold"
                 size="md"
                 disabled={!inStock}
                 onClick={handleAddToCart}

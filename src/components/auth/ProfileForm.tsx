@@ -101,7 +101,7 @@ export function ProfileForm() {
 
       <Button
         type="submit"
-        variant="primary"
+        variant="gold"
         size="lg"
         isLoading={isSubmitting}
         className="w-fit"

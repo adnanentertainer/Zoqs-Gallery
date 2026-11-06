@@ -124,7 +124,7 @@ export function CampaignEngagementChecklist({
             {error}
           </Text>
         )}
-        <Button onClick={handleJoin} isLoading={isJoining} variant="primary" size="md">
+        <Button onClick={handleJoin} isLoading={isJoining} variant="gold" size="md">
           Join Campaign
         </Button>
       </div>

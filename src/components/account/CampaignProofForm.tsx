@@ -73,7 +73,7 @@ export function CampaignProofForm({
           className="w-full rounded-sm border border-beige bg-white px-4 py-3 font-body text-sm text-primary focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
         />
       </div>
-      <Button type="submit" variant="primary" size="md" isLoading={isSubmitting}>
+      <Button type="submit" variant="gold" size="md" isLoading={isSubmitting}>
         Submit for Review
       </Button>
     </form>

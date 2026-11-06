@@ -76,7 +76,7 @@ export default function AboutPage() {
               and worn again.
             </Text>
             <div className="mt-2 flex justify-center lg:justify-start">
-              <Link href="/shop" className={buttonVariants("primary", "lg")}>
+              <Link href="/shop" className={buttonVariants("gold", "lg")}>
                 Shop the Collection
               </Link>
             </div>

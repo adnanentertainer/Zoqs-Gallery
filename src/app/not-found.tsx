@@ -14,7 +14,7 @@ export default function NotFound() {
         We couldn&apos;t find the page you were looking for. It may have moved
         or no longer exists.
       </Text>
-      <Link href="/shop" className={buttonVariants("primary", "lg")}>
+      <Link href="/shop" className={buttonVariants("gold", "lg")}>
         Continue Shopping
       </Link>
     </Container>

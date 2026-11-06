@@ -28,7 +28,7 @@ export default async function CheckoutStartPage() {
       <div className="flex flex-col gap-3">
         <Link
           href={`/login?redirect=${CHECKOUT_REDIRECT}`}
-          className={buttonVariants("primary", "lg", "w-full justify-center")}
+          className={buttonVariants("gold", "lg", "w-full justify-center")}
         >
           <LogIn className="h-4 w-4" aria-hidden="true" />
           Log In

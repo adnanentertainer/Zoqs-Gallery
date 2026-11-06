@@ -186,7 +186,7 @@ export function ProductActions({ product }: ProductActionsProps) {
         <div className="flex gap-3">
           <Button
             type="button"
-            variant="primary"
+            variant="gold"
             size="lg"
             className="flex-1"
             onClick={handleAddToCart}

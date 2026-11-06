@@ -85,7 +85,7 @@ export function OrderConfirmation({
           href={whatsAppHref}
           target="_blank"
           rel="noopener noreferrer"
-          className={buttonVariants("primary", "lg", "h-14 text-base")}
+          className={buttonVariants("gold", "lg", "h-14 text-base")}
         >
           <WhatsAppIcon className="h-5 w-5" aria-hidden="true" />
           Send Order Details via WhatsApp
@@ -189,7 +189,7 @@ export function OrderConfirmation({
         <Link
           href={isGuest ? "/signup" : "/account"}
           className={buttonVariants(
-            "primary",
+            "gold",
             "lg",
             "h-14 flex-1 text-base",
           )}

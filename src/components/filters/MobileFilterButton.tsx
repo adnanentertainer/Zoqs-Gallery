@@ -131,7 +131,7 @@ export function MobileFilterButton({
           <div className="border-t border-beige px-6 py-4">
             <Button
               type="button"
-              variant="primary"
+              variant="gold"
               size="lg"
               className="w-full"
               onClick={applyFilters}

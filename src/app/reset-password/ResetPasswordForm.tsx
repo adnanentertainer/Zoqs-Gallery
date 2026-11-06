@@ -113,7 +113,7 @@ export function ResetPasswordForm() {
 
         <Button
           type="submit"
-          variant="primary"
+          variant="gold"
           size="lg"
           isLoading={isSubmitting}
           className="w-full"

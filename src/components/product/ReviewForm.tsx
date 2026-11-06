@@ -100,7 +100,7 @@ export function ReviewForm({ productId, productSlug }: ReviewFormProps) {
       </div>
       <Button
         type="submit"
-        variant="primary"
+        variant="gold"
         size="lg"
         isLoading={isSubmitting}
         disabled={rating === 0 || !reviewText.trim()}
