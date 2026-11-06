@@ -76,3 +76,34 @@ body {
     opacity: 0.85;
   }
 }
+
+/* One-time entrance for the hero's text and photo on page load -- not
+   scroll-triggered (it's above the fold already), just a soft fade+rise
+   so the first screen feels composed rather than snapping in instantly.
+   See Reveal.tsx for the equivalent scroll-into-view version used by
+   every section below the fold. */
+@keyframes fade-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-rise-in {
+  animation: fade-rise-in 0.8s ease-out both;
+}
+
+.animate-fade-rise-in-delayed {
+  animation: fade-rise-in 0.9s ease-out 0.15s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-rise-in,
+  .animate-fade-rise-in-delayed {
+    animation: none;
+  }
+}

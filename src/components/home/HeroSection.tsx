@@ -38,7 +38,7 @@ export function HeroSection({ imageUrl, imageAlt }: HeroSectionProps) {
             text in a narrow column instead of side-by-side. Saves a full
             aspect-[4/5] image's worth of scroll height on every page that
             renders this section on mobile. */}
-        <div className="order-2 hidden justify-center lg:flex">
+        <div className="order-2 hidden justify-center lg:flex animate-fade-rise-in-delayed">
           <div className="relative w-full max-w-md">
             <div
               aria-hidden="true"
@@ -60,7 +60,7 @@ export function HeroSection({ imageUrl, imageAlt }: HeroSectionProps) {
           </div>
         </div>
 
-        <div className="order-1 flex flex-col items-center gap-5 text-center lg:items-start lg:text-left">
+        <div className="order-1 flex flex-col items-center gap-5 text-center lg:items-start lg:text-left animate-fade-rise-in">
           <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-gold">
             <span className="h-px w-8 bg-gold" aria-hidden="true" />
             Premium Artificial Jewellery

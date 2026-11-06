@@ -92,11 +92,11 @@ export function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <article className="group flex flex-col">
+    <article className="group flex flex-col transition-transform duration-300 hover:-translate-y-1">
       <Link
         href={`/product/${product.slug}`}
         onMouseEnter={() => setHasHoveredOnce(true)}
-        className="relative block aspect-[3/4] w-full overflow-hidden rounded-2xl bg-beige shadow-sm transition-shadow duration-300 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+        className="relative block aspect-[3/4] w-full overflow-hidden rounded-2xl bg-beige shadow-sm transition-shadow duration-300 group-hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
       >
         <Image
           src={primaryImage}

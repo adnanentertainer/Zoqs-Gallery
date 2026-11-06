@@ -40,11 +40,13 @@ export function BenefitsSection() {
             key={title}
             className={`flex items-center gap-4 ${index > 0 ? "lg:pl-8" : ""}`}
           >
-            <Icon
-              className="h-7 w-7 shrink-0 text-gold"
-              strokeWidth={1.5}
-              aria-hidden="true"
-            />
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gold/10">
+              <Icon
+                className="h-6 w-6 text-gold"
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
+            </span>
             <div className="flex flex-col gap-0.5">
               <span className="font-heading text-base font-semibold text-primary">
                 {title}

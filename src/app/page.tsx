@@ -9,6 +9,7 @@ import { BenefitsSection } from "@/components/home/BenefitsSection";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
 import { SocialGallery } from "@/components/home/SocialGallery";
 import { WhatsAppFloatingButton } from "@/components/shared/WhatsAppFloatingButton";
+import { Reveal } from "@/components/shared/Reveal";
 import { getCategories } from "@/lib/services/categoryService";
 import {
   getBestSellers,
@@ -63,44 +64,62 @@ export default async function Home() {
       />
       {showWeddingPromotion && (
         <>
-          <WeddingBanner
-            imageUrl={weddingPromotion.imageUrl || undefined}
-            heading={weddingPromotion.bannerHeading || undefined}
-            subtext={weddingPromotion.bannerSubtext || undefined}
-            buttonLabel={weddingPromotion.bannerButtonLabel || undefined}
-          />
-          <ProductSection
-            id="wedding-collection"
-            title="Wedding Season Favourites"
-            subtitle="Hand-picked jewellery for your wedding celebrations"
-            products={weddingPicks.slice(0, 8)}
-            viewAllLabel="View Wedding Collection"
-            viewAllHref="/wedding-collection"
-            background="cream"
-          />
+          <Reveal>
+            <WeddingBanner
+              imageUrl={weddingPromotion.imageUrl || undefined}
+              heading={weddingPromotion.bannerHeading || undefined}
+              subtext={weddingPromotion.bannerSubtext || undefined}
+              buttonLabel={weddingPromotion.bannerButtonLabel || undefined}
+            />
+          </Reveal>
+          <Reveal>
+            <ProductSection
+              id="wedding-collection"
+              title="Wedding Season Favourites"
+              subtitle="Hand-picked jewellery for your wedding celebrations"
+              products={weddingPicks.slice(0, 8)}
+              viewAllLabel="View Wedding Collection"
+              viewAllHref="/wedding-collection"
+              background="cream"
+            />
+          </Reveal>
         </>
       )}
-      <CategorySection categories={categories} />
-      <ProductSection
-        id="new-arrivals"
-        title="New Arrivals"
-        subtitle="Fresh styles, just added to the collection."
-        products={newArrivals}
-        viewAllLabel="View All New Arrivals"
-        viewAllHref="/new-arrivals"
-      />
-      <ProductSection
-        title="Best Sellers"
-        subtitle="Loved and worn again and again by ZOQ's Gallery customers."
-        products={bestSellers}
-        viewAllLabel="View All Best Sellers"
-        viewAllHref="/best-sellers"
-        background="cream"
-      />
-      <BridalSection />
-      <BenefitsSection />
-      <ReviewsSection />
-      <SocialGallery posts={socialPosts} />
+      <Reveal>
+        <CategorySection categories={categories} />
+      </Reveal>
+      <Reveal>
+        <ProductSection
+          id="new-arrivals"
+          title="New Arrivals"
+          subtitle="Fresh styles, just added to the collection."
+          products={newArrivals}
+          viewAllLabel="View All New Arrivals"
+          viewAllHref="/new-arrivals"
+        />
+      </Reveal>
+      <Reveal>
+        <ProductSection
+          title="Best Sellers"
+          subtitle="Loved and worn again and again by ZOQ's Gallery customers."
+          products={bestSellers}
+          viewAllLabel="View All Best Sellers"
+          viewAllHref="/best-sellers"
+          background="cream"
+        />
+      </Reveal>
+      <Reveal>
+        <BridalSection />
+      </Reveal>
+      <Reveal>
+        <BenefitsSection />
+      </Reveal>
+      <Reveal>
+        <ReviewsSection />
+      </Reveal>
+      <Reveal>
+        <SocialGallery posts={socialPosts} />
+      </Reveal>
     </>
   );
 }
