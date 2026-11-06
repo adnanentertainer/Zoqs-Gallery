@@ -32,7 +32,13 @@ export function HeroSection({ imageUrl, imageAlt }: HeroSectionProps) {
         {/* Text leads on every breakpoint (order-2 on mobile would otherwise
             push the heading and "Shop" CTA below a full-bleed photo, costing
             a full scroll before a mobile visitor sees any call to action). */}
-        <div className="order-2 flex justify-center">
+        {/* Hidden below lg (not just phone-width) to match the grid's own
+            single-column-until-lg breakpoint -- showing it again at an
+            intermediate tablet width would just cram it above/below the
+            text in a narrow column instead of side-by-side. Saves a full
+            aspect-[4/5] image's worth of scroll height on every page that
+            renders this section on mobile. */}
+        <div className="order-2 hidden justify-center lg:flex">
           <div className="relative w-full max-w-md">
             <div
               aria-hidden="true"

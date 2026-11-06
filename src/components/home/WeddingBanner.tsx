@@ -45,7 +45,11 @@ export function WeddingBanner({
       />
 
       <Container className="relative grid grid-cols-1 items-center gap-10 py-14 sm:py-16 lg:grid-cols-2 lg:gap-16 lg:py-20">
-        <div className="relative mx-auto w-full max-w-md lg:mx-0">
+        {/* Hidden below lg, same reasoning as HeroSection's image -- this
+            banner sits between the hero and "Shop By Category," so cutting
+            its image on mobile brings that section (and everything after
+            it) up by a full aspect-[4/5] image's worth of scroll height. */}
+        <div className="relative mx-auto hidden w-full max-w-md lg:mx-0 lg:block">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -inset-3 hidden rounded-2xl border border-maroon/20 sm:block"
