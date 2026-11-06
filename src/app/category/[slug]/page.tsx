@@ -12,6 +12,7 @@ import {
 } from "@/components/filters";
 import { SearchTrigger } from "@/components/search";
 import { ProductResults } from "@/components/product";
+import { WhatsAppFloatingButton } from "@/components/shared/WhatsAppFloatingButton";
 import { getCategoryBySlug } from "@/lib/services/categoryService";
 import { getProductsByCategory } from "@/lib/services/productService";
 import {
@@ -38,11 +39,13 @@ export async function generateMetadata({
   params,
 }: PageProps<"/category/[slug]">): Promise<Metadata> {
   const { slug } = await params;
+  // A missing slug never reaches here -- src/proxy.ts rewrites it to
+  // /not-found-passthrough before this page (or its metadata) ever runs,
+  // which is also what lets that case return a real HTTP 404 instead of
+  // the 200 a notFound() call from inside this loading.tsx-wrapped route
+  // would be stuck with (see proxy.ts's checkCatalogResourceExists).
   const category = await getCategoryBySlug(slug);
-
-  if (!category) {
-    return { title: "Category Not Found | ZOQ's Gallery" };
-  }
+  if (!category) notFound();
 
   const title = `${category.name} | ZOQ's Gallery`;
   const description = category.description;
@@ -140,6 +143,8 @@ export default async function CategoryPage({
           />
         </div>
       </Container>
+
+      <WhatsAppFloatingButton ariaLabel="Chat with ZOQ's Gallery on WhatsApp" />
     </>
   );
 }

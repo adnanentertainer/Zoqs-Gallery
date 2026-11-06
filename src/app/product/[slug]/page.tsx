@@ -55,11 +55,13 @@ export async function generateMetadata({
   params,
 }: PageProps<"/product/[slug]">): Promise<Metadata> {
   const { slug } = await params;
+  // A missing slug never reaches here -- src/proxy.ts rewrites it to
+  // /not-found-passthrough before this page (or its metadata) ever runs,
+  // which is also what lets that case return a real HTTP 404 instead of
+  // the 200 a notFound() call from inside this loading.tsx-wrapped route
+  // would be stuck with (see proxy.ts's checkCatalogResourceExists).
   const product = await getProductBySlug(slug);
-
-  if (!product) {
-    return { title: "Product Not Found | ZOQ's Gallery" };
-  }
+  if (!product) notFound();
 
   const title = `${product.name} | ZOQ's Gallery`;
   const description = buildMetaDescription(
