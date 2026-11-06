@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { Container } from "@/components/ui/Container";
 import { Heading, Text } from "@/components/ui/Typography";
+import { WhatsAppTextLink } from "@/components/shared/WhatsAppTextLink";
 import { siteConfig } from "@/constants/site";
 
 export const metadata: Metadata = {
@@ -19,10 +20,7 @@ export default function ReturnsAndRefundsPage() {
   return (
     <Container className="py-10 sm:py-16">
       <Breadcrumb
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Returns & Refunds" },
-        ]}
+        items={[{ label: "Home", href: "/" }, { label: "Returns & Refunds" }]}
       />
 
       <div className="mx-auto flex max-w-3xl flex-col gap-8 pt-6">
@@ -45,19 +43,24 @@ export default function ReturnsAndRefundsPage() {
           <Text variant="body" className="text-muted">
             We accept returns within <strong>7 days</strong> of the delivery
             date. To qualify, an item must be unworn, unused, and in its
-            original condition, with all packaging and accessories included
-            and no signs of wear or damage.
+            original condition, with all packaging and accessories included and
+            no signs of wear or damage.
           </Text>
           <Text variant="body" className="text-muted">
-            To start a return, message us on WhatsApp at{" "}
-            {siteConfig.mobileWalletNumber} with your order number and the
-            reason for the return.
+            To start a return, message us on{" "}
+            <WhatsAppTextLink>
+              WhatsApp at {siteConfig.mobileWalletNumber}
+            </WhatsAppTextLink>{" "}
+            with your order number and the reason for the return.
           </Text>
         </Section>
 
         <Section title="Exchanges">
           <Text variant="body" className="text-muted">
-            Want a different color or design instead? Reach out on WhatsApp
+            Want a different color or design instead? Reach out on{" "}
+            <WhatsAppTextLink>
+              WhatsApp at {siteConfig.mobileWalletNumber}
+            </WhatsAppTextLink>{" "}
             within 7 days of delivery and we&rsquo;ll help you swap it for
             something else, subject to availability.
           </Text>
@@ -76,23 +79,26 @@ export default function ReturnsAndRefundsPage() {
         <Section title="Damaged or Incorrect Items">
           <Text variant="body" className="text-muted">
             If your order arrives damaged or isn&rsquo;t what you ordered,
-            message us on WhatsApp within 48 hours of delivery with photos of
-            the item. We&rsquo;ll review it and arrange a replacement or
-            refund.
+            message us on{" "}
+            <WhatsAppTextLink>
+              WhatsApp at {siteConfig.mobileWalletNumber}
+            </WhatsAppTextLink>{" "}
+            within 48 hours of delivery with photos of the item. We&rsquo;ll
+            review it and arrange a replacement or refund.
           </Text>
         </Section>
 
         <Section title="Refunds">
           <Text variant="body" className="text-muted">
             Once we receive and inspect a returned item, we&rsquo;ll let you
-            know whether the refund is approved. Approved refunds are
-            processed within 5&ndash;10 business days.
+            know whether the refund is approved. Approved refunds are processed
+            within 5&ndash;10 business days.
           </Text>
           <Text variant="body" className="text-muted">
-            Since we don&rsquo;t collect card details, refunds are sent back
-            the same way you paid: cash for Cash on Delivery orders, or a
-            transfer to your bank account, Easypaisa, or JazzCash for orders
-            paid that way.
+            Since we don&rsquo;t collect card details, refunds are sent back the
+            same way you paid: cash for Cash on Delivery orders, or a transfer
+            to your bank account, Easypaisa, or JazzCash for orders paid that
+            way.
           </Text>
         </Section>
 
@@ -107,17 +113,19 @@ export default function ReturnsAndRefundsPage() {
 
         <Section title="Order Cancellation">
           <Text variant="body" className="text-muted">
-            You can cancel an order before it ships by messaging us on
-            WhatsApp with your order number. Once an order has been
-            dispatched, it follows the standard return process above instead.
+            You can cancel an order before it ships by messaging us on{" "}
+            <WhatsAppTextLink>
+              WhatsApp at {siteConfig.mobileWalletNumber}
+            </WhatsAppTextLink>{" "}
+            with your order number. Once an order has been dispatched, it
+            follows the standard return process above instead.
           </Text>
         </Section>
 
         <Section title="Changes to This Policy">
           <Text variant="body" className="text-muted">
-            We may update this policy from time to time as our services
-            change. We&rsquo;ll update the date at the top of this page when
-            we do.
+            We may update this policy from time to time as our services change.
+            We&rsquo;ll update the date at the top of this page when we do.
           </Text>
         </Section>
 
@@ -130,7 +138,11 @@ export default function ReturnsAndRefundsPage() {
             >
               Contact Us
             </Link>{" "}
-            page or WhatsApp at {siteConfig.mobileWalletNumber}.
+            page or{" "}
+            <WhatsAppTextLink>
+              WhatsApp at {siteConfig.mobileWalletNumber}
+            </WhatsAppTextLink>
+            .
           </Text>
         </Section>
       </div>
@@ -138,13 +150,7 @@ export default function ReturnsAndRefundsPage() {
   );
 }
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-3 border-t border-beige pt-8">
       <Heading variant="h3" as="h2">
@@ -159,8 +165,14 @@ function List({ items }: { items: string[] }) {
   return (
     <ul className="flex flex-col gap-2">
       {items.map((item) => (
-        <li key={item} className="flex gap-2 font-body text-base text-muted leading-relaxed">
-          <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-gold" aria-hidden="true" />
+        <li
+          key={item}
+          className="flex gap-2 font-body text-base text-muted leading-relaxed"
+        >
+          <span
+            className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-gold"
+            aria-hidden="true"
+          />
           <span>{item}</span>
         </li>
       ))}

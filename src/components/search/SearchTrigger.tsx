@@ -14,6 +14,7 @@ import { Search, X } from "lucide-react";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { searchProducts } from "@/lib/products";
+import { trackSearch } from "@/lib/metaPixel";
 import {
   recentSearchesStore,
   recordSearchTerm,
@@ -101,6 +102,7 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
     const trimmed = value.trim();
     if (!trimmed) return;
     recordSearchTerm(trimmed);
+    trackSearch({ searchString: trimmed });
     router.push(`/search?q=${encodeURIComponent(trimmed)}`);
     closeOverlay();
   }

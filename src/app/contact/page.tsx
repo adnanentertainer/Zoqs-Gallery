@@ -3,6 +3,7 @@ import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { Container } from "@/components/ui/Container";
 import { Heading, Text } from "@/components/ui/Typography";
 import { ContactForm } from "@/components/contact/ContactForm";
+import { ContactChannelLink } from "@/components/contact/ContactChannelLink";
 import {
   InstagramIcon,
   FacebookIcon,
@@ -21,23 +22,27 @@ export const metadata: Metadata = {
   openGraph: buildOpenGraph({ path: "/contact", title, description }),
 };
 
+const iconClassName =
+  "h-16 w-16 transition-transform duration-200 group-hover:scale-105";
+
 const contactChannels = [
   {
-    icon: WhatsAppIcon,
+    icon: <WhatsAppIcon className={iconClassName} aria-hidden="true" />,
     title: "WhatsApp",
     detail: siteConfig.mobileWalletNumber,
     href: siteConfig.socialLinks.whatsapp,
     cta: "Chat on WhatsApp",
+    isContactChannel: true,
   },
   {
-    icon: InstagramIcon,
+    icon: <InstagramIcon className={iconClassName} aria-hidden="true" />,
     title: "Instagram",
     detail: "@zoqsgallery",
     href: siteConfig.socialLinks.instagram,
     cta: "Follow on Instagram",
   },
   {
-    icon: FacebookIcon,
+    icon: <FacebookIcon className={iconClassName} aria-hidden="true" />,
     title: "Facebook",
     detail: "ZOQ's Gallery",
     href: siteConfig.socialLinks.facebook,
@@ -63,26 +68,8 @@ export default function ContactPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        {contactChannels.map(({ icon: Icon, title, detail, href, cta }) => (
-          <a
-            key={title}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex flex-col items-center gap-3 rounded-2xl border border-beige bg-white p-8 text-center shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-gold hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-          >
-            <Icon
-              className="h-16 w-16 transition-transform duration-200 group-hover:scale-105"
-              aria-hidden="true"
-            />
-            <span className="font-heading text-lg font-semibold text-primary">
-              {title}
-            </span>
-            <span className="font-body text-sm text-muted">{detail}</span>
-            <span className="font-body text-xs font-semibold uppercase tracking-wide text-gold">
-              {cta}
-            </span>
-          </a>
+        {contactChannels.map((channel) => (
+          <ContactChannelLink key={channel.title} {...channel} />
         ))}
       </div>
 

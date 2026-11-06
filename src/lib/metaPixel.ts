@@ -29,6 +29,13 @@ export function trackViewContent(params: {
   });
 }
 
+export function trackSearch(params: { searchString: string }) {
+  fire("track", "Search", {
+    search_string: params.searchString,
+    content_type: "product",
+  });
+}
+
 export function trackAddToCart(params: {
   contentId: string;
   contentName: string;
@@ -83,6 +90,13 @@ export function setAdvancedMatchingUserData(user: {
   if (Object.keys(userData).length > 0) {
     fire("set", "userData", userData);
   }
+}
+
+// Fired when a visitor clicks any WhatsApp/phone/email contact link --
+// WhatsApp is this store's primary support and pre-purchase-question
+// channel, and was previously untracked entirely.
+export function trackContact() {
+  fire("track", "Contact");
 }
 
 export function trackPurchase(params: {

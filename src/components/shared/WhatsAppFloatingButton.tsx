@@ -1,5 +1,8 @@
+"use client";
+
 import { WhatsAppIcon } from "@/components/icons/social-icons";
 import { siteConfig } from "@/constants/site";
+import { trackContact } from "@/lib/metaPixel";
 
 // siteConfig.socialLinks.whatsapp is a public wa.me click-to-chat link
 // (e.g. "https://wa.me/923316668233") -- reuse its number so every WhatsApp
@@ -36,6 +39,7 @@ export function WhatsAppFloatingButton({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={ariaLabel}
+      onClick={() => trackContact()}
       className="fixed bottom-24 right-4 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full drop-shadow-[0_4px_16px_rgba(31,31,31,0.25)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold lg:bottom-6 lg:right-6"
     >
       <WhatsAppIcon className="h-full w-full" aria-hidden="true" />
