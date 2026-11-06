@@ -9,6 +9,7 @@ import {
 } from "@/components/filters";
 import { SearchTrigger } from "@/components/search";
 import { ProductResults } from "@/components/product";
+import { WhatsAppFloatingButton } from "@/components/shared/WhatsAppFloatingButton";
 import { getProducts } from "@/lib/services/productService";
 import {
   filterProducts,
@@ -84,6 +85,8 @@ export default async function ShopPage({ searchParams }: PageProps<"/shop">) {
           />
         </div>
       </Container>
+
+      <WhatsAppFloatingButton ariaLabel="Chat with ZOQ's Gallery on WhatsApp" />
     </>
   );
 }

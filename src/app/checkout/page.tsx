@@ -3,6 +3,7 @@ import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { Container } from "@/components/ui/Container";
 import { Heading } from "@/components/ui/Typography";
 import { CheckoutForm } from "@/components/checkout";
+import { CartWhatsAppButton } from "@/components/cart/CartWhatsAppButton";
 import { getServerUser } from "@/lib/auth/getServerUser";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { mapProfileRow } from "@/lib/supabase/mappers";
@@ -61,6 +62,8 @@ export default async function CheckoutPage() {
         showPromoCode={showPromoCode}
         blessedFridayOffer={blessedFridayOffer}
       />
+
+      <CartWhatsAppButton />
     </Container>
   );
 }

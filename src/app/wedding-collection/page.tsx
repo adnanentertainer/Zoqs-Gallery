@@ -9,6 +9,7 @@ import {
 } from "@/components/filters";
 import { SearchTrigger } from "@/components/search";
 import { ProductResults } from "@/components/product";
+import { WhatsAppFloatingButton } from "@/components/shared/WhatsAppFloatingButton";
 import { getWeddingPicks } from "@/lib/services/productService";
 import {
   filterProducts,
@@ -109,6 +110,8 @@ export default async function WeddingCollectionPage({
           />
         </div>
       </Container>
+
+      <WhatsAppFloatingButton ariaLabel="Chat with ZOQ's Gallery on WhatsApp" />
     </>
   );
 }
