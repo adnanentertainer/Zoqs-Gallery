@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
-import { Text } from "@/components/ui/Typography";
+import { ProductDescription } from "@/components/product/ProductDescription";
 import { ProductSpecifications } from "@/components/product/ProductSpecifications";
 import { CareInstructions } from "@/components/product/CareInstructions";
 import { DeliveryInfo } from "@/components/product/DeliveryInfo";
@@ -35,11 +35,7 @@ export function ProductTabs({
   const [activeTab, setActiveTab] = useState<TabId>("description");
 
   const panels: Record<TabId, ReactNode> = {
-    description: (
-      <Text variant="body" className="whitespace-pre-line text-muted">
-        {product.description}
-      </Text>
-    ),
+    description: <ProductDescription description={product.description} />,
     details: <ProductSpecifications product={product} />,
     care: <CareInstructions product={product} />,
     delivery: (
