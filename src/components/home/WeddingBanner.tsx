@@ -38,18 +38,18 @@ export function WeddingBanner({
   buttonLabel,
 }: WeddingBannerProps) {
   return (
-    <section className="relative overflow-hidden bg-secondary">
+    // Web-only section -- hidden below lg entirely (not just its image),
+    // so mobile visitors go straight from the hero to "Wedding Season
+    // Favourites" / "Shop By Category" instead of scrolling past a whole
+    // extra promotional section first.
+    <section className="relative hidden overflow-hidden bg-secondary lg:block">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_10%,rgba(110,20,35,0.07),transparent_50%),radial-gradient(circle_at_8%_95%,rgba(138,106,36,0.12),transparent_50%)]"
       />
 
       <Container className="relative grid grid-cols-1 items-center gap-10 py-14 sm:py-16 lg:grid-cols-2 lg:gap-16 lg:py-20">
-        {/* Hidden below lg, same reasoning as HeroSection's image -- this
-            banner sits between the hero and "Shop By Category," so cutting
-            its image on mobile brings that section (and everything after
-            it) up by a full aspect-[4/5] image's worth of scroll height. */}
-        <div className="relative mx-auto hidden w-full max-w-md lg:mx-0 lg:block">
+        <div className="relative mx-auto w-full max-w-md lg:mx-0">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -inset-3 hidden rounded-2xl border border-maroon/20 sm:block"
