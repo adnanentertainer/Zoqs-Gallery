@@ -22,6 +22,10 @@ export async function generateMetadata({
       : "Search | ZOQ's Gallery",
     description:
       "Search ZOQ's Gallery for jewellery, categories, materials and more.",
+    // Internal search-result pages are conventionally kept out of the
+    // index (one near-duplicate "page" per query string otherwise), while
+    // still letting crawlers follow the product links found on them.
+    robots: { index: false, follow: true },
   };
 }
 
