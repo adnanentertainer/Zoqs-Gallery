@@ -12,6 +12,7 @@ import {
   CATEGORY_LAYOUTS,
   HERO_LAYOUTS,
   PRODUCT_LAYOUTS,
+  PROMO_BANNER_LAYOUTS,
   REVIEWS_LAYOUTS,
   SOCIAL_GALLERY_LAYOUTS,
   type BenefitsLayoutId,
@@ -21,6 +22,7 @@ import {
   type LayoutTemplate,
   type LayoutVariantOption,
   type ProductLayoutId,
+  type PromoBannerLayoutId,
   type ReviewsLayoutId,
   type SocialGalleryLayoutId,
 } from "@/types/layoutTemplate";
@@ -32,6 +34,7 @@ interface LayoutTemplateFormProps {
 
 const SECTION_KEYS = [
   "hero",
+  "promoBanner",
   "categories",
   "products",
   "bridal",
@@ -118,6 +121,16 @@ export function LayoutTemplateForm({
           </span>
         </label>
       </SectionPicker>
+
+      <SectionPicker
+        title="Promo Banner Carousel"
+        description="The scrolling promotional strip above the hero (e.g. a sale announcement)."
+        name="promo-banner-layout"
+        options={PROMO_BANNER_LAYOUTS}
+        selectedId={selected.promoBanner}
+        onSelect={(id) => setSection("promoBanner", id)}
+        renderPreview={(id) => <PromoBannerPreview id={id} />}
+      />
 
       <SectionPicker
         title="Shop By Category Section"
@@ -401,6 +414,101 @@ function HeroPreview({ id }: { id: HeroLayoutId }) {
         <div className="mt-1 h-3.5 w-10 rounded-full bg-gold" />
       </div>
       <div className="aspect-[4/5] h-full rounded-lg bg-beige" />
+    </div>
+  );
+}
+
+function PromoBannerPreview({ id }: { id: PromoBannerLayoutId }) {
+  if (id === "splitReverse") {
+    return (
+      <div className="flex aspect-[16/6] w-full items-center gap-3 rounded-xl bg-primary p-3">
+        <div className="h-full aspect-square shrink-0 rounded-full bg-white/10" />
+        <div className="flex flex-1 flex-col items-end gap-1.5 text-right">
+          <div className="h-1.5 w-10 rounded-full bg-gold" />
+          <div className="h-2 w-20 rounded-full bg-white/90" />
+          <div className="mt-1 h-3.5 w-14 rounded-full bg-gold" />
+        </div>
+      </div>
+    );
+  }
+
+  if (id === "fullBleed") {
+    return (
+      <div className="relative aspect-[16/6] w-full overflow-hidden rounded-xl bg-beige">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/40 to-transparent" />
+        <div className="absolute inset-y-0 left-3 flex flex-col justify-center gap-1.5">
+          <div className="h-1.5 w-10 rounded-full bg-gold" />
+          <div className="h-2 w-20 rounded-full bg-white/90" />
+          <div className="mt-1 h-3.5 w-14 rounded-full bg-gold" />
+        </div>
+      </div>
+    );
+  }
+
+  if (id === "panel") {
+    return (
+      <div className="flex aspect-[16/6] w-full overflow-hidden rounded-xl bg-primary">
+        <div className="h-full w-[42%] bg-white/10" />
+        <div className="flex flex-1 flex-col justify-center gap-1.5 p-3">
+          <div className="h-1.5 w-10 rounded-full bg-gold" />
+          <div className="h-2 w-16 rounded-full bg-white/90" />
+          <div className="mt-1 h-3.5 w-10 rounded-full bg-gold" />
+        </div>
+      </div>
+    );
+  }
+
+  if (id === "badge") {
+    return (
+      <div className="relative flex aspect-[16/6] w-full items-end overflow-hidden rounded-xl bg-beige p-2.5">
+        <div className="flex w-3/5 flex-col gap-1 rounded-lg bg-white p-2 shadow-md">
+          <div className="h-1 w-8 rounded-full bg-gold" />
+          <div className="h-1.5 w-16 rounded-full bg-primary/70" />
+          <div className="mt-0.5 h-3 w-10 rounded-full bg-gold" />
+        </div>
+      </div>
+    );
+  }
+
+  if (id === "centered") {
+    return (
+      <div className="flex aspect-[16/6] w-full flex-col items-center justify-center gap-1.5 rounded-xl bg-primary p-3">
+        <div className="h-1.5 w-10 rounded-full bg-gold" />
+        <div className="h-2 w-24 rounded-full bg-white/90" />
+        <div className="mt-1 h-3.5 w-14 rounded-full bg-gold" />
+      </div>
+    );
+  }
+
+  if (id === "ticker") {
+    return (
+      <div className="flex aspect-[16/6] w-full items-center justify-between gap-2 rounded-xl bg-primary px-4">
+        <div className="h-2 w-24 rounded-full bg-white/90" />
+        <div className="h-3.5 w-12 shrink-0 rounded-full border border-gold" />
+      </div>
+    );
+  }
+
+  if (id === "stacked") {
+    return (
+      <div className="flex aspect-[16/6] w-full flex-col overflow-hidden rounded-xl bg-primary">
+        <div className="h-1/2 w-full bg-white/10" />
+        <div className="flex flex-1 flex-col items-center justify-center gap-1">
+          <div className="h-1.5 w-16 rounded-full bg-white/90" />
+          <div className="h-2.5 w-10 rounded-full bg-gold" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex aspect-[16/6] w-full items-center gap-3 rounded-xl bg-primary p-3">
+      <div className="flex flex-1 flex-col gap-1.5">
+        <div className="h-1.5 w-10 rounded-full bg-gold" />
+        <div className="h-2 w-20 rounded-full bg-white/90" />
+        <div className="mt-1 h-3.5 w-14 rounded-full bg-gold" />
+      </div>
+      <div className="h-full aspect-square shrink-0 rounded-full bg-white/10" />
     </div>
   );
 }

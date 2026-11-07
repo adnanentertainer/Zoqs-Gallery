@@ -8,6 +8,7 @@ import { buttonVariants } from "@/components/ui/Button";
 import { setPendingPromoCode } from "@/lib/pendingPromo";
 import { cn } from "@/lib/utils";
 import type { PromoBanner } from "@/types/promoBanner";
+import type { PromoBannerLayoutId } from "@/types/layoutTemplate";
 
 const AUTO_ADVANCE_MS = 5000;
 
@@ -18,7 +19,91 @@ function slideHref(banner: PromoBanner): string {
   return `${link}${separator}promo=${encodeURIComponent(banner.promoCode)}`;
 }
 
-function Slide({ banner }: { banner: PromoBanner }) {
+function PromoTextLabel({
+  text,
+  light = true,
+}: {
+  text: string;
+  light?: boolean;
+}) {
+  if (!text) return null;
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em]",
+        light ? "text-gold" : "text-gold",
+      )}
+    >
+      <span className="h-px w-8 bg-gold" aria-hidden="true" />
+      {text}
+    </span>
+  );
+}
+
+function PromoCodeBadge({
+  code,
+  light = true,
+}: {
+  code: string | null;
+  light?: boolean;
+}) {
+  if (!code) return null;
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-2 rounded-sm border border-dashed px-3 py-1.5 font-body text-sm",
+        light
+          ? "border-gold/60 bg-white/5 text-white"
+          : "border-gold/60 bg-black/5 text-primary",
+      )}
+    >
+      <Tag className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
+      Use code <span className="font-semibold tracking-wide text-gold">{code}</span>
+    </span>
+  );
+}
+
+function CtaButton({
+  banner,
+  size = "lg",
+  variant = "gold",
+}: {
+  banner: PromoBanner;
+  size?: "md" | "lg";
+  variant?: "gold" | "outline-gold";
+}) {
+  if (!banner.buttonText) return null;
+  return (
+    <Link
+      href={slideHref(banner)}
+      onClick={() => {
+        if (banner.promoCode) setPendingPromoCode(banner.promoCode);
+      }}
+      className={cn(
+        buttonVariants(variant, size, "group"),
+        "transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+      )}
+    >
+      {banner.buttonText}
+      <ArrowRight
+        className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+        aria-hidden="true"
+      />
+    </Link>
+  );
+}
+
+function RadialGradientBackdrop() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(230,164,33,0.16),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(230,164,33,0.12),transparent_50%)]"
+    />
+  );
+}
+
+/** Classic Split: text left, a circular photo badge right -- the original look. */
+function SlideClassic({ banner }: { banner: PromoBanner }) {
   return (
     <div
       className="relative flex min-h-[300px] items-center overflow-hidden bg-primary sm:min-h-[340px]"
@@ -38,19 +123,11 @@ function Slide({ banner }: { banner: PromoBanner }) {
           aria-hidden="true"
         />
       ) : (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(230,164,33,0.16),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(230,164,33,0.12),transparent_50%)]"
-        />
+        <RadialGradientBackdrop />
       )}
       <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-6 px-4 py-14 text-center sm:px-6 lg:flex-row lg:justify-between lg:px-8 lg:py-16 lg:text-left">
         <div className="flex flex-col items-center gap-3 lg:items-start">
-          {banner.promoText && (
-            <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-              <span className="h-px w-8 bg-gold" aria-hidden="true" />
-              {banner.promoText}
-            </span>
-          )}
+          <PromoTextLabel text={banner.promoText} />
           <h2 className="font-heading text-3xl font-semibold text-white sm:text-4xl">
             {banner.title}
           </h2>
@@ -59,33 +136,10 @@ function Slide({ banner }: { banner: PromoBanner }) {
               {banner.subtitle}
             </p>
           )}
-          {banner.promoCode && (
-            <span className="inline-flex items-center gap-2 rounded-sm border border-dashed border-gold/60 bg-white/5 px-3 py-1.5 font-body text-sm text-white">
-              <Tag className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
-              Use code{" "}
-              <span className="font-semibold tracking-wide text-gold">
-                {banner.promoCode}
-              </span>
-            </span>
-          )}
-          {banner.buttonText && (
-            <Link
-              href={slideHref(banner)}
-              onClick={() => {
-                if (banner.promoCode) setPendingPromoCode(banner.promoCode);
-              }}
-              className={cn(
-                buttonVariants("gold", "lg", "group mt-1"),
-                "transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-lg",
-              )}
-            >
-              {banner.buttonText}
-              <ArrowRight
-                className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
-                aria-hidden="true"
-              />
-            </Link>
-          )}
+          <PromoCodeBadge code={banner.promoCode} />
+          <div className="mt-1">
+            <CtaButton banner={banner} />
+          </div>
         </div>
         {banner.bannerImageUrl && (
           <div className="relative h-40 w-40 shrink-0 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)] sm:h-52 sm:w-52">
@@ -103,10 +157,273 @@ function Slide({ banner }: { banner: PromoBanner }) {
   );
 }
 
+/** Split Reverse: same as Classic Split, mirrored -- photo badge left. */
+function SlideSplitReverse({ banner }: { banner: PromoBanner }) {
+  return (
+    <div
+      className="relative flex min-h-[300px] items-center overflow-hidden bg-primary sm:min-h-[340px]"
+      style={
+        banner.backgroundImageUrl
+          ? {
+              backgroundImage: `url(${banner.backgroundImageUrl})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }
+          : undefined
+      }
+    >
+      {banner.backgroundImageUrl ? (
+        <div
+          className="absolute inset-0 bg-gradient-to-l from-primary/90 via-primary/60 to-primary/30"
+          aria-hidden="true"
+        />
+      ) : (
+        <RadialGradientBackdrop />
+      )}
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-6 px-4 py-14 text-center sm:px-6 lg:flex-row lg:justify-between lg:px-8 lg:py-16 lg:text-left">
+        {banner.bannerImageUrl && (
+          <div className="relative h-40 w-40 shrink-0 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)] sm:h-52 sm:w-52">
+            <Image
+              src={banner.bannerImageUrl}
+              alt=""
+              fill
+              sizes="208px"
+              className="object-cover"
+            />
+          </div>
+        )}
+        <div className="flex flex-col items-center gap-3 lg:items-end lg:text-right">
+          <PromoTextLabel text={banner.promoText} />
+          <h2 className="font-heading text-3xl font-semibold text-white sm:text-4xl">
+            {banner.title}
+          </h2>
+          {banner.subtitle && (
+            <p className="max-w-md font-body text-base text-white/85">
+              {banner.subtitle}
+            </p>
+          )}
+          <PromoCodeBadge code={banner.promoCode} />
+          <div className="mt-1">
+            <CtaButton banner={banner} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Full-Bleed Photo: the photo fills the whole banner, text overlaid. */
+function SlideFullBleed({ banner }: { banner: PromoBanner }) {
+  const photo = banner.backgroundImageUrl || banner.bannerImageUrl;
+  return (
+    <div className="relative flex min-h-[340px] items-center overflow-hidden bg-primary sm:min-h-[400px]">
+      {photo ? (
+        <Image
+          src={photo}
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover"
+        />
+      ) : (
+        <RadialGradientBackdrop />
+      )}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/50 to-transparent"
+      />
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col items-start gap-4 px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+        <PromoTextLabel text={banner.promoText} />
+        <h2 className="max-w-lg font-heading text-3xl font-semibold text-white sm:text-4xl">
+          {banner.title}
+        </h2>
+        {banner.subtitle && (
+          <p className="max-w-md font-body text-base text-white/85">
+            {banner.subtitle}
+          </p>
+        )}
+        <PromoCodeBadge code={banner.promoCode} />
+        <div className="mt-1">
+          <CtaButton banner={banner} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Side Panel: photo bleeds edge-to-edge in a rectangular panel, no circle crop. */
+function SlidePanel({ banner }: { banner: PromoBanner }) {
+  const photo = banner.bannerImageUrl || banner.backgroundImageUrl;
+  return (
+    <div className="relative overflow-hidden bg-primary">
+      <div className="flex flex-col lg:flex-row lg:min-h-[320px]">
+        {photo && (
+          <div className="relative aspect-[16/9] w-full lg:aspect-auto lg:w-[42%]">
+            <Image src={photo} alt="" fill sizes="(max-width: 1024px) 100vw, 42vw" className="object-cover" />
+          </div>
+        )}
+        <div className="relative flex flex-1 flex-col items-center justify-center gap-3 px-4 py-10 text-center sm:px-6 lg:items-start lg:px-10 lg:py-12 lg:text-left">
+          {!photo && <RadialGradientBackdrop />}
+          <PromoTextLabel text={banner.promoText} />
+          <h2 className="font-heading text-3xl font-semibold text-white sm:text-4xl">
+            {banner.title}
+          </h2>
+          {banner.subtitle && (
+            <p className="max-w-md font-body text-base text-white/85">
+              {banner.subtitle}
+            </p>
+          )}
+          <PromoCodeBadge code={banner.promoCode} />
+          <div className="mt-1">
+            <CtaButton banner={banner} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Floating Badge: full-bleed photo with text in a floating card over the corner. */
+function SlideBadge({ banner }: { banner: PromoBanner }) {
+  const photo = banner.backgroundImageUrl || banner.bannerImageUrl;
+  return (
+    <div className="relative min-h-[340px] overflow-hidden bg-primary sm:min-h-[380px]">
+      {photo ? (
+        <Image src={photo} alt="" fill sizes="100vw" className="object-cover" />
+      ) : (
+        <RadialGradientBackdrop />
+      )}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"
+      />
+      <div className="relative flex min-h-[340px] items-end px-4 py-6 sm:min-h-[380px] sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+        <div className="w-full max-w-md rounded-2xl bg-white/95 p-6 shadow-[0_25px_60px_-15px_rgba(31,31,31,0.35)] backdrop-blur sm:p-7">
+          <PromoTextLabel text={banner.promoText} light={false} />
+          <h2 className="mt-2 font-heading text-2xl font-semibold text-primary sm:text-3xl">
+            {banner.title}
+          </h2>
+          {banner.subtitle && (
+            <p className="mt-2 font-body text-sm text-muted">
+              {banner.subtitle}
+            </p>
+          )}
+          <div className="mt-3">
+            <PromoCodeBadge code={banner.promoCode} light={false} />
+          </div>
+          <div className="mt-4">
+            <CtaButton banner={banner} size="md" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Centered Minimal: no photo -- centered text and button on a solid band. */
+function SlideCentered({ banner }: { banner: PromoBanner }) {
+  return (
+    <div className="relative overflow-hidden bg-primary">
+      <RadialGradientBackdrop />
+      <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-3 px-4 py-12 text-center sm:px-6 lg:py-14">
+        <PromoTextLabel text={banner.promoText} />
+        <h2 className="font-heading text-3xl font-semibold text-white sm:text-4xl">
+          {banner.title}
+        </h2>
+        {banner.subtitle && (
+          <p className="max-w-md font-body text-base text-white/85">
+            {banner.subtitle}
+          </p>
+        )}
+        <PromoCodeBadge code={banner.promoCode} />
+        <div className="mt-1">
+          <CtaButton banner={banner} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Compact Ticker: a short single-row announcement strip, no subtitle. */
+function SlideTicker({ banner }: { banner: PromoBanner }) {
+  return (
+    <div className="relative overflow-hidden bg-primary">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center justify-center gap-3 px-4 py-4 text-center sm:flex-row sm:justify-between sm:px-6 sm:py-5 lg:px-8">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 sm:justify-start">
+          <PromoTextLabel text={banner.promoText} />
+          <h2 className="font-heading text-lg font-semibold text-white sm:text-xl">
+            {banner.title}
+          </h2>
+          <PromoCodeBadge code={banner.promoCode} />
+        </div>
+        <CtaButton banner={banner} size="md" />
+      </div>
+    </div>
+  );
+}
+
+/** Stacked Poster: a wide photo on top, text and button centered beneath it. */
+function SlideStacked({ banner }: { banner: PromoBanner }) {
+  const photo = banner.bannerImageUrl || banner.backgroundImageUrl;
+  return (
+    <div className="relative overflow-hidden bg-primary">
+      {photo && (
+        <div className="relative aspect-[21/9] w-full sm:aspect-[21/7]">
+          <Image src={photo} alt="" fill sizes="100vw" className="object-cover" />
+        </div>
+      )}
+      <div className="relative mx-auto flex w-full max-w-2xl flex-col items-center gap-3 px-4 py-8 text-center sm:px-6">
+        <PromoTextLabel text={banner.promoText} light={false} />
+        <h2 className="font-heading text-2xl font-semibold text-white sm:text-3xl">
+          {banner.title}
+        </h2>
+        {banner.subtitle && (
+          <p className="max-w-md font-body text-sm text-white/85">
+            {banner.subtitle}
+          </p>
+        )}
+        <PromoCodeBadge code={banner.promoCode} />
+        <div className="mt-1">
+          <CtaButton banner={banner} size="md" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Slide({
+  banner,
+  layout,
+}: {
+  banner: PromoBanner;
+  layout: PromoBannerLayoutId;
+}) {
+  switch (layout) {
+    case "splitReverse":
+      return <SlideSplitReverse banner={banner} />;
+    case "fullBleed":
+      return <SlideFullBleed banner={banner} />;
+    case "panel":
+      return <SlidePanel banner={banner} />;
+    case "badge":
+      return <SlideBadge banner={banner} />;
+    case "centered":
+      return <SlideCentered banner={banner} />;
+    case "ticker":
+      return <SlideTicker banner={banner} />;
+    case "stacked":
+      return <SlideStacked banner={banner} />;
+    default:
+      return <SlideClassic banner={banner} />;
+  }
+}
+
 export function PromoBannerCarousel({
   banners,
+  layout = "classic",
 }: {
   banners: PromoBanner[];
+  layout?: PromoBannerLayoutId;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const isPausedRef = useRef(false);
@@ -121,7 +438,7 @@ export function PromoBannerCarousel({
   }, [banners.length]);
 
   if (banners.length === 1) {
-    return <Slide banner={banners[0]} />;
+    return <Slide banner={banners[0]} layout={layout} />;
   }
 
   return (
@@ -132,7 +449,7 @@ export function PromoBannerCarousel({
       onFocus={() => (isPausedRef.current = true)}
       onBlur={() => (isPausedRef.current = false)}
     >
-      <Slide banner={banners[activeIndex]} />
+      <Slide banner={banners[activeIndex]} layout={layout} />
 
       <button
         type="button"

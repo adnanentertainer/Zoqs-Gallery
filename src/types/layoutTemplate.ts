@@ -5,6 +5,15 @@ export type HeroLayoutId =
   | "minimal"
   | "panel"
   | "badge";
+export type PromoBannerLayoutId =
+  | "classic"
+  | "splitReverse"
+  | "fullBleed"
+  | "panel"
+  | "badge"
+  | "centered"
+  | "ticker"
+  | "stacked";
 export type CategoryLayoutId =
   | "grid"
   | "row"
@@ -51,6 +60,7 @@ export interface LayoutTemplate {
    * already show their photo on mobile regardless (Centered Spotlight,
    * Editorial Full-Bleed, Side Panel, Floating Badge) ignore this flag. */
   heroShowImageOnMobile: boolean;
+  promoBanner: PromoBannerLayoutId;
   categories: CategoryLayoutId;
   products: ProductLayoutId;
   bridal: BridalLayoutId;
@@ -62,6 +72,7 @@ export interface LayoutTemplate {
 export const DEFAULT_LAYOUT_TEMPLATE: LayoutTemplate = {
   hero: "classic",
   heroShowImageOnMobile: false,
+  promoBanner: "classic",
   categories: "grid",
   products: "grid",
   bridal: "classic",
@@ -124,6 +135,64 @@ export const HERO_LAYOUTS: LayoutVariantOption<HeroLayoutId>[] = [
     spec: "Photo: 1920×1200px (landscape) or larger -- fills the full screen. Set in Admin → Settings → Homepage Hero Image, or add 2+ in Admin → Hero Carousel to auto-scroll between them.",
   },
 ];
+
+export const PROMO_BANNER_LAYOUTS: LayoutVariantOption<PromoBannerLayoutId>[] =
+  [
+    {
+      id: "classic",
+      name: "Classic Split",
+      description:
+        "Text on the left, a circular photo badge on the right -- the current look.",
+      spec: "Banner Image: 400×400px (square) or larger, shown as a circle. Edit each banner in Admin → Promo Banners.",
+    },
+    {
+      id: "splitReverse",
+      name: "Split Reverse",
+      description: "Same as Classic Split, mirrored -- photo badge on the left.",
+      spec: "Banner Image: 400×400px (square) or larger, shown as a circle. Edit each banner in Admin → Promo Banners.",
+    },
+    {
+      id: "fullBleed",
+      name: "Full-Bleed Photo",
+      description:
+        "The photo fills the entire banner edge-to-edge, text overlaid on top.",
+      spec: "Background Image: 1920×600px (wide landscape) or larger -- fills the full banner. Edit each banner in Admin → Promo Banners.",
+    },
+    {
+      id: "panel",
+      name: "Side Panel",
+      description:
+        "Photo bleeds edge-to-edge in a rectangular side panel, no frame or circle crop.",
+      spec: "Banner Image: 800×600px or larger, portrait or landscape both work. Edit each banner in Admin → Promo Banners.",
+    },
+    {
+      id: "badge",
+      name: "Floating Badge",
+      description:
+        "Full-bleed photo with the text in a floating card over the corner.",
+      spec: "Background Image: 1920×600px (wide landscape) or larger. Edit each banner in Admin → Promo Banners.",
+    },
+    {
+      id: "centered",
+      name: "Centered Minimal",
+      description:
+        "No photo -- centered text and button on a solid color band.",
+      spec: "No photo needed -- text-only layout.",
+    },
+    {
+      id: "ticker",
+      name: "Compact Ticker",
+      description:
+        "A short single-row announcement strip -- text and button inline, no subtitle.",
+      spec: "No photo needed -- text-only, compact layout.",
+    },
+    {
+      id: "stacked",
+      name: "Stacked Poster",
+      description: "A wide photo on top, text and button centered beneath it.",
+      spec: "Banner Image: 1200×675px (16:9 landscape) or larger. Edit each banner in Admin → Promo Banners.",
+    },
+  ];
 
 export const CATEGORY_LAYOUTS: LayoutVariantOption<CategoryLayoutId>[] = [
   {
@@ -334,6 +403,12 @@ export function isHeroLayoutId(value: string): value is HeroLayoutId {
   return HERO_LAYOUTS.some((layout) => layout.id === value);
 }
 
+export function isPromoBannerLayoutId(
+  value: string,
+): value is PromoBannerLayoutId {
+  return PROMO_BANNER_LAYOUTS.some((layout) => layout.id === value);
+}
+
 export function isCategoryLayoutId(value: string): value is CategoryLayoutId {
   return CATEGORY_LAYOUTS.some((layout) => layout.id === value);
 }
@@ -379,6 +454,10 @@ export function resolveLayoutTemplate(
       typeof stored?.heroShowImageOnMobile === "boolean"
         ? stored.heroShowImageOnMobile
         : DEFAULT_LAYOUT_TEMPLATE.heroShowImageOnMobile,
+    promoBanner:
+      stored?.promoBanner && isPromoBannerLayoutId(stored.promoBanner)
+        ? stored.promoBanner
+        : DEFAULT_LAYOUT_TEMPLATE.promoBanner,
     categories:
       stored?.categories && isCategoryLayoutId(stored.categories)
         ? stored.categories

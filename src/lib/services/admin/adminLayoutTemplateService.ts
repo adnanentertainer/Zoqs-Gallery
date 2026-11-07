@@ -9,6 +9,7 @@ import {
   CATEGORY_LAYOUTS,
   HERO_LAYOUTS,
   PRODUCT_LAYOUTS,
+  PROMO_BANNER_LAYOUTS,
   resolveLayoutTemplate,
   REVIEWS_LAYOUTS,
   SOCIAL_GALLERY_LAYOUTS,
@@ -30,6 +31,10 @@ export async function updateAdminLayoutTemplate(
 
   const checks: [string, boolean][] = [
     ["hero layout", HERO_LAYOUTS.some((l) => l.id === template.hero)],
+    [
+      "promo banner layout",
+      PROMO_BANNER_LAYOUTS.some((l) => l.id === template.promoBanner),
+    ],
     [
       "category layout",
       CATEGORY_LAYOUTS.some((l) => l.id === template.categories),
