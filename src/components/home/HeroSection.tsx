@@ -440,21 +440,31 @@ function HeroPanel({ imageUrl, imageAlt }: HeroVariantProps) {
 
 function HeroBadge({ imageUrl, imageAlt }: HeroVariantProps) {
   return (
-    <section className="relative min-h-[70vh] overflow-hidden bg-primary lg:min-h-[85vh]">
-      <Image
-        src={imageUrl || heroImage}
-        alt={imageAlt || defaultImageAlt}
-        fill
-        preload
-        sizes="100vw"
-        className="object-cover [object-position:65%_20%]"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 to-transparent"
-      />
+    // Below lg, the image is a normal in-flow block (its own aspect ratio)
+    // with the card sitting underneath it, not overlaid -- a bottom-anchored
+    // card that has to span nearly the full viewport width (max-w-md is
+    // already wider than most phones) left almost nothing of the photo
+    // visible behind it. At lg there's enough width for both, so the image
+    // switches to a full-bleed absolute background with the card floating
+    // over its bottom-left corner, same as before. One <Image> throughout
+    // (repositioned by breakpoint, not duplicated) so it's never fetched twice.
+    <section className="relative overflow-hidden bg-primary lg:min-h-[85vh]">
+      <div className="relative aspect-[4/3] w-full sm:aspect-[16/9] lg:absolute lg:inset-0 lg:aspect-auto lg:h-full">
+        <Image
+          src={imageUrl || heroImage}
+          alt={imageAlt || defaultImageAlt}
+          fill
+          preload
+          sizes="100vw"
+          className="object-cover [object-position:65%_20%]"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 to-transparent"
+        />
+      </div>
 
-      <Container className="relative flex h-full min-h-[70vh] items-end py-8 sm:py-10 lg:min-h-[85vh] lg:py-14">
+      <Container className="relative flex flex-col py-6 sm:py-8 lg:absolute lg:inset-0 lg:min-h-[85vh] lg:items-end lg:py-14">
         <div className="w-full max-w-md rounded-2xl bg-white/95 p-6 shadow-[0_25px_60px_-15px_rgba(31,31,31,0.35)] backdrop-blur sm:p-8 animate-fade-rise-in">
           <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-gold">
             <span className="h-px w-8 bg-gold" aria-hidden="true" />
