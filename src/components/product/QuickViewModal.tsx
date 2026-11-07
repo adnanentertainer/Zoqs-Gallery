@@ -1,5 +1,6 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { X, ShoppingBag } from "lucide-react";
@@ -66,7 +67,12 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
     onClose();
   }
 
-  return (
+  // Portaled straight to <body> -- ProductCard's own root has a hover
+  // transition on transform, which (even at rest) makes it establish a
+  // containing block for fixed-position descendants in Chromium. Left
+  // un-portaled, this modal's "fixed inset-0" backdrop silently shrinks
+  // to the card's own box instead of covering the viewport.
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         onClick={onClose}
@@ -183,6 +189,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
           </Link>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
