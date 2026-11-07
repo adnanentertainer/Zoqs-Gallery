@@ -74,6 +74,7 @@ export default async function Home() {
         // for that promotion -- don't dilute it by cycling in the generic
         // carousel on top of it.
         images={activeHeroImage ? [] : heroCarouselImages}
+        showImageOnMobile={layoutTemplate.heroShowImageOnMobile}
       />
       {showWeddingPromotion && (
         <>

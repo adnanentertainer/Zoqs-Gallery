@@ -30,6 +30,10 @@ interface HeroSectionProps {
    * array (e.g. while a scheduled promo code's own hero image is active)
    * to keep a variant on the single-photo behavior. */
   images?: HeroImage[];
+  /** Admin → Layout's "Show hero photo on mobile" checkbox. Only
+   * HeroClassic reads this -- the other photo-bearing variants already
+   * show their photo on mobile regardless. */
+  showImageOnMobile?: boolean;
 }
 
 export function HeroSection({
@@ -37,6 +41,7 @@ export function HeroSection({
   imageUrl,
   imageAlt,
   images = [],
+  showImageOnMobile = false,
 }: HeroSectionProps) {
   if (layout === "centered") {
     return <HeroCentered imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
@@ -53,13 +58,21 @@ export function HeroSection({
   if (layout === "badge") {
     return <HeroBadge imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
   }
-  return <HeroClassic imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
+  return (
+    <HeroClassic
+      imageUrl={imageUrl}
+      imageAlt={imageAlt}
+      images={images}
+      showImageOnMobile={showImageOnMobile}
+    />
+  );
 }
 
 interface HeroVariantProps {
   imageUrl?: string;
   imageAlt?: string;
   images?: HeroImage[];
+  showImageOnMobile?: boolean;
 }
 
 const defaultImageAlt =
@@ -90,7 +103,12 @@ function TrustBadges({
   );
 }
 
-function HeroClassic({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
+function HeroClassic({
+  imageUrl,
+  imageAlt,
+  images = [],
+  showImageOnMobile = false,
+}: HeroVariantProps) {
   return (
     <section className="relative flex items-center overflow-hidden bg-secondary lg:min-h-[85vh]">
       <div
@@ -166,6 +184,23 @@ function HeroClassic({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
               Explore Collections
             </Link>
           </div>
+
+          {showImageOnMobile && (
+            // The whole photo, uncropped (letterboxed against the beige
+            // frame instead) -- shown only below lg, where the tall 4:5
+            // cover-cropped version above stays hidden. A short, wide crop
+            // here would otherwise cut off parts of the same photo the
+            // admin already composed for the tall desktop frame.
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-beige shadow-[0_15px_35px_-10px_rgba(31,31,31,0.3)] ring-1 ring-gold/20 lg:hidden">
+              <HeroImageCarousel
+                images={images}
+                fallbackUrl={imageUrl || heroImage}
+                fallbackAlt={imageAlt || defaultImageAlt}
+                sizes="100vw"
+                fit="contain"
+              />
+            </div>
+          )}
 
           <TrustBadges className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-2 lg:justify-start" />
         </div>

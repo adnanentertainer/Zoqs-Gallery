@@ -23,6 +23,13 @@ interface HeroImageCarouselProps {
   fallbackAlt: string;
   sizes: string;
   imageClassName?: string;
+  /** "cover" (default) scales the photo to fill the frame, cropping
+   * whatever overflows -- fine when the frame's aspect ratio roughly
+   * matches the photo. "contain" shows the whole photo with no cropping,
+   * letterboxed against the frame's own background instead -- use this
+   * when the frame's aspect ratio (e.g. a short mobile strip) is likely to
+   * cut off more of the photo than is acceptable. */
+  fit?: "cover" | "contain";
 }
 
 /** Stacked, crossfading `<Image fill>` layers -- drop-in replacement for a
@@ -36,6 +43,7 @@ export function HeroImageCarousel({
   fallbackAlt,
   sizes,
   imageClassName,
+  fit = "cover",
 }: HeroImageCarouselProps) {
   const slides: Slide[] =
     images.length > 0
@@ -69,7 +77,8 @@ export function HeroImageCarousel({
           aria-hidden={index !== activeIndex}
           className={cn(
             imageClassName,
-            "object-cover transition-opacity duration-1000 ease-in-out",
+            fit === "contain" ? "object-contain" : "object-cover",
+            "transition-opacity duration-1000 ease-in-out",
             index === activeIndex ? "opacity-100" : "opacity-0",
           )}
         />

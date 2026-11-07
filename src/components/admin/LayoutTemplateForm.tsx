@@ -49,7 +49,9 @@ export function LayoutTemplateForm({
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const isDirty = SECTION_KEYS.some((key) => selected[key] !== saved[key]);
+  const isDirty =
+    SECTION_KEYS.some((key) => selected[key] !== saved[key]) ||
+    selected.heroShowImageOnMobile !== saved.heroShowImageOnMobile;
 
   function setSection<Key extends keyof LayoutTemplate>(
     key: Key,
@@ -95,7 +97,27 @@ export function LayoutTemplateForm({
         selectedId={selected.hero}
         onSelect={(id) => setSection("hero", id)}
         renderPreview={(id) => <HeroPreview id={id} />}
-      />
+      >
+        <label className="flex items-start gap-2.5 rounded-xl border border-beige bg-white p-4 font-body text-sm text-primary">
+          <input
+            type="checkbox"
+            checked={selected.heroShowImageOnMobile}
+            onChange={(event) =>
+              setSection("heroShowImageOnMobile", event.target.checked)
+            }
+            className="mt-0.5 h-4 w-4 accent-gold"
+          />
+          <span>
+            Show hero photo on mobile
+            <span className="mt-0.5 block font-body text-xs text-muted">
+              Classic Split hides its photo below desktop width by default to
+              save scroll height. Enable this to show the full photo there
+              too, as an uncropped strip beneath the heading and buttons.
+              Other layouts already show their photo on mobile regardless.
+            </span>
+          </span>
+        </label>
+      </SectionPicker>
 
       <SectionPicker
         title="Shop By Category Section"
@@ -186,6 +208,7 @@ function SectionPicker<Id extends string>({
   selectedId,
   onSelect,
   renderPreview,
+  children,
 }: {
   title: string;
   description: string;
@@ -194,6 +217,9 @@ function SectionPicker<Id extends string>({
   selectedId: Id;
   onSelect: (id: Id) => void;
   renderPreview: (id: Id) => ReactNode;
+  /** Extra controls (e.g. a checkbox) shown below the variant grid, scoped
+   * to this section only. */
+  children?: ReactNode;
 }) {
   return (
     <section className="flex flex-col gap-4">
@@ -225,6 +251,7 @@ function SectionPicker<Id extends string>({
           />
         ))}
       </div>
+      {children}
     </section>
   );
 }

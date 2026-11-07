@@ -45,6 +45,12 @@ export type SocialGalleryLayoutId =
 
 export interface LayoutTemplate {
   hero: HeroLayoutId;
+  /** Classic Split hides its photo below the `lg` breakpoint by default (to
+   * save mobile scroll height) -- set this to show it there too, as a
+   * short, uncropped strip beneath the heading/CTAs instead. Layouts that
+   * already show their photo on mobile regardless (Centered Spotlight,
+   * Editorial Full-Bleed, Side Panel, Floating Badge) ignore this flag. */
+  heroShowImageOnMobile: boolean;
   categories: CategoryLayoutId;
   products: ProductLayoutId;
   bridal: BridalLayoutId;
@@ -55,6 +61,7 @@ export interface LayoutTemplate {
 
 export const DEFAULT_LAYOUT_TEMPLATE: LayoutTemplate = {
   hero: "classic",
+  heroShowImageOnMobile: false,
   categories: "grid",
   products: "grid",
   bridal: "classic",
@@ -368,6 +375,10 @@ export function resolveLayoutTemplate(
       stored?.hero && isHeroLayoutId(stored.hero)
         ? stored.hero
         : DEFAULT_LAYOUT_TEMPLATE.hero,
+    heroShowImageOnMobile:
+      typeof stored?.heroShowImageOnMobile === "boolean"
+        ? stored.heroShowImageOnMobile
+        : DEFAULT_LAYOUT_TEMPLATE.heroShowImageOnMobile,
     categories:
       stored?.categories && isCategoryLayoutId(stored.categories)
         ? stored.categories
