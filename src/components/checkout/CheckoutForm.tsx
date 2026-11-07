@@ -38,8 +38,10 @@ import {
   type ShippingSettings,
 } from "@/lib/checkout/shipping";
 import { calculateBlessedFridayDiscount } from "@/lib/checkout/blessedFriday";
+import { calculateSaleDiscount, isSaleActive } from "@/lib/checkout/sale";
 import type { PaymentMethod, ShippingAddress } from "@/types/order";
 import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
+import type { SaleOffer } from "@/types/saleOffer";
 
 interface CheckoutFormProps {
   initialShipping: Pick<ShippingAddress, "fullName" | "email" | "phone">;
@@ -48,6 +50,7 @@ interface CheckoutFormProps {
    * currently active — see promoCodeService.hasActivePromoCode(). */
   showPromoCode: boolean;
   blessedFridayOffer: BlessedFridayOffer;
+  saleOffer: SaleOffer;
 }
 
 export function CheckoutForm({
@@ -55,6 +58,7 @@ export function CheckoutForm({
   shippingSettings,
   showPromoCode,
   blessedFridayOffer,
+  saleOffer,
 }: CheckoutFormProps) {
   const router = useRouter();
   const cart = useCart();
@@ -117,26 +121,35 @@ export function CheckoutForm({
 
   const effectiveShippingSettings: ShippingSettings = shippingSettings;
 
-  // The automatic discount and an entered promo code never stack — the
-  // customer gets whichever saves them more, never both at once.
-  // create_order() independently makes the same choice server-side from the
-  // same settings, so this is a preview that always matches what's charged.
-  const blessedFridayDiscount = calculateBlessedFridayDiscount(
-    cart.subtotal,
-    blessedFridayOffer,
-  );
+  // The Sale overrides Blessed Friday outright whenever it's currently
+  // active (see lib/checkout/sale.ts and SaleOfferForm's copy) — never
+  // both at once. Whichever one of those "wins" then never stacks with an
+  // entered promo code either — the customer gets whichever saves them
+  // more. create_order() independently makes the same choices server-side
+  // from the same settings, so this is a preview that always matches
+  // what's charged.
+  const saleActive = isSaleActive(saleOffer);
+  const saleDiscount = calculateSaleDiscount(cart.subtotal, saleOffer);
+  const blessedFridayDiscount = saleActive
+    ? 0
+    : calculateBlessedFridayDiscount(cart.subtotal, blessedFridayOffer);
+  const autoDiscount = saleActive ? saleDiscount : blessedFridayDiscount;
   const promoDiscount = appliedPromo?.discountAmount ?? 0;
-  const useBlessedFriday = blessedFridayDiscount > promoDiscount;
-  const effectiveDiscountAmount = Math.max(blessedFridayDiscount, promoDiscount);
+  const useAutoDiscount = autoDiscount > promoDiscount;
+  const effectiveDiscountAmount = Math.max(autoDiscount, promoDiscount);
   // Whether an offer is in play for shipping purposes — mirrors
-  // create_order()'s v_bf_enabled or v_promo_id is not null check, which
-  // decides whether freeShippingEnabledOffers or freeShippingEnabledNormalOrders
-  // governs the free-shipping-above-threshold perk.
-  const isOfferActive = blessedFridayOffer.enabled || Boolean(appliedPromo);
-  const effectiveDiscountLabel = useBlessedFriday
-    ? `Blessed Friday Offer (${blessedFridayOffer.discountPercentage}% off)`
+  // create_order()'s v_sale_active or v_bf_enabled or v_promo_id is not
+  // null check, which decides whether freeShippingEnabledOffers or
+  // freeShippingEnabledNormalOrders governs the free-shipping-above-
+  // threshold perk.
+  const isOfferActive =
+    saleActive || blessedFridayOffer.enabled || Boolean(appliedPromo);
+  const effectiveDiscountLabel = useAutoDiscount
+    ? saleActive
+      ? `${saleOffer.name.trim() || "Sale"} (${saleOffer.discountPercentage}% off)`
+      : `Blessed Friday Offer (${blessedFridayOffer.discountPercentage}% off)`
     : undefined;
-  const effectivePromoCode = useBlessedFriday ? null : appliedPromo?.code;
+  const effectivePromoCode = useAutoDiscount ? null : appliedPromo?.code;
 
   function updateField(field: keyof ShippingAddress, value: string) {
     setShipping((prev) => ({ ...prev, [field]: value }));
@@ -299,6 +312,8 @@ export function CheckoutForm({
           promoCode={effectivePromoCode}
           discountLabel={effectiveDiscountLabel}
           blessedFridayOffer={blessedFridayOffer}
+          saleOffer={saleOffer}
+          saleActive={saleActive}
           isOfferActive={isOfferActive}
         />
         <CheckoutTrustBadges />

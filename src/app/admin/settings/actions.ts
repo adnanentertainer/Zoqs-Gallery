@@ -16,12 +16,14 @@ import {
   uploadBridalBannerImage,
 } from "@/lib/services/admin/adminBridalBannerImageService";
 import { updateAdminBlessedFridayOffer } from "@/lib/services/admin/adminBlessedFridayOfferService";
+import { updateAdminSaleOffer } from "@/lib/services/admin/adminSaleOfferService";
 import {
   updateAdminWeddingPromotionSettings,
   uploadWeddingBannerImage,
 } from "@/lib/services/admin/adminWeddingPromotionService";
 import type { FestivalBanner } from "@/types/festivalBanner";
 import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
+import type { SaleOffer } from "@/types/saleOffer";
 import type { WeddingPromotionSettings } from "@/types/weddingPromotion";
 
 export async function updateAdminStoreSettingsAction(
@@ -55,6 +57,19 @@ export async function updateAdminBlessedFridayOfferAction(
 ): Promise<{ error?: string }> {
   await requireAdmin();
   const result = await updateAdminBlessedFridayOffer(input);
+  if (!result.error) {
+    revalidatePath("/admin/settings");
+    revalidatePath("/checkout");
+    revalidatePath("/cart");
+  }
+  return result;
+}
+
+export async function updateAdminSaleOfferAction(
+  input: SaleOffer,
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const result = await updateAdminSaleOffer(input);
   if (!result.error) {
     revalidatePath("/admin/settings");
     revalidatePath("/checkout");

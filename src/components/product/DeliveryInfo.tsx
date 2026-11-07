@@ -1,30 +1,32 @@
 import { Banknote, Package, RotateCcw, Truck } from "lucide-react";
 import { siteConfig } from "@/constants/site";
 import { formatPrice } from "@/lib/utils";
-import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
+import type { DisplayOffer } from "@/lib/checkout/sale";
 import type { ShippingSettings } from "@/lib/checkout/shipping";
 
 interface DeliveryInfoProps {
-  blessedFridayOffer: BlessedFridayOffer;
+  /** Whichever automatic offer (the Sale or Blessed Friday) is currently
+   * active, already resolved by the caller — see resolveDisplayOffer(). */
+  displayOffer: DisplayOffer;
   shippingSettings: ShippingSettings;
 }
 
 export function DeliveryInfo({
-  blessedFridayOffer,
+  displayOffer,
   shippingSettings,
 }: DeliveryInfoProps) {
   // Which toggle governs the "X% off"/"Free Delivery" badge depends on
-  // whether Blessed Friday is on — mirrors create_order()'s
+  // whether an automatic offer is on — mirrors create_order()'s
   // freeShippingEnabledOffers/freeShippingEnabledNormalOrders choice.
-  const freeShippingEnabled = blessedFridayOffer.enabled
+  const freeShippingEnabled = displayOffer.enabled
     ? shippingSettings.freeShippingEnabledOffers
     : shippingSettings.freeShippingEnabledNormalOrders;
 
-  const thirdItem = blessedFridayOffer.enabled
+  const thirdItem = displayOffer.enabled
     ? {
         icon: Package,
-        title: "Blessed Friday Offer",
-        description: `${blessedFridayOffer.discountPercentage}% off${freeShippingEnabled ? " + free shipping" : ""} on orders of ${formatPrice(blessedFridayOffer.minSpend)} and above.`,
+        title: displayOffer.label,
+        description: `${displayOffer.discountPercentage}% off${freeShippingEnabled ? " + free shipping" : ""} on orders of ${formatPrice(displayOffer.minSpend)} and above.`,
       }
     : freeShippingEnabled
       ? {

@@ -4,6 +4,7 @@ import { ShippingProgress } from "@/components/cart/ShippingProgress";
 import { cn, formatPrice } from "@/lib/utils";
 import type { FreeShippingProgress } from "@/lib/cart";
 import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
+import type { SaleOffer } from "@/types/saleOffer";
 
 interface CartSummaryProps {
   subtotal: number;
@@ -14,6 +15,11 @@ interface CartSummaryProps {
    * checkout, instead of only revealing it there. */
   blessedFridayOffer: BlessedFridayOffer;
   blessedFridayDiscount: number;
+  /** The general sitewide Sale — overrides Blessed Friday's messaging and
+   * discount above whenever `saleActive` is true. See lib/checkout/sale.ts. */
+  saleOffer: SaleOffer;
+  saleActive: boolean;
+  saleDiscount: number;
   secondaryAction: { label: string; href: string };
   onNavigate?: () => void;
   className?: string;
@@ -32,12 +38,19 @@ export function CartSummary({
   freeShippingSuspended,
   blessedFridayOffer,
   blessedFridayDiscount,
+  saleOffer,
+  saleActive,
+  saleDiscount,
   secondaryAction,
   onNavigate,
   className,
   showTopDivider = true,
 }: CartSummaryProps) {
-  const total = subtotal - blessedFridayDiscount + freeShipping.shippingCost;
+  const discountAmount = saleActive ? saleDiscount : blessedFridayDiscount;
+  const discountLabel = saleActive
+    ? `${saleOffer.name.trim() || "Sale"} (${saleOffer.discountPercentage}% off)`
+    : `Blessed Friday Offer (${blessedFridayOffer.discountPercentage}% off)`;
+  const total = subtotal - discountAmount + freeShipping.shippingCost;
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
@@ -46,7 +59,24 @@ export function CartSummary({
         hidden={freeShippingSuspended}
       />
 
-      {blessedFridayOffer.enabled &&
+      {saleActive ? (
+        saleDiscount > 0 ? (
+          <p className="font-body text-xs font-medium text-success">
+            {saleOffer.name.trim() || "Sale"} applied —{" "}
+            {saleOffer.discountPercentage}% off
+            {freeShipping.enabled ? " + free shipping" : ""} on orders of{" "}
+            {formatPrice(saleOffer.minSpend)} and above.
+          </p>
+        ) : (
+          <p className="font-body text-xs text-muted">
+            Add {formatPrice(saleOffer.minSpend - subtotal)} more to unlock{" "}
+            {saleOffer.discountPercentage}% off
+            {freeShipping.enabled ? " + free shipping" : ""} with our{" "}
+            {saleOffer.name.trim() || "sale"}.
+          </p>
+        )
+      ) : (
+        blessedFridayOffer.enabled &&
         (blessedFridayDiscount > 0 ? (
           <p className="font-body text-xs font-medium text-success">
             Blessed Friday offer applied — {blessedFridayOffer.discountPercentage}
@@ -60,7 +90,8 @@ export function CartSummary({
             {freeShipping.enabled ? " + free shipping" : ""} with our Blessed
             Friday offer.
           </p>
-        ))}
+        ))
+      )}
 
       <div
         className={cn(
@@ -74,13 +105,13 @@ export function CartSummary({
             {formatPrice(subtotal)}
           </span>
         </div>
-        {blessedFridayDiscount > 0 && (
+        {discountAmount > 0 && (
           <div className="flex items-center justify-between">
             <span className="font-body text-sm text-success">
-              Blessed Friday Offer ({blessedFridayOffer.discountPercentage}% off)
+              {discountLabel}
             </span>
             <span className="font-body text-sm text-success">
-              -{formatPrice(blessedFridayDiscount)}
+              -{formatPrice(discountAmount)}
             </span>
           </div>
         )}

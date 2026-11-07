@@ -9,7 +9,7 @@ import { CareInstructions } from "@/components/product/CareInstructions";
 import { DeliveryInfo } from "@/components/product/DeliveryInfo";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types";
-import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
+import type { DisplayOffer } from "@/lib/checkout/sale";
 import type { ShippingSettings } from "@/lib/checkout/shipping";
 
 const TABS = [
@@ -23,13 +23,13 @@ type TabId = (typeof TABS)[number]["id"];
 
 interface ProductTabsProps {
   product: Product;
-  blessedFridayOffer: BlessedFridayOffer;
+  displayOffer: DisplayOffer;
   shippingSettings: ShippingSettings;
 }
 
 export function ProductTabs({
   product,
-  blessedFridayOffer,
+  displayOffer,
   shippingSettings,
 }: ProductTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>("description");
@@ -40,7 +40,7 @@ export function ProductTabs({
     care: <CareInstructions product={product} />,
     delivery: (
       <DeliveryInfo
-        blessedFridayOffer={blessedFridayOffer}
+        displayOffer={displayOffer}
         shippingSettings={shippingSettings}
       />
     ),

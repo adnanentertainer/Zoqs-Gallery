@@ -31,6 +31,8 @@ import {
 import { getProductReviews } from "@/lib/services/reviewService";
 import { getAverageRating, getReviewBreakdown } from "@/lib/reviews";
 import { getBlessedFridayOffer } from "@/lib/services/blessedFridayOfferService";
+import { getSaleOffer } from "@/lib/services/saleOfferService";
+import { resolveDisplayOffer } from "@/lib/checkout/sale";
 import { getShippingSettings } from "@/lib/checkout/getShippingSettings";
 import { buildMetaDescription, categoryLabel, safeJsonLd } from "@/lib/utils";
 import type { ProductBadge as ProductBadgeType } from "@/types";
@@ -109,18 +111,28 @@ export default async function ProductPage({
 
   const categoryName = categoryLabel(product.categorySlug);
   const badge = getProductBadge(product);
-  const [productReviews, relatedProducts, blessedFridayOffer, shippingSettings] =
-    await Promise.all([
-      getProductReviews(product.id, product.name),
-      getRelatedProducts(product, 4),
-      getBlessedFridayOffer(),
-      getShippingSettings(),
-    ]);
+  const [
+    productReviews,
+    relatedProducts,
+    blessedFridayOffer,
+    saleOffer,
+    shippingSettings,
+  ] = await Promise.all([
+    getProductReviews(product.id, product.name),
+    getRelatedProducts(product, 4),
+    getBlessedFridayOffer(),
+    getSaleOffer(),
+    getShippingSettings(),
+  ]);
+  // Whichever automatic offer (the Sale or Blessed Friday) is currently
+  // active — the Sale takes priority whenever it's live. See
+  // lib/checkout/sale.ts.
+  const displayOffer = resolveDisplayOffer(saleOffer, blessedFridayOffer);
   // Which toggle governs the free-shipping rich-result entry and the
-  // delivery-tab badge depends on whether Blessed Friday is on — mirrors
+  // delivery-tab badge depends on whether an automatic offer is on — mirrors
   // create_order()'s freeShippingEnabledOffers/freeShippingEnabledNormalOrders
   // choice (see 20261029000000_configurable_free_shipping_offers.sql).
-  const freeShippingEnabledHere = blessedFridayOffer.enabled
+  const freeShippingEnabledHere = displayOffer.enabled
     ? shippingSettings.freeShippingEnabledOffers
     : shippingSettings.freeShippingEnabledNormalOrders;
   const breakdown = getReviewBreakdown(productReviews);
@@ -332,7 +344,7 @@ export default async function ProductPage({
             <ProductActions product={product} />
 
             <DeliveryInfo
-              blessedFridayOffer={blessedFridayOffer}
+              displayOffer={displayOffer}
               shippingSettings={shippingSettings}
             />
           </div>
@@ -342,7 +354,7 @@ export default async function ProductPage({
       <Container className="pb-16">
         <ProductTabs
           product={product}
-          blessedFridayOffer={blessedFridayOffer}
+          displayOffer={displayOffer}
           shippingSettings={shippingSettings}
         />
       </Container>

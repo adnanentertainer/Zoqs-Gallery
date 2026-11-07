@@ -9,21 +9,27 @@ import {
   type ShippingSettings,
 } from "@/lib/checkout/shipping";
 import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
+import type { SaleOffer } from "@/types/saleOffer";
 
 interface OrderSummaryProps {
   items: CheckoutItemData[];
   subtotal: number;
   /** The real free-shipping threshold/cost — applies the same whether or
-   * not the Blessed Friday offer or a promo code discount is also live. */
+   * not the Blessed Friday offer, the Sale, or a promo code discount is
+   * also live. */
   shippingSettings: ShippingSettings;
-  /** The larger of the entered promo code's discount and the automatic
-   * Blessed Friday discount — never both added together. */
+  /** The largest of the entered promo code's discount and the automatic
+   * Sale/Blessed Friday discount — never more than one added together. */
   discountAmount?: number;
   promoCode?: string | null;
   discountLabel?: string;
   blessedFridayOffer: BlessedFridayOffer;
-  /** Whether an offer (Blessed Friday or a redeemed promo code) governs
-   * this order — decides whether freeShippingEnabledOffers or
+  /** The general sitewide Sale — overrides Blessed Friday's messaging
+   * below whenever `saleActive` is true. See lib/checkout/sale.ts. */
+  saleOffer: SaleOffer;
+  saleActive: boolean;
+  /** Whether an offer (the Sale, Blessed Friday, or a redeemed promo code)
+   * governs this order — decides whether freeShippingEnabledOffers or
    * freeShippingEnabledNormalOrders applies. See CheckoutForm. */
   isOfferActive: boolean;
 }
@@ -36,6 +42,8 @@ export function OrderSummary({
   promoCode,
   discountLabel,
   blessedFridayOffer,
+  saleOffer,
+  saleActive,
   isOfferActive,
 }: OrderSummaryProps) {
   const discountedSubtotal = subtotal - discountAmount;
@@ -62,7 +70,23 @@ export function OrderSummary({
         ))}
       </div>
 
-      {blessedFridayOffer.enabled ? (
+      {saleActive ? (
+        discountAmount > 0 ? (
+          <p className="font-body text-xs font-medium text-success">
+            {saleOffer.name.trim() || "Sale"} applied —{" "}
+            {saleOffer.discountPercentage}% off
+            {freeShippingEnabled ? " + free shipping" : ""} on orders of{" "}
+            {formatPrice(saleOffer.minSpend)} and above.
+          </p>
+        ) : (
+          <p className="font-body text-xs text-muted">
+            Add {formatPrice(saleOffer.minSpend - subtotal)} more to unlock{" "}
+            {saleOffer.discountPercentage}% off
+            {freeShippingEnabled ? " + free shipping" : ""} with our{" "}
+            {saleOffer.name.trim() || "sale"}.
+          </p>
+        )
+      ) : blessedFridayOffer.enabled ? (
         discountAmount > 0 ? (
           <p className="font-body text-xs font-medium text-success">
             Blessed Friday offer applied — {blessedFridayOffer.discountPercentage}

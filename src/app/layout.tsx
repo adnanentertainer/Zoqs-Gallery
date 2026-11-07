@@ -17,6 +17,8 @@ import { PromoStatusProvider } from "@/context/PromoStatusContext";
 import { getShippingSettings } from "@/lib/checkout/getShippingSettings";
 import { hasActivePromoCode } from "@/lib/services/promoCodeService";
 import { getBlessedFridayOffer } from "@/lib/services/blessedFridayOfferService";
+import { getSaleOffer } from "@/lib/services/saleOfferService";
+import { isSaleActive } from "@/lib/checkout/sale";
 import { getWeddingPromotionSettings } from "@/lib/services/weddingPromotionService";
 import { getActiveColorTheme } from "@/lib/services/colorThemeService";
 import { META_PIXEL_ID } from "@/constants/meta";
@@ -111,24 +113,27 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     shippingSettings,
     promoActive,
     blessedFridayOffer,
+    saleOffer,
     weddingPromotion,
     colorTheme,
   ] = await Promise.all([
     getShippingSettings(),
     hasActivePromoCode(),
     getBlessedFridayOffer(),
+    getSaleOffer(),
     getWeddingPromotionSettings(),
     getActiveColorTheme(),
   ]);
 
   // Free shipping at the threshold now applies alongside the Blessed Friday
-  // offer or a promo code (create_order() applies the same rule server-side)
-  // instead of one suspending the other. `freeShippingSuspended` only hides
-  // the cart's generic "add X more for free shipping" nudge while Blessed
-  // Friday's own threshold message (same number) is shown in its place —
-  // a promo code has no such message of its own, so it no longer suspends
-  // anything here.
-  const freeShippingSuspended = blessedFridayOffer.enabled;
+  // offer, the Sale, or a promo code (create_order() applies the same rule
+  // server-side) instead of one suspending the other. `freeShippingSuspended`
+  // only hides the cart's generic "add X more for free shipping" nudge
+  // while Blessed Friday's/the Sale's own threshold message (same number) is
+  // shown in its place — a promo code has no such message of its own, so it
+  // no longer suspends anything here.
+  const freeShippingSuspended =
+    blessedFridayOffer.enabled || isSaleActive(saleOffer);
   const effectiveShippingSettings = shippingSettings;
 
   // Overrides the matching :root custom properties from globals.css --
@@ -171,6 +176,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                   shippingSettings={effectiveShippingSettings}
                   freeShippingSuspended={freeShippingSuspended}
                   blessedFridayOffer={blessedFridayOffer}
+                  saleOffer={saleOffer}
                 >
                   <FestivalCountdownBanner />
                   <AnnouncementBar />

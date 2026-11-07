@@ -1,5 +1,7 @@
 import { formatPrice } from "@/lib/utils";
 import { getBlessedFridayOffer } from "@/lib/services/blessedFridayOfferService";
+import { getSaleOffer } from "@/lib/services/saleOfferService";
+import { resolveDisplayOffer } from "@/lib/checkout/sale";
 import { getActivePromoCodeSummary } from "@/lib/services/promoCodeService";
 import { getShippingSettings } from "@/lib/checkout/getShippingSettings";
 
@@ -14,17 +16,21 @@ function promoCodeMessage(
 }
 
 export async function AnnouncementBar() {
-  // Blessed Friday takes priority — it's the bigger, code-free promise (free
+  // The Sale takes priority over Blessed Friday whenever it's active (see
+  // lib/checkout/sale.ts), and whichever of those is live takes priority
+  // over everything else here — it's the bigger, code-free promise (free
   // delivery still applies at the same threshold alongside it — see
   // create_order() / layout.tsx). A running promo code is announced next,
   // ahead of the generic default, since there's otherwise nowhere on the
   // site that tells a visitor a code exists at all.
-  const [blessedFridayOffer, activePromoCode, shippingSettings] =
+  const [blessedFridayOffer, saleOffer, activePromoCode, shippingSettings] =
     await Promise.all([
       getBlessedFridayOffer(),
+      getSaleOffer(),
       getActivePromoCodeSummary(),
       getShippingSettings(),
     ]);
+  const displayOffer = resolveDisplayOffer(saleOffer, blessedFridayOffer);
 
   // The generic default banner is just a restatement of the admin-configured
   // free shipping threshold/toggle (Admin → Settings) — computed here
@@ -36,8 +42,8 @@ export async function AnnouncementBar() {
     ? `Free Delivery on Orders ${formatPrice(shippingSettings.freeShippingThreshold)} and Above`
     : `Flat Rate Shipping — ${formatPrice(shippingSettings.flatShippingCost)} on All Orders`;
 
-  const message = blessedFridayOffer.enabled
-    ? `Blessed Friday Offer — ${blessedFridayOffer.discountPercentage}% Off Orders ${formatPrice(blessedFridayOffer.minSpend)} and Above${shippingSettings.freeShippingEnabledOffers ? " + Free Shipping" : ""}`
+  const message = displayOffer.enabled
+    ? `${displayOffer.label} — ${displayOffer.discountPercentage}% Off Orders ${formatPrice(displayOffer.minSpend)} and Above${shippingSettings.freeShippingEnabledOffers ? " + Free Shipping" : ""}`
     : activePromoCode
       ? promoCodeMessage(activePromoCode)
       : defaultMessage;

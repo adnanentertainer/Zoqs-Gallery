@@ -31,7 +31,9 @@ import { useToast } from "@/context/ToastContext";
 import { siteConfig } from "@/constants/site";
 import type { ShippingSettings } from "@/lib/checkout/shipping";
 import { calculateBlessedFridayDiscount } from "@/lib/checkout/blessedFriday";
+import { calculateSaleDiscount, isSaleActive } from "@/lib/checkout/sale";
 import type { BlessedFridayOffer } from "@/types/blessedFridayOffer";
+import type { SaleOffer } from "@/types/saleOffer";
 import type { Product } from "@/types";
 
 const STORAGE_KEY = "zoqs-gallery-cart";
@@ -202,8 +204,21 @@ interface CartContextValue {
   blessedFridayOffer: BlessedFridayOffer;
   /** The Blessed Friday discount on the current subtotal, computed the same
    * way checkout computes its own preview (see lib/checkout/blessedFriday) —
-   * 0 whenever the offer is off or the cart doesn't meet its minimum spend. */
+   * 0 whenever the offer is off, the Sale below is active (it overrides
+   * Blessed Friday — see saleActive), or the cart doesn't meet its minimum
+   * spend. */
   blessedFridayDiscount: number;
+  /** The general sitewide Sale (e.g. "11.11") — same automatic, no-promo-
+   * code shape as Blessed Friday, plus an optional schedule window. See
+   * lib/checkout/sale.ts. */
+  saleOffer: SaleOffer;
+  /** Whether the Sale is currently live (enabled AND, if set, inside its
+   * [startDate, endDate] window) — not just whether `saleOffer.enabled` is
+   * on. When true, it overrides (suspends) the Blessed Friday offer above. */
+  saleActive: boolean;
+  /** The Sale discount on the current subtotal — 0 whenever saleActive is
+   * false or the cart doesn't meet its minimum spend. */
+  saleDiscount: number;
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
@@ -248,6 +263,10 @@ interface CartProviderProps {
    * the cart can show its own "Blessed Friday offer applied" messaging and
    * discount line. */
   blessedFridayOffer: BlessedFridayOffer;
+  /** Same offer object layout.tsx already fetches above — passed through so
+   * the cart can show its own "Sale applied" messaging and discount line,
+   * overriding Blessed Friday's whenever the Sale is active. */
+  saleOffer: SaleOffer;
 }
 
 export function CartProvider({
@@ -255,6 +274,7 @@ export function CartProvider({
   shippingSettings,
   freeShippingSuspended,
   blessedFridayOffer,
+  saleOffer,
 }: CartProviderProps) {
   const items = useSyncExternalStore(
     cartStore.subscribe,
@@ -312,15 +332,29 @@ export function CartProvider({
     [lineItems],
   );
 
+  const saleActive = useMemo(() => isSaleActive(saleOffer), [saleOffer]);
+
   const freeShipping = useMemo(
     () =>
-      getFreeShippingProgress(subtotal, shippingSettings, blessedFridayOffer.enabled),
-    [subtotal, shippingSettings, blessedFridayOffer.enabled],
+      getFreeShippingProgress(
+        subtotal,
+        shippingSettings,
+        blessedFridayOffer.enabled || saleActive,
+      ),
+    [subtotal, shippingSettings, blessedFridayOffer.enabled, saleActive],
   );
 
+  const saleDiscount = useMemo(
+    () => calculateSaleDiscount(subtotal, saleOffer),
+    [subtotal, saleOffer],
+  );
+
+  // The Sale overrides Blessed Friday outright whenever it's active — never
+  // both at once (see SaleOfferForm's copy and lib/checkout/sale.ts).
   const blessedFridayDiscount = useMemo(
-    () => calculateBlessedFridayDiscount(subtotal, blessedFridayOffer),
-    [subtotal, blessedFridayOffer],
+    () =>
+      saleActive ? 0 : calculateBlessedFridayDiscount(subtotal, blessedFridayOffer),
+    [subtotal, blessedFridayOffer, saleActive],
   );
 
   const isInCart = useCallback(
@@ -425,6 +459,9 @@ export function CartProvider({
       freeShippingSuspended,
       blessedFridayOffer,
       blessedFridayDiscount,
+      saleOffer,
+      saleActive,
+      saleDiscount,
       isDrawerOpen,
       openDrawer,
       closeDrawer,
@@ -446,6 +483,9 @@ export function CartProvider({
       freeShippingSuspended,
       blessedFridayOffer,
       blessedFridayDiscount,
+      saleOffer,
+      saleActive,
+      saleDiscount,
       isDrawerOpen,
       openDrawer,
       closeDrawer,

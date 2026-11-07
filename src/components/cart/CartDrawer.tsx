@@ -21,6 +21,9 @@ export function CartDrawer() {
     freeShippingSuspended,
     blessedFridayOffer,
     blessedFridayDiscount,
+    saleOffer,
+    saleActive,
+    saleDiscount,
   } = useCart();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -97,6 +100,9 @@ export function CartDrawer() {
                 freeShippingSuspended={freeShippingSuspended}
                 blessedFridayOffer={blessedFridayOffer}
                 blessedFridayDiscount={blessedFridayDiscount}
+                saleOffer={saleOffer}
+                saleActive={saleActive}
+                saleDiscount={saleDiscount}
                 secondaryAction={{ label: "View Cart", href: "/cart" }}
                 onNavigate={closeDrawer}
                 showTopDivider={false}

@@ -5,6 +5,7 @@ import { getSupabasePublicClient } from "@/lib/supabase/server";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 import { DEFAULT_FESTIVAL_BANNER } from "@/types/festivalBanner";
 import { DEFAULT_BLESSED_FRIDAY_OFFER } from "@/types/blessedFridayOffer";
+import { DEFAULT_SALE_OFFER } from "@/types/saleOffer";
 import { DEFAULT_WEDDING_PROMOTION_SETTINGS } from "@/types/weddingPromotion";
 import {
   DEFAULT_COLOR_THEME_ID,
@@ -32,6 +33,7 @@ const MOCK_SETTINGS: Record<string, unknown> = {
   default_hero_image: "",
   bridal_banner_image: "",
   blessed_friday_offer: DEFAULT_BLESSED_FRIDAY_OFFER,
+  sale_offer: DEFAULT_SALE_OFFER,
   wedding_promotion: DEFAULT_WEDDING_PROMOTION_SETTINGS,
   color_theme: DEFAULT_COLOR_THEME_ID,
   color_theme_schedule: DEFAULT_COLOR_THEME_SCHEDULE,

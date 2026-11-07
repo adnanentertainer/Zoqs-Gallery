@@ -6,12 +6,14 @@ import { FestivalBannerForm } from "@/components/admin/FestivalBannerForm";
 import { DefaultHeroImageForm } from "@/components/admin/DefaultHeroImageForm";
 import { BridalBannerImageForm } from "@/components/admin/BridalBannerImageForm";
 import { BlessedFridayOfferForm } from "@/components/admin/BlessedFridayOfferForm";
+import { SaleOfferForm } from "@/components/admin/SaleOfferForm";
 import { WeddingPromotionForm } from "@/components/admin/WeddingPromotionForm";
 import { getAdminStoreSettings } from "@/lib/services/admin/adminSettingsService";
 import { getAdminFestivalBanner } from "@/lib/services/admin/adminFestivalBannerService";
 import { getAdminDefaultHeroImage } from "@/lib/services/admin/adminHeroImageService";
 import { getAdminBridalBannerImage } from "@/lib/services/admin/adminBridalBannerImageService";
 import { getAdminBlessedFridayOffer } from "@/lib/services/admin/adminBlessedFridayOfferService";
+import { getAdminSaleOffer } from "@/lib/services/admin/adminSaleOfferService";
 import { getAdminWeddingPromotionSettings } from "@/lib/services/admin/adminWeddingPromotionService";
 
 export const metadata: Metadata = {
@@ -25,6 +27,7 @@ export default async function AdminSettingsPage() {
     festivalBanner,
     defaultHeroImage,
     bridalBannerImage,
+    saleOffer,
     blessedFridayOffer,
     weddingPromotion,
   ] = await Promise.all([
@@ -32,6 +35,7 @@ export default async function AdminSettingsPage() {
     getAdminFestivalBanner(),
     getAdminDefaultHeroImage(),
     getAdminBridalBannerImage(),
+    getAdminSaleOffer(),
     getAdminBlessedFridayOffer(),
     getAdminWeddingPromotionSettings(),
   ]);
@@ -43,6 +47,19 @@ export default async function AdminSettingsPage() {
         description="These settings control the public storefront."
       />
       <SettingsForm initialValues={settings} />
+
+      <div className="mt-4">
+        <Heading variant="h3" as="h2">
+          Sale
+        </Heading>
+        <Text variant="bodySm" className="mt-1 text-muted">
+          A general, schedulable sitewide sale (e.g. &quot;11.11&quot;) —
+          automatic, no promo code needed. Optionally pre-set a date range in
+          advance and enable it anytime; while active, it takes priority
+          over the Blessed Friday offer below.
+        </Text>
+      </div>
+      <SaleOfferForm initialValues={saleOffer} />
 
       <div className="mt-4">
         <Heading variant="h3" as="h2">

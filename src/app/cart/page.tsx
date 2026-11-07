@@ -18,6 +18,9 @@ export default function CartPage() {
     freeShippingSuspended,
     blessedFridayOffer,
     blessedFridayDiscount,
+    saleOffer,
+    saleActive,
+    saleDiscount,
     totalQuantity,
   } = useCart();
 
@@ -60,6 +63,9 @@ export default function CartPage() {
               freeShippingSuspended={freeShippingSuspended}
               blessedFridayOffer={blessedFridayOffer}
               blessedFridayDiscount={blessedFridayDiscount}
+              saleOffer={saleOffer}
+              saleActive={saleActive}
+              saleDiscount={saleDiscount}
               secondaryAction={{ label: "Continue Shopping", href: "/shop" }}
             />
           </div>
