@@ -18,6 +18,7 @@ import {
 } from "@/lib/services/productService";
 import { getSocialPosts } from "@/lib/services/socialPostService";
 import { getActiveHeroImage } from "@/lib/services/promoCodeService";
+import { getActiveHeroImages } from "@/lib/services/heroImageService";
 import { getSiteSetting } from "@/lib/services/settingsService";
 import { getWeddingPromotionSettings } from "@/lib/services/weddingPromotionService";
 import { getActiveLayoutTemplate } from "@/lib/services/layoutTemplateService";
@@ -38,6 +39,7 @@ export default async function Home() {
     bestSellers,
     socialPosts,
     activeHeroImage,
+    heroCarouselImages,
     defaultHeroImage,
     bridalBannerImageUrl,
     weddingPromotion,
@@ -49,6 +51,7 @@ export default async function Home() {
     getBestSellers(),
     getSocialPosts(),
     getActiveHeroImage(),
+    getActiveHeroImages(),
     getSiteSetting<string>("default_hero_image"),
     getSiteSetting<string>("bridal_banner_image"),
     getWeddingPromotionSettings(),
@@ -67,6 +70,10 @@ export default async function Home() {
         layout={layoutTemplate.hero}
         imageUrl={activeHeroImage?.imageUrl || defaultHeroImage || undefined}
         imageAlt={activeHeroImage?.imageAlt}
+        // A scheduled promo code's own hero image is a deliberate override
+        // for that promotion -- don't dilute it by cycling in the generic
+        // carousel on top of it.
+        images={activeHeroImage ? [] : heroCarouselImages}
       />
       {showWeddingPromotion && (
         <>

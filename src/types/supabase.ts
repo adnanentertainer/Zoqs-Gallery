@@ -219,6 +219,26 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["social_posts"]["Insert"]>;
         Relationships: [];
       };
+      hero_images: {
+        Row: {
+          id: string;
+          image_url: string;
+          alt_text: string | null;
+          is_active: boolean;
+          display_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          image_url: string;
+          alt_text?: string | null;
+          is_active?: boolean;
+          display_order?: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["hero_images"]["Insert"]>;
+        Relationships: [];
+      };
       social_media_settings: {
         Row: {
           id: string;

@@ -1,12 +1,13 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Banknote, ShieldCheck, Truck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Heading, Text } from "@/components/ui/Typography";
 import { buttonVariants } from "@/components/ui/Button";
+import { HeroImageCarousel } from "@/components/home/HeroImageCarousel";
 import { cn } from "@/lib/utils";
 import { heroImage } from "@/constants/images";
 import type { HeroLayoutId } from "@/types/layoutTemplate";
+import type { HeroImage } from "@/types/heroImage";
 
 const trustBadges = [
   { icon: Truck, label: "Nationwide Delivery" },
@@ -23,34 +24,42 @@ interface HeroSectionProps {
    * lib/services/promoCodeService.ts's getActiveHeroImage(). */
   imageUrl?: string;
   imageAlt?: string;
+  /** Admin-managed carousel slides (Admin → Hero Carousel). When there are
+   * 2+ of these, every photo-bearing variant below auto-advances between
+   * them instead of showing the single `imageUrl` photo -- pass an empty
+   * array (e.g. while a scheduled promo code's own hero image is active)
+   * to keep a variant on the single-photo behavior. */
+  images?: HeroImage[];
 }
 
 export function HeroSection({
   layout = "classic",
   imageUrl,
   imageAlt,
+  images = [],
 }: HeroSectionProps) {
   if (layout === "centered") {
-    return <HeroCentered imageUrl={imageUrl} imageAlt={imageAlt} />;
+    return <HeroCentered imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
   }
   if (layout === "editorial") {
-    return <HeroEditorial imageUrl={imageUrl} imageAlt={imageAlt} />;
+    return <HeroEditorial imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
   }
   if (layout === "minimal") {
     return <HeroMinimal />;
   }
   if (layout === "panel") {
-    return <HeroPanel imageUrl={imageUrl} imageAlt={imageAlt} />;
+    return <HeroPanel imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
   }
   if (layout === "badge") {
-    return <HeroBadge imageUrl={imageUrl} imageAlt={imageAlt} />;
+    return <HeroBadge imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
   }
-  return <HeroClassic imageUrl={imageUrl} imageAlt={imageAlt} />;
+  return <HeroClassic imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
 }
 
 interface HeroVariantProps {
   imageUrl?: string;
   imageAlt?: string;
+  images?: HeroImage[];
 }
 
 const defaultImageAlt =
@@ -81,7 +90,7 @@ function TrustBadges({
   );
 }
 
-function HeroClassic({ imageUrl, imageAlt }: HeroVariantProps) {
+function HeroClassic({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
   return (
     <section className="relative flex items-center overflow-hidden bg-secondary lg:min-h-[85vh]">
       <div
@@ -106,13 +115,11 @@ function HeroClassic({ imageUrl, imageAlt }: HeroVariantProps) {
               className="pointer-events-none absolute -inset-3 hidden rounded-2xl border border-gold/25 sm:block"
             />
             <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-[0_25px_60px_-15px_rgba(31,31,31,0.35)] ring-1 ring-gold/30">
-              <Image
-                src={imageUrl || heroImage}
-                alt={imageAlt || defaultImageAlt}
-                fill
-                preload
+              <HeroImageCarousel
+                images={images}
+                fallbackUrl={imageUrl || heroImage}
+                fallbackAlt={imageAlt || defaultImageAlt}
                 sizes="(max-width: 1024px) 100vw, 448px"
-                className="object-cover"
               />
             </div>
           </div>
@@ -167,7 +174,7 @@ function HeroClassic({ imageUrl, imageAlt }: HeroVariantProps) {
   );
 }
 
-function HeroCentered({ imageUrl, imageAlt }: HeroVariantProps) {
+function HeroCentered({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
   return (
     <section className="relative overflow-hidden bg-secondary">
       <div
@@ -228,13 +235,12 @@ function HeroCentered({ imageUrl, imageAlt }: HeroVariantProps) {
             className="pointer-events-none absolute -inset-2 hidden rounded-2xl border border-gold/25 sm:block"
           />
           <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl shadow-[0_25px_60px_-15px_rgba(31,31,31,0.35)] ring-1 ring-gold/30 sm:aspect-[21/8]">
-            <Image
-              src={imageUrl || heroImage}
-              alt={imageAlt || defaultImageAlt}
-              fill
-              preload
+            <HeroImageCarousel
+              images={images}
+              fallbackUrl={imageUrl || heroImage}
+              fallbackAlt={imageAlt || defaultImageAlt}
               sizes="100vw"
-              className="object-cover [object-position:50%_20%]"
+              imageClassName="[object-position:50%_20%]"
             />
           </div>
         </div>
@@ -243,16 +249,15 @@ function HeroCentered({ imageUrl, imageAlt }: HeroVariantProps) {
   );
 }
 
-function HeroEditorial({ imageUrl, imageAlt }: HeroVariantProps) {
+function HeroEditorial({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
   return (
     <section className="relative flex min-h-[70vh] items-end overflow-hidden bg-primary lg:min-h-[88vh]">
-      <Image
-        src={imageUrl || heroImage}
-        alt={imageAlt || defaultImageAlt}
-        fill
-        preload
+      <HeroImageCarousel
+        images={images}
+        fallbackUrl={imageUrl || heroImage}
+        fallbackAlt={imageAlt || defaultImageAlt}
         sizes="100vw"
-        className="object-cover [object-position:60%_20%]"
+        imageClassName="[object-position:60%_20%]"
       />
       <div
         aria-hidden="true"
@@ -374,18 +379,16 @@ function HeroMinimal() {
   );
 }
 
-function HeroPanel({ imageUrl, imageAlt }: HeroVariantProps) {
+function HeroPanel({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
   return (
     <section className="relative overflow-hidden bg-secondary">
       <div className="flex flex-col lg:min-h-[80vh] lg:flex-row">
         <div className="relative order-1 aspect-[4/3] w-full sm:aspect-[16/9] lg:order-2 lg:aspect-auto lg:w-[45%]">
-          <Image
-            src={imageUrl || heroImage}
-            alt={imageAlt || defaultImageAlt}
-            fill
-            preload
+          <HeroImageCarousel
+            images={images}
+            fallbackUrl={imageUrl || heroImage}
+            fallbackAlt={imageAlt || defaultImageAlt}
             sizes="(max-width: 1024px) 100vw, 45vw"
-            className="object-cover"
           />
         </div>
 
@@ -438,7 +441,7 @@ function HeroPanel({ imageUrl, imageAlt }: HeroVariantProps) {
   );
 }
 
-function HeroBadge({ imageUrl, imageAlt }: HeroVariantProps) {
+function HeroBadge({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
   return (
     // Below lg, the image is a normal in-flow block (its own aspect ratio)
     // with the card sitting underneath it, not overlaid -- a bottom-anchored
@@ -450,13 +453,12 @@ function HeroBadge({ imageUrl, imageAlt }: HeroVariantProps) {
     // (repositioned by breakpoint, not duplicated) so it's never fetched twice.
     <section className="relative overflow-hidden bg-primary lg:min-h-[85vh]">
       <div className="relative aspect-[4/3] w-full sm:aspect-[16/9] lg:absolute lg:inset-0 lg:aspect-auto lg:h-full">
-        <Image
-          src={imageUrl || heroImage}
-          alt={imageAlt || defaultImageAlt}
-          fill
-          preload
+        <HeroImageCarousel
+          images={images}
+          fallbackUrl={imageUrl || heroImage}
+          fallbackAlt={imageAlt || defaultImageAlt}
           sizes="100vw"
-          className="object-cover [object-position:65%_20%]"
+          imageClassName="[object-position:65%_20%]"
         />
         <div
           aria-hidden="true"

@@ -80,20 +80,20 @@ export const HERO_LAYOUTS: LayoutVariantOption<HeroLayoutId>[] = [
     id: "classic",
     name: "Classic Split",
     description: "Boxed photo beside the headline -- the current look.",
-    spec: "Photo: 900×1125px (4:5 portrait) or larger. Set in Admin → Settings → Homepage Hero Image.",
+    spec: "Photo: 900×1125px (4:5 portrait) or larger. Set in Admin → Settings → Homepage Hero Image, or add 2+ in Admin → Hero Carousel to auto-scroll between them.",
   },
   {
     id: "centered",
     name: "Centered Spotlight",
     description: "Centered headline with a wide photo band beneath it.",
-    spec: "Photo: 2400×1050px (21:9 landscape) or larger. Set in Admin → Settings → Homepage Hero Image.",
+    spec: "Photo: 2400×1050px (21:9 landscape) or larger. Set in Admin → Settings → Homepage Hero Image, or add 2+ in Admin → Hero Carousel to auto-scroll between them.",
   },
   {
     id: "editorial",
     name: "Editorial Full-Bleed",
     description:
       "Full-bleed cinematic photo with the headline overlaid on top, magazine-style.",
-    spec: "Photo: 1920×1200px (landscape) or larger -- fills the full screen. Set in Admin → Settings → Homepage Hero Image.",
+    spec: "Photo: 1920×1200px (landscape) or larger -- fills the full screen. Set in Admin → Settings → Homepage Hero Image, or add 2+ in Admin → Hero Carousel to auto-scroll between them.",
   },
   {
     id: "minimal",
@@ -107,14 +107,14 @@ export const HERO_LAYOUTS: LayoutVariantOption<HeroLayoutId>[] = [
     name: "Side Panel",
     description:
       "Photo bleeds edge-to-edge in a tall side panel, no frame or padding.",
-    spec: "Photo: 1600×1200px or larger, portrait or landscape both work -- bleeds to the edge. Set in Admin → Settings → Homepage Hero Image.",
+    spec: "Photo: 1600×1200px or larger, portrait or landscape both work -- bleeds to the edge. Set in Admin → Settings → Homepage Hero Image, or add 2+ in Admin → Hero Carousel to auto-scroll between them.",
   },
   {
     id: "badge",
     name: "Floating Badge",
     description:
       "Full-bleed photo with the headline in a floating card over the corner.",
-    spec: "Photo: 1920×1200px (landscape) or larger -- fills the full screen. Set in Admin → Settings → Homepage Hero Image.",
+    spec: "Photo: 1920×1200px (landscape) or larger -- fills the full screen. Set in Admin → Settings → Homepage Hero Image, or add 2+ in Admin → Hero Carousel to auto-scroll between them.",
   },
 ];
 

@@ -11,6 +11,7 @@ import {
   FileBarChart,
   Star,
   Images,
+  GalleryHorizontal,
   Share2,
   Clapperboard,
   Ticket,
@@ -64,6 +65,11 @@ export const adminNavItems: AdminNavItem[] = [
     label: "Layout",
     href: "/admin/layout-template",
     icon: LayoutTemplate,
+  },
+  {
+    label: "Hero Carousel",
+    href: "/admin/hero-images",
+    icon: GalleryHorizontal,
   },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
