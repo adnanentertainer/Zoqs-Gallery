@@ -40,7 +40,7 @@ export function WhatsAppFloatingButton({
       rel="noopener noreferrer"
       aria-label={ariaLabel}
       onClick={() => trackContact()}
-      className="fixed bottom-24 right-4 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full drop-shadow-[0_4px_16px_rgba(31,31,31,0.25)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold lg:bottom-6 lg:right-6"
+      className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom)+0.75rem)] right-4 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full drop-shadow-[0_4px_16px_rgba(31,31,31,0.25)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold lg:bottom-6 lg:right-6"
     >
       <WhatsAppIcon className="h-full w-full" aria-hidden="true" />
     </a>

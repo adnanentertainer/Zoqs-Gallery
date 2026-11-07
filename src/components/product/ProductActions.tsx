@@ -255,7 +255,7 @@ export function ProductActions({ product }: ProductActionsProps) {
       <div
         aria-hidden={!showStickyBar}
         className={cn(
-          "fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-beige bg-white/95 px-4 py-3 shadow-[0_-4px_16px_rgba(31,31,31,0.08)] backdrop-blur transition-transform duration-200 motion-reduce:transition-none lg:hidden",
+          "fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 flex items-center gap-3 border-t border-beige bg-white/95 px-4 py-3 shadow-[0_-4px_16px_rgba(31,31,31,0.08)] backdrop-blur transition-transform duration-200 motion-reduce:transition-none lg:hidden",
           showStickyBar ? "translate-y-0" : "pointer-events-none translate-y-full",
         )}
       >

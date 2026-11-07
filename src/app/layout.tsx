@@ -7,6 +7,7 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { FestivalCountdownBanner } from "@/components/layout/FestivalCountdownBanner";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { BottomTabBar } from "@/components/layout/BottomTabBar";
 import { ToastProvider } from "@/context/ToastContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { CartProvider } from "@/context/CartContext";
@@ -178,6 +179,18 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                   />
                   <main className="flex flex-1 flex-col">{children}</main>
                   <Footer />
+                  {/* Keeps the fixed BottomTabBar from covering whatever's
+                      last in normal flow (the footer, or a page with no
+                      awareness of the bar) -- same height as the bar's own
+                      content box, see BottomTabBar.tsx's BAR_HEIGHT_REM. */}
+                  <div
+                    aria-hidden="true"
+                    className="lg:hidden"
+                    style={{
+                      height: "calc(4rem + env(safe-area-inset-bottom))",
+                    }}
+                  />
+                  <BottomTabBar />
                 </CartProvider>
               </PromoStatusProvider>
             </WishlistProvider>
