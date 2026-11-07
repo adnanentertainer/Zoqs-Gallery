@@ -125,29 +125,29 @@ function SlideClassic({ banner }: { banner: PromoBanner }) {
       ) : (
         <RadialGradientBackdrop />
       )}
-      <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-6 px-4 py-14 text-center sm:px-6 lg:flex-row lg:justify-between lg:px-8 lg:py-16 lg:text-left">
-        <div className="flex flex-col items-center gap-3 lg:items-start">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-row items-center justify-between gap-4 px-4 py-8 text-left sm:gap-6 sm:px-6 sm:py-10 lg:px-8 lg:py-16">
+        <div className="flex min-w-0 flex-col items-start gap-2 sm:gap-3">
           <PromoTextLabel text={banner.promoText} />
-          <h2 className="font-heading text-3xl font-semibold text-white sm:text-4xl">
+          <h2 className="font-heading text-lg font-semibold text-white sm:text-3xl lg:text-4xl">
             {banner.title}
           </h2>
           {banner.subtitle && (
-            <p className="max-w-md font-body text-base text-white/85">
+            <p className="max-w-md font-body text-xs text-white/85 sm:text-base">
               {banner.subtitle}
             </p>
           )}
           <PromoCodeBadge code={banner.promoCode} />
           <div className="mt-1">
-            <CtaButton banner={banner} />
+            <CtaButton banner={banner} size="md" />
           </div>
         </div>
         {banner.bannerImageUrl && (
-          <div className="relative h-40 w-40 shrink-0 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)] sm:h-52 sm:w-52">
+          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)] sm:h-40 sm:w-40 lg:h-52 lg:w-52">
             <Image
               src={banner.bannerImageUrl}
               alt=""
               fill
-              sizes="208px"
+              sizes="(max-width: 640px) 64px, (max-width: 1024px) 160px, 208px"
               className="object-cover"
             />
           </div>
@@ -180,31 +180,31 @@ function SlideSplitReverse({ banner }: { banner: PromoBanner }) {
       ) : (
         <RadialGradientBackdrop />
       )}
-      <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-6 px-4 py-14 text-center sm:px-6 lg:flex-row lg:justify-between lg:px-8 lg:py-16 lg:text-left">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-row items-center justify-between gap-4 px-4 py-8 text-right sm:gap-6 sm:px-6 sm:py-10 lg:px-8 lg:py-16">
         {banner.bannerImageUrl && (
-          <div className="relative h-40 w-40 shrink-0 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)] sm:h-52 sm:w-52">
+          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)] sm:h-40 sm:w-40 lg:h-52 lg:w-52">
             <Image
               src={banner.bannerImageUrl}
               alt=""
               fill
-              sizes="208px"
+              sizes="(max-width: 640px) 64px, (max-width: 1024px) 160px, 208px"
               className="object-cover"
             />
           </div>
         )}
-        <div className="flex flex-col items-center gap-3 lg:items-end lg:text-right">
+        <div className="flex min-w-0 flex-col items-end gap-2 sm:gap-3">
           <PromoTextLabel text={banner.promoText} />
-          <h2 className="font-heading text-3xl font-semibold text-white sm:text-4xl">
+          <h2 className="font-heading text-lg font-semibold text-white sm:text-3xl lg:text-4xl">
             {banner.title}
           </h2>
           {banner.subtitle && (
-            <p className="max-w-md font-body text-base text-white/85">
+            <p className="max-w-md font-body text-xs text-white/85 sm:text-base">
               {banner.subtitle}
             </p>
           )}
           <PromoCodeBadge code={banner.promoCode} />
           <div className="mt-1">
-            <CtaButton banner={banner} />
+            <CtaButton banner={banner} size="md" />
           </div>
         </div>
       </div>
