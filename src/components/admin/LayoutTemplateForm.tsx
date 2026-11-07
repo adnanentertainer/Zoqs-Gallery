@@ -7,18 +7,38 @@ import { AuthMessage } from "@/components/auth";
 import { Heading, Text } from "@/components/ui/Typography";
 import { cn } from "@/lib/utils";
 import {
+  BENEFITS_LAYOUTS,
+  BRIDAL_LAYOUTS,
   CATEGORY_LAYOUTS,
   HERO_LAYOUTS,
+  PRODUCT_LAYOUTS,
+  REVIEWS_LAYOUTS,
+  SOCIAL_GALLERY_LAYOUTS,
+  type BenefitsLayoutId,
+  type BridalLayoutId,
   type CategoryLayoutId,
   type HeroLayoutId,
   type LayoutTemplate,
   type LayoutVariantOption,
+  type ProductLayoutId,
+  type ReviewsLayoutId,
+  type SocialGalleryLayoutId,
 } from "@/types/layoutTemplate";
 import { updateAdminLayoutTemplateAction } from "@/app/admin/layout-template/actions";
 
 interface LayoutTemplateFormProps {
   initialTemplate: LayoutTemplate;
 }
+
+const SECTION_KEYS = [
+  "hero",
+  "categories",
+  "products",
+  "bridal",
+  "benefits",
+  "reviews",
+  "socialGallery",
+] as const satisfies readonly (keyof LayoutTemplate)[];
 
 export function LayoutTemplateForm({
   initialTemplate,
@@ -29,8 +49,15 @@ export function LayoutTemplateForm({
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const isDirty =
-    selected.hero !== saved.hero || selected.categories !== saved.categories;
+  const isDirty = SECTION_KEYS.some((key) => selected[key] !== saved[key]);
+
+  function setSection<Key extends keyof LayoutTemplate>(
+    key: Key,
+    value: LayoutTemplate[Key],
+  ) {
+    setSelected((prev) => ({ ...prev, [key]: value }));
+    setSuccess(false);
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,65 +87,75 @@ export function LayoutTemplateForm({
         />
       )}
 
-      <section className="flex flex-col gap-4">
-        <div>
-          <Heading variant="h3" as="h2">
-            Hero Section
-          </Heading>
-          <Text variant="bodySm" className="mt-1 text-muted">
-            The first thing visitors see at the top of the homepage.
-          </Text>
-        </div>
-        <div
-          role="radiogroup"
-          aria-label="Hero section layout"
-          className="grid grid-cols-1 gap-5 sm:grid-cols-3"
-        >
-          {HERO_LAYOUTS.map((layout) => (
-            <VariantCard
-              key={layout.id}
-              layout={layout}
-              isSelected={selected.hero === layout.id}
-              onSelect={() => {
-                setSelected((prev) => ({ ...prev, hero: layout.id }));
-                setSuccess(false);
-              }}
-              name="hero-layout"
-              preview={<HeroPreview id={layout.id} />}
-            />
-          ))}
-        </div>
-      </section>
+      <SectionPicker
+        title="Hero Section"
+        description="The first thing visitors see at the top of the homepage."
+        name="hero-layout"
+        options={HERO_LAYOUTS}
+        selectedId={selected.hero}
+        onSelect={(id) => setSection("hero", id)}
+        renderPreview={(id) => <HeroPreview id={id} />}
+      />
 
-      <section className="flex flex-col gap-4">
-        <div>
-          <Heading variant="h3" as="h2">
-            Shop By Category Section
-          </Heading>
-          <Text variant="bodySm" className="mt-1 text-muted">
-            How category tiles are arranged beneath the hero.
-          </Text>
-        </div>
-        <div
-          role="radiogroup"
-          aria-label="Category section layout"
-          className="grid grid-cols-1 gap-5 sm:grid-cols-3"
-        >
-          {CATEGORY_LAYOUTS.map((layout) => (
-            <VariantCard
-              key={layout.id}
-              layout={layout}
-              isSelected={selected.categories === layout.id}
-              onSelect={() => {
-                setSelected((prev) => ({ ...prev, categories: layout.id }));
-                setSuccess(false);
-              }}
-              name="category-layout"
-              preview={<CategoryPreview id={layout.id} />}
-            />
-          ))}
-        </div>
-      </section>
+      <SectionPicker
+        title="Shop By Category Section"
+        description="How category tiles are arranged beneath the hero."
+        name="category-layout"
+        options={CATEGORY_LAYOUTS}
+        selectedId={selected.categories}
+        onSelect={(id) => setSection("categories", id)}
+        renderPreview={(id) => <CategoryPreview id={id} />}
+      />
+
+      <SectionPicker
+        title="Product Sections"
+        description="Applies to every product row -- Wedding Picks, New Arrivals, Best Sellers."
+        name="product-layout"
+        options={PRODUCT_LAYOUTS}
+        selectedId={selected.products}
+        onSelect={(id) => setSection("products", id)}
+        renderPreview={(id) => <ProductPreview id={id} />}
+      />
+
+      <SectionPicker
+        title="Bridal Collection Banner"
+        description="The dark banner promoting the bridal collection."
+        name="bridal-layout"
+        options={BRIDAL_LAYOUTS}
+        selectedId={selected.bridal}
+        onSelect={(id) => setSection("bridal", id)}
+        renderPreview={(id) => <BridalPreview id={id} />}
+      />
+
+      <SectionPicker
+        title="Benefits Strip"
+        description="Delivery / COD / quality trust badges."
+        name="benefits-layout"
+        options={BENEFITS_LAYOUTS}
+        selectedId={selected.benefits}
+        onSelect={(id) => setSection("benefits", id)}
+        renderPreview={(id) => <BenefitsPreview id={id} />}
+      />
+
+      <SectionPicker
+        title="Customer Reviews"
+        description="How testimonial cards are arranged."
+        name="reviews-layout"
+        options={REVIEWS_LAYOUTS}
+        selectedId={selected.reviews}
+        onSelect={(id) => setSection("reviews", id)}
+        renderPreview={(id) => <ReviewsPreview id={id} />}
+      />
+
+      <SectionPicker
+        title="Follow Our Style (Instagram)"
+        description="How Instagram photo tiles are arranged."
+        name="social-gallery-layout"
+        options={SOCIAL_GALLERY_LAYOUTS}
+        selectedId={selected.socialGallery}
+        onSelect={(id) => setSection("socialGallery", id)}
+        renderPreview={(id) => <SocialGalleryPreview id={id} />}
+      />
 
       <div className="flex items-center gap-3 border-t border-beige pt-5">
         <Button
@@ -138,6 +175,56 @@ export function LayoutTemplateForm({
         )}
       </div>
     </form>
+  );
+}
+
+function SectionPicker<Id extends string>({
+  title,
+  description,
+  name,
+  options,
+  selectedId,
+  onSelect,
+  renderPreview,
+}: {
+  title: string;
+  description: string;
+  name: string;
+  options: LayoutVariantOption<Id>[];
+  selectedId: Id;
+  onSelect: (id: Id) => void;
+  renderPreview: (id: Id) => ReactNode;
+}) {
+  return (
+    <section className="flex flex-col gap-4">
+      <div>
+        <Heading variant="h3" as="h2">
+          {title}
+        </Heading>
+        <Text variant="bodySm" className="mt-1 text-muted">
+          {description}
+        </Text>
+      </div>
+      <div
+        role="radiogroup"
+        aria-label={title}
+        className={cn(
+          "grid grid-cols-1 gap-5 sm:grid-cols-2",
+          options.length >= 3 && "lg:grid-cols-3",
+        )}
+      >
+        {options.map((layout) => (
+          <VariantCard
+            key={layout.id}
+            layout={layout}
+            isSelected={selectedId === layout.id}
+            onSelect={() => onSelect(layout.id)}
+            name={name}
+            preview={renderPreview(layout.id)}
+          />
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -271,10 +358,154 @@ function CategoryPreview({ id }: { id: CategoryLayoutId }) {
   return (
     <div className="grid aspect-[16/8] w-full grid-cols-4 gap-2 rounded-xl bg-secondary p-3">
       {Array.from({ length: 4 }).map((_, index) => (
-        <div
-          key={index}
-          className="rounded-xl bg-beige ring-1 ring-black/5"
-        />
+        <div key={index} className="rounded-xl bg-beige ring-1 ring-black/5" />
+      ))}
+    </div>
+  );
+}
+
+function ProductPreview({ id }: { id: ProductLayoutId }) {
+  if (id === "carousel") {
+    return (
+      <div className="flex aspect-[16/9] w-full gap-2 overflow-hidden rounded-xl bg-secondary p-3">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className={cn(
+              "flex shrink-0 flex-col gap-1",
+              index === 3 ? "w-6 opacity-40" : "w-1/4",
+            )}
+          >
+            <div className="aspect-square w-full rounded-lg bg-beige" />
+            <div className="h-1 w-3/4 rounded-full bg-muted/40" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid aspect-[16/9] w-full grid-cols-4 gap-2 rounded-xl bg-secondary p-3">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div key={index} className="flex flex-col gap-1">
+          <div className="aspect-square w-full rounded-lg bg-beige" />
+          <div className="h-1 w-3/4 rounded-full bg-muted/40" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BridalPreview({ id }: { id: BridalLayoutId }) {
+  if (id === "editorial") {
+    return (
+      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-primary">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/60 to-transparent" />
+        <div className="absolute inset-y-0 left-3 flex flex-col justify-center gap-1.5">
+          <div className="h-1.5 w-10 rounded-full bg-gold" />
+          <div className="h-2 w-20 rounded-full bg-white/90" />
+          <div className="mt-1 h-3.5 w-14 rounded-full bg-gold" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex aspect-[16/9] w-full items-center gap-3 rounded-xl bg-primary p-3">
+      <div className="aspect-[4/5] h-full rounded-lg bg-white/10" />
+      <div className="flex flex-1 flex-col gap-1.5">
+        <div className="h-1.5 w-10 rounded-full bg-gold" />
+        <div className="h-2 w-16 rounded-full bg-white/90" />
+        <div className="mt-1 h-3.5 w-14 rounded-full bg-gold" />
+      </div>
+    </div>
+  );
+}
+
+function BenefitsPreview({ id }: { id: BenefitsLayoutId }) {
+  if (id === "cards") {
+    return (
+      <div className="grid aspect-[16/7] w-full grid-cols-4 gap-2 rounded-xl bg-secondary p-3">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="flex flex-col items-center justify-center gap-1 rounded-lg border border-beige bg-white"
+          >
+            <div className="h-4 w-4 rounded-full bg-gold/30" />
+            <div className="h-1 w-8 rounded-full bg-muted/40" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex aspect-[16/7] w-full items-center justify-between gap-2 rounded-xl bg-secondary p-3">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div key={index} className="flex items-center gap-1.5">
+          <div className="h-5 w-5 shrink-0 rounded-full bg-gold/30" />
+          <div className="h-1 w-8 rounded-full bg-muted/40" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ReviewsPreview({ id }: { id: ReviewsLayoutId }) {
+  if (id === "carousel") {
+    return (
+      <div className="flex aspect-[16/9] w-full gap-2 overflow-hidden rounded-xl bg-secondary p-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div
+            key={index}
+            className={cn(
+              "shrink-0 rounded-lg border border-beige bg-white p-2",
+              index === 2 ? "w-6 opacity-40" : "w-1/3",
+            )}
+          >
+            <div className="h-1 w-3/4 rounded-full bg-muted/40" />
+            <div className="mt-1 h-1 w-full rounded-full bg-muted/30" />
+            <div className="mt-1 h-1 w-1/2 rounded-full bg-muted/30" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid aspect-[16/9] w-full grid-cols-3 gap-2 rounded-xl bg-secondary p-3">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div key={index} className="rounded-lg border border-beige bg-white p-2">
+          <div className="h-1 w-3/4 rounded-full bg-muted/40" />
+          <div className="mt-1 h-1 w-full rounded-full bg-muted/30" />
+          <div className="mt-1 h-1 w-1/2 rounded-full bg-muted/30" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SocialGalleryPreview({ id }: { id: SocialGalleryLayoutId }) {
+  if (id === "carousel") {
+    return (
+      <div className="flex aspect-[16/6] w-full gap-2 overflow-hidden rounded-xl bg-secondary p-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div
+            key={index}
+            className={cn(
+              "aspect-square shrink-0 rounded-lg bg-beige",
+              index === 5 && "opacity-40",
+            )}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid aspect-[16/6] w-full grid-cols-6 gap-2 rounded-xl bg-secondary p-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <div key={index} className="rounded-lg bg-beige" />
       ))}
     </div>
   );

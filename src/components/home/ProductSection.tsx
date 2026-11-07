@@ -4,6 +4,7 @@ import { Section } from "@/components/ui/Section";
 import { Heading, Text } from "@/components/ui/Typography";
 import { ProductCard } from "@/components/product/ProductCard";
 import type { Product } from "@/types";
+import type { ProductLayoutId } from "@/types/layoutTemplate";
 
 interface ProductSectionProps {
   id?: string;
@@ -13,6 +14,9 @@ interface ProductSectionProps {
   viewAllLabel: string;
   viewAllHref: string;
   background?: "white" | "cream" | "beige";
+  /** Which of the admin-selected layout variants to render -- see
+   * src/types/layoutTemplate.ts. Defaults to the original "grid" look. */
+  layout?: ProductLayoutId;
 }
 
 export function ProductSection({
@@ -23,6 +27,7 @@ export function ProductSection({
   viewAllLabel,
   viewAllHref,
   background = "white",
+  layout = "grid",
 }: ProductSectionProps) {
   return (
     <Section id={id} background={background}>
@@ -48,11 +53,24 @@ export function ProductSection({
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {layout === "carousel" ? (
+        <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2">
+          {products.map((product) => (
+            <div
+              key={product.id}
+              className="w-[46%] shrink-0 snap-start sm:w-[31%] lg:w-[23%]"
+            >
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
 
       <div className="mt-10 flex justify-center sm:hidden">
         <Link

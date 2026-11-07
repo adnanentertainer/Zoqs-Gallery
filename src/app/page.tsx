@@ -85,6 +85,7 @@ export default async function Home() {
               viewAllLabel="View Wedding Collection"
               viewAllHref="/wedding-collection"
               background="cream"
+              layout={layoutTemplate.products}
             />
           </Reveal>
         </>
@@ -103,6 +104,7 @@ export default async function Home() {
           products={newArrivals}
           viewAllLabel="View All New Arrivals"
           viewAllHref="/new-arrivals"
+          layout={layoutTemplate.products}
         />
       </Reveal>
       <Reveal>
@@ -113,19 +115,20 @@ export default async function Home() {
           viewAllLabel="View All Best Sellers"
           viewAllHref="/best-sellers"
           background="cream"
+          layout={layoutTemplate.products}
         />
       </Reveal>
       <Reveal>
-        <BridalSection />
+        <BridalSection layout={layoutTemplate.bridal} />
       </Reveal>
       <Reveal>
-        <BenefitsSection />
+        <BenefitsSection layout={layoutTemplate.benefits} />
       </Reveal>
       <Reveal>
-        <ReviewsSection />
+        <ReviewsSection layout={layoutTemplate.reviews} />
       </Reveal>
       <Reveal>
-        <SocialGallery posts={socialPosts} />
+        <SocialGallery posts={socialPosts} layout={layoutTemplate.socialGallery} />
       </Reveal>
     </>
   );

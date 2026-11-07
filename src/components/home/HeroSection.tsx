@@ -254,7 +254,7 @@ function HeroEditorial({ imageUrl, imageAlt }: HeroVariantProps) {
         className="pointer-events-none absolute inset-0 bg-gradient-to-r from-primary/75 via-primary/15 to-transparent"
       />
 
-      <Container className="relative flex flex-col items-start gap-5 py-12 sm:py-16 lg:max-w-xl lg:py-24 animate-fade-rise-in">
+      <Container className="relative flex flex-col items-start gap-5 py-12 sm:py-16 lg:py-24 animate-fade-rise-in">
         <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-white/90">
           <span className="h-px w-8 bg-gold" aria-hidden="true" />
           Premium Artificial Jewellery
