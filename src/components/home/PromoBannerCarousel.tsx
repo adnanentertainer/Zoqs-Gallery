@@ -142,12 +142,12 @@ function SlideClassic({ banner }: { banner: PromoBanner }) {
           </div>
         </div>
         {banner.bannerImageUrl && (
-          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)] sm:h-40 sm:w-40 lg:h-52 lg:w-52">
+          <div className="relative h-[clamp(112px,30vw,208px)] w-[clamp(112px,30vw,208px)] shrink-0 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)]">
             <Image
               src={banner.bannerImageUrl}
               alt=""
               fill
-              sizes="(max-width: 640px) 96px, (max-width: 1024px) 160px, 208px"
+              sizes="(max-width: 1024px) 30vw, 208px"
               className="object-cover"
             />
           </div>
@@ -182,12 +182,12 @@ function SlideSplitReverse({ banner }: { banner: PromoBanner }) {
       )}
       <div className="relative mx-auto flex w-full max-w-7xl flex-row items-center justify-between gap-4 px-4 py-8 text-right sm:gap-6 sm:px-6 sm:py-10 lg:px-8 lg:py-16">
         {banner.bannerImageUrl && (
-          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)] sm:h-40 sm:w-40 lg:h-52 lg:w-52">
+          <div className="relative h-[clamp(112px,30vw,208px)] w-[clamp(112px,30vw,208px)] shrink-0 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)]">
             <Image
               src={banner.bannerImageUrl}
               alt=""
               fill
-              sizes="(max-width: 640px) 96px, (max-width: 1024px) 160px, 208px"
+              sizes="(max-width: 1024px) 30vw, 208px"
               className="object-cover"
             />
           </div>
