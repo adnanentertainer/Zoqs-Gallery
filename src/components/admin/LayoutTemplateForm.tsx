@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent, type ReactNode } from "react";
-import { Check } from "lucide-react";
+import { Check, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { AuthMessage } from "@/components/auth";
 import { Heading, Text } from "@/components/ui/Typography";
@@ -281,6 +281,17 @@ function VariantCard<Id extends string>({
         </span>
         <span className="font-body text-xs leading-relaxed text-muted">
           {layout.description}
+        </span>
+      </div>
+
+      <div className="flex items-start gap-1.5 border-t border-beige px-4 py-2.5">
+        <ImageIcon
+          className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold"
+          strokeWidth={1.75}
+          aria-hidden="true"
+        />
+        <span className="font-body text-[11px] leading-relaxed text-muted">
+          {layout.spec}
         </span>
       </div>
     </label>

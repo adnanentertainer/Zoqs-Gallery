@@ -67,6 +67,12 @@ export interface LayoutVariantOption<Id extends string> {
   id: Id;
   name: string;
   description: string;
+  /** Image/content requirements for this specific variant -- recommended
+   * pixel dimensions and aspect ratio where a photo is used, which admin
+   * page edits that photo, or a note when the variant uses no photo at
+   * all. Shown on the variant's card in /admin/layout-template so the
+   * admin knows what to prepare before switching to it. */
+  spec: string;
 }
 
 export const HERO_LAYOUTS: LayoutVariantOption<HeroLayoutId>[] = [
@@ -74,35 +80,41 @@ export const HERO_LAYOUTS: LayoutVariantOption<HeroLayoutId>[] = [
     id: "classic",
     name: "Classic Split",
     description: "Boxed photo beside the headline -- the current look.",
+    spec: "Photo: 900×1125px (4:5 portrait) or larger. Set in Admin → Settings → Homepage Hero Image.",
   },
   {
     id: "centered",
     name: "Centered Spotlight",
     description: "Centered headline with a wide photo band beneath it.",
+    spec: "Photo: 2400×1050px (21:9 landscape) or larger. Set in Admin → Settings → Homepage Hero Image.",
   },
   {
     id: "editorial",
     name: "Editorial Full-Bleed",
     description:
       "Full-bleed cinematic photo with the headline overlaid on top, magazine-style.",
+    spec: "Photo: 1920×1200px (landscape) or larger -- fills the full screen. Set in Admin → Settings → Homepage Hero Image.",
   },
   {
     id: "minimal",
     name: "Minimal Typographic",
     description:
       "No photo -- just a large centered headline on a soft tinted background.",
+    spec: "No photo needed -- headline-only layout.",
   },
   {
     id: "panel",
     name: "Side Panel",
     description:
       "Photo bleeds edge-to-edge in a tall side panel, no frame or padding.",
+    spec: "Photo: 1600×1200px or larger, portrait or landscape both work -- bleeds to the edge. Set in Admin → Settings → Homepage Hero Image.",
   },
   {
     id: "badge",
     name: "Floating Badge",
     description:
       "Full-bleed photo with the headline in a floating card over the corner.",
+    spec: "Photo: 1920×1200px (landscape) or larger -- fills the full screen. Set in Admin → Settings → Homepage Hero Image.",
   },
 ];
 
@@ -111,31 +123,37 @@ export const CATEGORY_LAYOUTS: LayoutVariantOption<CategoryLayoutId>[] = [
     id: "grid",
     name: "Rounded Grid",
     description: "Rounded square cards in an even grid -- the current look.",
+    spec: "Photos: 600×600px (square) or larger. Edit each category's photo in Admin → Categories.",
   },
   {
     id: "row",
     name: "Minimal Row",
     description: "Flush square photos in a clean horizontal row.",
+    spec: "Photos: 600×600px (square) or larger. Edit each category's photo in Admin → Categories.",
   },
   {
     id: "spotlight",
     name: "Featured Spotlight",
     description: "One large featured category beside the smaller ones.",
+    spec: "The first category's photo looks best at 1200×900px (4:3) or larger; the rest at 600×600px squares. Edit in Admin → Categories.",
   },
   {
     id: "circles",
     name: "Circle Avatars",
     description: "Round category photos in a row, app-style.",
+    spec: "Photos: 400×400px (square) or larger. Edit each category's photo in Admin → Categories.",
   },
   {
     id: "list",
     name: "Compact List",
     description: "A vertical list of rows -- thumbnail, name and count.",
+    spec: "Photos: any size works (square crop recommended). Edit each category's photo in Admin → Categories.",
   },
   {
     id: "tiles",
     name: "Banner Tiles",
     description: "Wide rectangular tiles with the name overlaid on each photo.",
+    spec: "Photos: 900×560px (16:10 landscape) or larger. Edit each category's photo in Admin → Categories.",
   },
 ];
 
@@ -144,26 +162,31 @@ export const PRODUCT_LAYOUTS: LayoutVariantOption<ProductLayoutId>[] = [
     id: "grid",
     name: "Grid",
     description: "An even product grid -- the current look.",
+    spec: "Uses your product photos as-is (3:4 portrait, already set per product). No extra setup for this layout.",
   },
   {
     id: "carousel",
     name: "Scrolling Carousel",
     description: "A horizontally scrollable row of product cards.",
+    spec: "Uses your product photos as-is (3:4 portrait, already set per product). No extra setup for this layout.",
   },
   {
     id: "featured",
     name: "Featured Grid",
     description: "The first product shown large beside a smaller grid.",
+    spec: "Uses your product photos as-is (3:4 portrait, already set per product). No extra setup for this layout.",
   },
   {
     id: "compact",
     name: "Compact Grid",
     description: "More columns, tighter spacing -- a denser catalog feel.",
+    spec: "Uses your product photos as-is (3:4 portrait, already set per product). No extra setup for this layout.",
   },
   {
     id: "duo",
     name: "Duo Feature",
     description: "The first two products shown large beside a smaller grid.",
+    spec: "Uses your product photos as-is (3:4 portrait, already set per product). No extra setup for this layout.",
   },
 ];
 
@@ -172,26 +195,31 @@ export const BRIDAL_LAYOUTS: LayoutVariantOption<BridalLayoutId>[] = [
     id: "classic",
     name: "Classic Split",
     description: "Boxed photo beside the text -- the current look.",
+    spec: "Uses the site's bridal banner photo (4:5 portrait crop). Not yet admin-editable.",
   },
   {
     id: "editorial",
     name: "Editorial Full-Bleed",
     description: "Full-bleed cinematic photo with the text overlaid on top.",
+    spec: "Uses the site's bridal banner photo (wide landscape crop). Not yet admin-editable.",
   },
   {
     id: "quote",
     name: "Minimal Quote",
     description: "No photo -- an elegant centered quote on a rich color field.",
+    spec: "No photo -- quote-only layout.",
   },
   {
     id: "side",
     name: "Side Accent",
     description: "Photo bleeds edge-to-edge beside a solid-color text panel.",
+    spec: "Uses the site's bridal banner photo (portrait or landscape crop). Not yet admin-editable.",
   },
   {
     id: "banner",
     name: "Compact Banner",
     description: "A shorter single-row banner -- photo, text and CTA inline.",
+    spec: "No photo -- compact text-only banner.",
   },
 ];
 
@@ -200,26 +228,31 @@ export const BENEFITS_LAYOUTS: LayoutVariantOption<BenefitsLayoutId>[] = [
     id: "inline",
     name: "Inline Row",
     description: "A divided row of icon + text -- the current look.",
+    spec: "No photos used -- icon + text only.",
   },
   {
     id: "cards",
     name: "Bordered Cards",
     description: "Each benefit in its own bordered card.",
+    spec: "No photos used -- icon + text only.",
   },
   {
     id: "steps",
     name: "Numbered Steps",
     description: "Each benefit shown as a large numbered step.",
+    spec: "No photos used -- icon + text only.",
   },
   {
     id: "ticker",
     name: "Compact Ticker",
     description: "A tight single-line row -- icon and label only, no description.",
+    spec: "No photos used -- icon + label only.",
   },
   {
     id: "banner",
     name: "Color Banner",
     description: "The whole strip on a bold color band, icons and text in white.",
+    spec: "No photos used -- icon + text only.",
   },
 ];
 
@@ -228,26 +261,31 @@ export const REVIEWS_LAYOUTS: LayoutVariantOption<ReviewsLayoutId>[] = [
     id: "grid",
     name: "Grid",
     description: "An even grid of review cards -- the current look.",
+    spec: "No photos used -- text only, pulled from your approved reviews.",
   },
   {
     id: "carousel",
     name: "Scrolling Carousel",
     description: "A horizontally scrollable row of review cards.",
+    spec: "No photos used -- text only, pulled from your approved reviews.",
   },
   {
     id: "spotlight",
     name: "Featured Spotlight",
     description: "One large featured review beside the smaller ones.",
+    spec: "No photos used -- text only, pulled from your approved reviews.",
   },
   {
     id: "masonry",
     name: "Masonry",
     description: "Staggered columns of varying height, Pinterest-style.",
+    spec: "No photos used -- text only, pulled from your approved reviews.",
   },
   {
     id: "list",
     name: "Minimal List",
     description: "No cards -- a clean divided list of quotes.",
+    spec: "No photos used -- text only, pulled from your approved reviews.",
   },
 ];
 
@@ -257,26 +295,31 @@ export const SOCIAL_GALLERY_LAYOUTS: LayoutVariantOption<SocialGalleryLayoutId>[
       id: "grid",
       name: "Grid",
       description: "An even photo grid -- the current look.",
+      spec: "Photos: 450×450px (square) or larger. Edit in Admin → Follow Our Style.",
     },
     {
       id: "carousel",
       name: "Scrolling Carousel",
       description: "A horizontally scrollable row of photos.",
+      spec: "Photos: 450×450px (square) or larger. Edit in Admin → Follow Our Style.",
     },
     {
       id: "mosaic",
       name: "Featured Mosaic",
       description: "One large featured photo beside a smaller grid.",
+      spec: "The first photo looks best at 900×900px (square) or larger; the rest at 450×450px. Edit in Admin → Follow Our Style.",
     },
     {
       id: "banner",
       name: "Banner Strip",
       description: "One wide featured photo above a row of thumbnails.",
+      spec: "The featured photo looks best at 2400×1050px (21:9 landscape); thumbnails at 300×300px squares. Edit in Admin → Follow Our Style.",
     },
     {
       id: "circles",
       name: "Circle Row",
       description: "Round photo avatars in a row, story-style.",
+      spec: "Photos: 400×400px (square) or larger. Edit in Admin → Follow Our Style.",
     },
   ];
 
