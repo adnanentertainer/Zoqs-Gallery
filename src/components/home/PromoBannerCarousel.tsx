@@ -106,7 +106,7 @@ function RadialGradientBackdrop() {
 function SlideClassic({ banner }: { banner: PromoBanner }) {
   return (
     <div
-      className="relative flex min-h-[300px] items-center overflow-hidden bg-primary sm:min-h-[340px]"
+      className="relative flex items-center overflow-hidden bg-primary"
       style={
         banner.backgroundImageUrl
           ? {
@@ -125,7 +125,7 @@ function SlideClassic({ banner }: { banner: PromoBanner }) {
       ) : (
         <RadialGradientBackdrop />
       )}
-      <div className="relative mx-auto flex w-full max-w-7xl flex-row items-center justify-between gap-4 px-4 py-8 text-left sm:gap-6 sm:px-6 sm:py-10 lg:px-8 lg:py-16">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-row items-center justify-between gap-4 px-4 py-5 text-left sm:gap-6 sm:px-6 lg:px-8">
         <div className="flex min-w-0 flex-col items-start gap-2 sm:gap-3">
           <PromoTextLabel text={banner.promoText} />
           <h2 className="font-heading text-lg font-semibold text-white sm:text-3xl lg:text-4xl">
@@ -161,7 +161,7 @@ function SlideClassic({ banner }: { banner: PromoBanner }) {
 function SlideSplitReverse({ banner }: { banner: PromoBanner }) {
   return (
     <div
-      className="relative flex min-h-[300px] items-center overflow-hidden bg-primary sm:min-h-[340px]"
+      className="relative flex items-center overflow-hidden bg-primary"
       style={
         banner.backgroundImageUrl
           ? {
@@ -180,7 +180,7 @@ function SlideSplitReverse({ banner }: { banner: PromoBanner }) {
       ) : (
         <RadialGradientBackdrop />
       )}
-      <div className="relative mx-auto flex w-full max-w-7xl flex-row items-center justify-between gap-4 px-4 py-8 text-right sm:gap-6 sm:px-6 sm:py-10 lg:px-8 lg:py-16">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-row items-center justify-between gap-4 px-4 py-5 text-right sm:gap-6 sm:px-6 lg:px-8">
         {banner.bannerImageUrl && (
           <div className="relative h-[clamp(112px,30vw,208px)] w-[clamp(112px,30vw,208px)] shrink-0 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)]">
             <Image
