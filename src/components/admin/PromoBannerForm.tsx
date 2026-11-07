@@ -151,20 +151,42 @@ export function PromoBannerForm({
           onChange={(event) => update("buttonLink", event.target.value)}
           placeholder="/shop"
         />
-        <Input
-          label="Banner Image URL (optional)"
-          className="sm:col-span-2"
-          value={values.bannerImageUrl}
-          onChange={(event) => update("bannerImageUrl", event.target.value)}
-        />
-        <Input
-          label="Background Image URL (optional)"
-          className="sm:col-span-2"
-          value={values.backgroundImageUrl}
-          onChange={(event) =>
-            update("backgroundImageUrl", event.target.value)
-          }
-        />
+        <div className="flex flex-col gap-1.5 sm:col-span-2">
+          <Input
+            label="Banner Image URL (optional)"
+            value={values.bannerImageUrl}
+            onChange={(event) => update("bannerImageUrl", event.target.value)}
+          />
+          <p className="font-body text-xs text-muted">
+            Which layout (Admin → Layout → Promo Banner Carousel) is active
+            decides how this is shown:{" "}
+            <strong>Classic Split / Split Reverse</strong> -- a circular
+            badge, 400×400px (square) or larger;{" "}
+            <strong>Side Panel</strong> -- a rectangular panel, 800×600px or
+            larger; <strong>Stacked Poster</strong> -- a wide top photo,
+            1200×675px (16:9) or larger. Also used as a fallback for{" "}
+            <strong>Full-Bleed Photo</strong> and{" "}
+            <strong>Floating Badge</strong> when Background Image below is
+            empty. Not used by Centered Minimal or Compact Ticker.
+          </p>
+        </div>
+        <div className="flex flex-col gap-1.5 sm:col-span-2">
+          <Input
+            label="Background Image URL (optional)"
+            value={values.backgroundImageUrl}
+            onChange={(event) =>
+              update("backgroundImageUrl", event.target.value)
+            }
+          />
+          <p className="font-body text-xs text-muted">
+            Used as the full-bleed photo by{" "}
+            <strong>Full-Bleed Photo</strong> and{" "}
+            <strong>Floating Badge</strong> -- 1920×600px (wide landscape) or
+            larger. Also an optional dark backdrop behind{" "}
+            <strong>Classic Split / Split Reverse</strong>. Not used by Side
+            Panel, Stacked Poster, Centered Minimal, or Compact Ticker.
+          </p>
+        </div>
         <Input
           label="Start Date & Time (optional)"
           type="datetime-local"
