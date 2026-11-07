@@ -53,7 +53,7 @@ export function ProductSection({
         </Link>
       </div>
 
-      {layout === "carousel" ? (
+      {layout === "carousel" && (
         <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2">
           {products.map((product) => (
             <div
@@ -64,7 +64,43 @@ export function ProductSection({
             </div>
           ))}
         </div>
-      ) : (
+      )}
+
+      {layout === "featured" && (
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {products.map((product, index) => (
+            <div
+              key={product.id}
+              className={index === 0 ? "col-span-2" : undefined}
+            >
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {layout === "compact" && (
+        <div className="grid grid-cols-3 gap-x-3 gap-y-6 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
+
+      {layout === "duo" && (
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {products.map((product, index) => (
+            <div
+              key={product.id}
+              className={index < 2 ? "col-span-2" : undefined}
+            >
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {layout === "grid" && (
         <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />

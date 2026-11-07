@@ -1,10 +1,47 @@
-export type HeroLayoutId = "classic" | "centered" | "editorial";
-export type CategoryLayoutId = "grid" | "row" | "spotlight";
-export type ProductLayoutId = "grid" | "carousel";
-export type BridalLayoutId = "classic" | "editorial";
-export type BenefitsLayoutId = "inline" | "cards";
-export type ReviewsLayoutId = "grid" | "carousel";
-export type SocialGalleryLayoutId = "grid" | "carousel";
+export type HeroLayoutId =
+  | "classic"
+  | "centered"
+  | "editorial"
+  | "minimal"
+  | "panel"
+  | "badge";
+export type CategoryLayoutId =
+  | "grid"
+  | "row"
+  | "spotlight"
+  | "circles"
+  | "list"
+  | "tiles";
+export type ProductLayoutId =
+  | "grid"
+  | "carousel"
+  | "featured"
+  | "compact"
+  | "duo";
+export type BridalLayoutId =
+  | "classic"
+  | "editorial"
+  | "quote"
+  | "side"
+  | "banner";
+export type BenefitsLayoutId =
+  | "inline"
+  | "cards"
+  | "steps"
+  | "ticker"
+  | "banner";
+export type ReviewsLayoutId =
+  | "grid"
+  | "carousel"
+  | "spotlight"
+  | "masonry"
+  | "list";
+export type SocialGalleryLayoutId =
+  | "grid"
+  | "carousel"
+  | "mosaic"
+  | "banner"
+  | "circles";
 
 export interface LayoutTemplate {
   hero: HeroLayoutId;
@@ -49,6 +86,24 @@ export const HERO_LAYOUTS: LayoutVariantOption<HeroLayoutId>[] = [
     description:
       "Full-bleed cinematic photo with the headline overlaid on top, magazine-style.",
   },
+  {
+    id: "minimal",
+    name: "Minimal Typographic",
+    description:
+      "No photo -- just a large centered headline on a soft tinted background.",
+  },
+  {
+    id: "panel",
+    name: "Side Panel",
+    description:
+      "Photo bleeds edge-to-edge in a tall side panel, no frame or padding.",
+  },
+  {
+    id: "badge",
+    name: "Floating Badge",
+    description:
+      "Full-bleed photo with the headline in a floating card over the corner.",
+  },
 ];
 
 export const CATEGORY_LAYOUTS: LayoutVariantOption<CategoryLayoutId>[] = [
@@ -67,6 +122,21 @@ export const CATEGORY_LAYOUTS: LayoutVariantOption<CategoryLayoutId>[] = [
     name: "Featured Spotlight",
     description: "One large featured category beside the smaller ones.",
   },
+  {
+    id: "circles",
+    name: "Circle Avatars",
+    description: "Round category photos in a row, app-style.",
+  },
+  {
+    id: "list",
+    name: "Compact List",
+    description: "A vertical list of rows -- thumbnail, name and count.",
+  },
+  {
+    id: "tiles",
+    name: "Banner Tiles",
+    description: "Wide rectangular tiles with the name overlaid on each photo.",
+  },
 ];
 
 export const PRODUCT_LAYOUTS: LayoutVariantOption<ProductLayoutId>[] = [
@@ -79,6 +149,21 @@ export const PRODUCT_LAYOUTS: LayoutVariantOption<ProductLayoutId>[] = [
     id: "carousel",
     name: "Scrolling Carousel",
     description: "A horizontally scrollable row of product cards.",
+  },
+  {
+    id: "featured",
+    name: "Featured Grid",
+    description: "The first product shown large beside a smaller grid.",
+  },
+  {
+    id: "compact",
+    name: "Compact Grid",
+    description: "More columns, tighter spacing -- a denser catalog feel.",
+  },
+  {
+    id: "duo",
+    name: "Duo Feature",
+    description: "The first two products shown large beside a smaller grid.",
   },
 ];
 
@@ -93,6 +178,21 @@ export const BRIDAL_LAYOUTS: LayoutVariantOption<BridalLayoutId>[] = [
     name: "Editorial Full-Bleed",
     description: "Full-bleed cinematic photo with the text overlaid on top.",
   },
+  {
+    id: "quote",
+    name: "Minimal Quote",
+    description: "No photo -- an elegant centered quote on a rich color field.",
+  },
+  {
+    id: "side",
+    name: "Side Accent",
+    description: "Photo bleeds edge-to-edge beside a solid-color text panel.",
+  },
+  {
+    id: "banner",
+    name: "Compact Banner",
+    description: "A shorter single-row banner -- photo, text and CTA inline.",
+  },
 ];
 
 export const BENEFITS_LAYOUTS: LayoutVariantOption<BenefitsLayoutId>[] = [
@@ -105,6 +205,21 @@ export const BENEFITS_LAYOUTS: LayoutVariantOption<BenefitsLayoutId>[] = [
     id: "cards",
     name: "Bordered Cards",
     description: "Each benefit in its own bordered card.",
+  },
+  {
+    id: "steps",
+    name: "Numbered Steps",
+    description: "Each benefit shown as a large numbered step.",
+  },
+  {
+    id: "ticker",
+    name: "Compact Ticker",
+    description: "A tight single-line row -- icon and label only, no description.",
+  },
+  {
+    id: "banner",
+    name: "Color Banner",
+    description: "The whole strip on a bold color band, icons and text in white.",
   },
 ];
 
@@ -119,6 +234,21 @@ export const REVIEWS_LAYOUTS: LayoutVariantOption<ReviewsLayoutId>[] = [
     name: "Scrolling Carousel",
     description: "A horizontally scrollable row of review cards.",
   },
+  {
+    id: "spotlight",
+    name: "Featured Spotlight",
+    description: "One large featured review beside the smaller ones.",
+  },
+  {
+    id: "masonry",
+    name: "Masonry",
+    description: "Staggered columns of varying height, Pinterest-style.",
+  },
+  {
+    id: "list",
+    name: "Minimal List",
+    description: "No cards -- a clean divided list of quotes.",
+  },
 ];
 
 export const SOCIAL_GALLERY_LAYOUTS: LayoutVariantOption<SocialGalleryLayoutId>[] =
@@ -132,6 +262,21 @@ export const SOCIAL_GALLERY_LAYOUTS: LayoutVariantOption<SocialGalleryLayoutId>[
       id: "carousel",
       name: "Scrolling Carousel",
       description: "A horizontally scrollable row of photos.",
+    },
+    {
+      id: "mosaic",
+      name: "Featured Mosaic",
+      description: "One large featured photo beside a smaller grid.",
+    },
+    {
+      id: "banner",
+      name: "Banner Strip",
+      description: "One wide featured photo above a row of thumbnails.",
+    },
+    {
+      id: "circles",
+      name: "Circle Row",
+      description: "Round photo avatars in a row, story-style.",
     },
   ];
 

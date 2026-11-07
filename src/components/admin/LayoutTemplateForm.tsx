@@ -210,7 +210,8 @@ function SectionPicker<Id extends string>({
         aria-label={title}
         className={cn(
           "grid grid-cols-1 gap-5 sm:grid-cols-2",
-          options.length >= 3 && "lg:grid-cols-3",
+          options.length === 3 && "lg:grid-cols-3",
+          options.length >= 4 && "lg:grid-cols-4",
         )}
       >
         {options.map((layout) => (
@@ -315,6 +316,44 @@ function HeroPreview({ id }: { id: HeroLayoutId }) {
     );
   }
 
+  if (id === "minimal") {
+    return (
+      <div className="flex aspect-[16/11] w-full flex-col items-center justify-center gap-2 rounded-xl bg-secondary p-4">
+        <div className="h-1 w-8 rounded-full bg-gold" />
+        <div className="h-2.5 w-24 rounded-full bg-primary/70" />
+        <div className="h-2.5 w-20 rounded-full bg-primary/70" />
+        <div className="h-1.5 w-16 rounded-full bg-muted/40" />
+        <div className="mt-1.5 h-4 w-14 rounded-full bg-gold" />
+      </div>
+    );
+  }
+
+  if (id === "panel") {
+    return (
+      <div className="flex aspect-[16/11] w-full overflow-hidden rounded-xl bg-secondary">
+        <div className="flex flex-1 flex-col justify-center gap-1.5 p-3">
+          <div className="h-1.5 w-10 rounded-full bg-gold" />
+          <div className="h-2 w-16 rounded-full bg-primary/70" />
+          <div className="h-1.5 w-14 rounded-full bg-muted/50" />
+          <div className="mt-1 h-3.5 w-10 rounded-full bg-gold" />
+        </div>
+        <div className="h-full w-[45%] bg-beige" />
+      </div>
+    );
+  }
+
+  if (id === "badge") {
+    return (
+      <div className="relative flex aspect-[16/11] w-full items-end overflow-hidden rounded-xl bg-beige p-2.5">
+        <div className="flex w-3/5 flex-col gap-1 rounded-lg bg-white p-2 shadow-md">
+          <div className="h-1 w-8 rounded-full bg-gold" />
+          <div className="h-1.5 w-16 rounded-full bg-primary/70" />
+          <div className="mt-0.5 h-3 w-10 rounded-full bg-gold" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex aspect-[16/11] w-full items-center gap-3 rounded-xl bg-secondary p-3">
       <div className="flex flex-1 flex-col gap-1.5">
@@ -355,6 +394,47 @@ function CategoryPreview({ id }: { id: CategoryLayoutId }) {
     );
   }
 
+  if (id === "circles") {
+    return (
+      <div className="flex aspect-[16/8] w-full items-start justify-around gap-2 rounded-xl bg-secondary p-3">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div key={index} className="flex flex-col items-center gap-1">
+            <div className="h-8 w-8 rounded-full bg-gold/40 ring-2 ring-white" />
+            <div className="h-1 w-6 rounded-full bg-muted/40" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (id === "list") {
+    return (
+      <div className="flex aspect-[16/8] w-full flex-col justify-center gap-2 rounded-xl border border-beige bg-white p-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <div className="h-5 w-5 shrink-0 rounded-md bg-beige" />
+            <div className="h-1 flex-1 rounded-full bg-muted/40" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (id === "tiles") {
+    return (
+      <div className="grid aspect-[16/8] w-full grid-cols-3 gap-2 rounded-xl bg-secondary p-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div
+            key={index}
+            className="relative flex items-end rounded-lg bg-gold/30 p-1"
+          >
+            <div className="h-1 w-6 rounded-full bg-white/90" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid aspect-[16/8] w-full grid-cols-4 gap-2 rounded-xl bg-secondary p-3">
       {Array.from({ length: 4 }).map((_, index) => (
@@ -377,6 +457,49 @@ function ProductPreview({ id }: { id: ProductLayoutId }) {
             )}
           >
             <div className="aspect-square w-full rounded-lg bg-beige" />
+            <div className="h-1 w-3/4 rounded-full bg-muted/40" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (id === "featured") {
+    return (
+      <div className="grid aspect-[16/9] w-full grid-cols-4 gap-2 rounded-xl bg-secondary p-3">
+        <div className="col-span-2 flex flex-col gap-1">
+          <div className="aspect-square w-full rounded-lg bg-gold/30" />
+          <div className="h-1 w-3/4 rounded-full bg-muted/40" />
+        </div>
+        {Array.from({ length: 2 }).map((_, index) => (
+          <div key={index} className="flex flex-col gap-1">
+            <div className="aspect-square w-full rounded-lg bg-beige" />
+            <div className="h-1 w-3/4 rounded-full bg-muted/40" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (id === "compact") {
+    return (
+      <div className="grid aspect-[16/9] w-full grid-cols-6 gap-1.5 rounded-xl bg-secondary p-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div key={index} className="flex flex-col gap-1">
+            <div className="aspect-square w-full rounded-md bg-beige" />
+            <div className="h-1 w-3/4 rounded-full bg-muted/40" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (id === "duo") {
+    return (
+      <div className="grid aspect-[16/9] w-full grid-cols-4 gap-2 rounded-xl bg-secondary p-3">
+        {Array.from({ length: 2 }).map((_, index) => (
+          <div key={index} className="col-span-2 flex flex-col gap-1">
+            <div className="aspect-square w-full rounded-lg bg-gold/30" />
             <div className="h-1 w-3/4 rounded-full bg-muted/40" />
           </div>
         ))}
@@ -410,6 +533,42 @@ function BridalPreview({ id }: { id: BridalLayoutId }) {
     );
   }
 
+  if (id === "quote") {
+    return (
+      <div className="flex aspect-[16/9] w-full flex-col items-center justify-center gap-1.5 rounded-xl bg-primary p-4">
+        <div className="h-1 w-8 rounded-full bg-gold" />
+        <div className="h-2 w-28 rounded-full bg-white/90" />
+        <div className="h-2 w-20 rounded-full bg-white/90" />
+        <div className="mt-1 h-3.5 w-14 rounded-full bg-gold" />
+      </div>
+    );
+  }
+
+  if (id === "side") {
+    return (
+      <div className="flex aspect-[16/9] w-full overflow-hidden rounded-xl bg-primary">
+        <div className="flex flex-1 flex-col justify-center gap-1.5 p-3">
+          <div className="h-1.5 w-10 rounded-full bg-gold" />
+          <div className="h-2 w-16 rounded-full bg-white/90" />
+          <div className="mt-1 h-3.5 w-14 rounded-full bg-gold" />
+        </div>
+        <div className="h-full w-[45%] bg-white/10" />
+      </div>
+    );
+  }
+
+  if (id === "banner") {
+    return (
+      <div className="flex aspect-[16/9] w-full items-center justify-between gap-2 rounded-xl bg-primary p-3">
+        <div className="flex flex-col gap-1.5">
+          <div className="h-1.5 w-8 rounded-full bg-gold" />
+          <div className="h-2 w-20 rounded-full bg-white/90" />
+        </div>
+        <div className="h-3.5 w-12 shrink-0 rounded-full bg-gold" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex aspect-[16/9] w-full items-center gap-3 rounded-xl bg-primary p-3">
       <div className="aspect-[4/5] h-full rounded-lg bg-white/10" />
@@ -433,6 +592,47 @@ function BenefitsPreview({ id }: { id: BenefitsLayoutId }) {
           >
             <div className="h-4 w-4 rounded-full bg-gold/30" />
             <div className="h-1 w-8 rounded-full bg-muted/40" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (id === "steps") {
+    return (
+      <div className="grid aspect-[16/7] w-full grid-cols-4 gap-2 rounded-xl bg-secondary p-3">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="flex flex-col gap-1">
+            <span className="font-heading text-sm font-semibold text-gold/40">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <div className="h-1 w-8 rounded-full bg-muted/40" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (id === "ticker") {
+    return (
+      <div className="flex aspect-[16/7] w-full flex-wrap items-center justify-center gap-3 rounded-xl bg-secondary p-3">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="flex items-center gap-1">
+            <div className="h-2.5 w-2.5 rounded-full bg-gold/40" />
+            <div className="h-1 w-8 rounded-full bg-muted/40" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (id === "banner") {
+    return (
+      <div className="grid aspect-[16/7] w-full grid-cols-4 gap-2 rounded-xl bg-primary p-3">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="flex flex-col items-center gap-1">
+            <div className="h-5 w-5 rounded-full bg-white/10" />
+            <div className="h-1 w-8 rounded-full bg-white/40" />
           </div>
         ))}
       </div>
@@ -472,6 +672,62 @@ function ReviewsPreview({ id }: { id: ReviewsLayoutId }) {
     );
   }
 
+  if (id === "spotlight") {
+    return (
+      <div className="flex aspect-[16/9] w-full gap-2 rounded-xl bg-secondary p-3">
+        <div className="flex-[2] rounded-lg border border-beige bg-white p-2.5">
+          <div className="h-1.5 w-3/4 rounded-full bg-muted/40" />
+          <div className="mt-1.5 h-1.5 w-full rounded-full bg-muted/30" />
+          <div className="mt-1 h-1.5 w-full rounded-full bg-muted/30" />
+          <div className="mt-1 h-1.5 w-1/2 rounded-full bg-muted/30" />
+        </div>
+        <div className="flex flex-1 flex-col gap-2">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <div
+              key={index}
+              className="flex-1 rounded-lg border border-beige bg-white p-1.5"
+            >
+              <div className="h-1 w-3/4 rounded-full bg-muted/40" />
+              <div className="mt-1 h-1 w-full rounded-full bg-muted/30" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (id === "masonry") {
+    return (
+      <div className="flex aspect-[16/9] w-full gap-2 rounded-xl bg-secondary p-3">
+        <div className="flex flex-1 flex-col gap-2">
+          <div className="h-1/3 rounded-lg border border-beige bg-white" />
+          <div className="h-2/3 rounded-lg border border-beige bg-white" />
+        </div>
+        <div className="flex flex-1 flex-col gap-2">
+          <div className="h-2/3 rounded-lg border border-beige bg-white" />
+          <div className="h-1/3 rounded-lg border border-beige bg-white" />
+        </div>
+        <div className="flex flex-1 flex-col gap-2">
+          <div className="h-1/2 rounded-lg border border-beige bg-white" />
+          <div className="h-1/2 rounded-lg border border-beige bg-white" />
+        </div>
+      </div>
+    );
+  }
+
+  if (id === "list") {
+    return (
+      <div className="flex aspect-[16/9] w-full flex-col justify-center gap-2.5 rounded-xl border border-beige bg-white p-4">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div key={index} className="flex flex-col gap-1 border-b border-beige pb-2 last:border-b-0">
+            <div className="h-1 w-3/4 rounded-full bg-muted/40" />
+            <div className="h-1 w-1/3 rounded-full bg-muted/30" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid aspect-[16/9] w-full grid-cols-3 gap-2 rounded-xl bg-secondary p-3">
       {Array.from({ length: 3 }).map((_, index) => (
@@ -496,6 +752,43 @@ function SocialGalleryPreview({ id }: { id: SocialGalleryLayoutId }) {
               "aspect-square shrink-0 rounded-lg bg-beige",
               index === 5 && "opacity-40",
             )}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (id === "mosaic") {
+    return (
+      <div className="grid aspect-[16/8] w-full grid-cols-4 grid-rows-2 gap-2 rounded-xl bg-secondary p-3">
+        <div className="col-span-2 row-span-2 rounded-lg bg-gold/30" />
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="rounded-lg bg-beige" />
+        ))}
+      </div>
+    );
+  }
+
+  if (id === "banner") {
+    return (
+      <div className="flex aspect-[16/8] w-full flex-col gap-2 rounded-xl bg-secondary p-3">
+        <div className="flex-1 rounded-lg bg-gold/30" />
+        <div className="grid grid-cols-6 gap-1.5">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div key={index} className="aspect-square rounded-md bg-beige" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (id === "circles") {
+    return (
+      <div className="flex aspect-[16/6] w-full items-center justify-around gap-2 rounded-xl bg-secondary p-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div
+            key={index}
+            className="h-8 w-8 shrink-0 rounded-full bg-gold/40 ring-2 ring-white"
           />
         ))}
       </div>

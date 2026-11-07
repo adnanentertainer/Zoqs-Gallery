@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { InstagramIcon } from "@/components/icons/social-icons";
 import { Section } from "@/components/ui/Section";
+import { cn } from "@/lib/utils";
 import { siteConfig } from "@/constants/site";
 import type { SocialPost } from "@/types";
 import type { SocialGalleryLayoutId } from "@/types/layoutTemplate";
@@ -20,7 +21,7 @@ export function SocialGallery({ posts, layout = "grid" }: SocialGalleryProps) {
       title="Follow Our Style"
       subtitle="Follow ZOQ's Gallery for daily inspiration and new arrivals."
     >
-      {layout === "carousel" ? (
+      {layout === "carousel" && (
         <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
           {posts.map((post) => (
             <div
@@ -31,7 +32,61 @@ export function SocialGallery({ posts, layout = "grid" }: SocialGalleryProps) {
             </div>
           ))}
         </div>
-      ) : (
+      )}
+
+      {layout === "mosaic" && (
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3">
+          {posts.map((post, index) => (
+            <div
+              key={post.id}
+              className={index === 0 ? "col-span-2 row-span-2" : undefined}
+            >
+              <SocialTile post={post} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {layout === "banner" && posts[0] && (
+        <div className="flex flex-col gap-3">
+          <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl bg-beige">
+            <SocialTile post={posts[0]} fill />
+          </div>
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 sm:gap-3">
+            {posts.slice(1, 7).map((post) => (
+              <SocialTile key={post.id} post={post} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {layout === "circles" && (
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
+          {posts.map((post) => (
+            <a
+              key={post.id}
+              href={post.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="View this look on Instagram"
+              className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-gold via-maroon to-gold p-[2.5px] transition-transform duration-300 hover:scale-105 sm:h-24 sm:w-24"
+            >
+              <span className="relative block h-full w-full overflow-hidden rounded-full border-2 border-white">
+                <Image
+                  src={post.image}
+                  alt={post.alt}
+                  fill
+                  sizes="96px"
+                  loading="lazy"
+                  className="object-cover"
+                />
+              </span>
+            </a>
+          ))}
+        </div>
+      )}
+
+      {layout === "grid" && (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6">
           {posts.map((post) => (
             <SocialTile key={post.id} post={post} />
@@ -57,14 +112,23 @@ export function SocialGallery({ posts, layout = "grid" }: SocialGalleryProps) {
   );
 }
 
-function SocialTile({ post }: { post: SocialPost }) {
+function SocialTile({
+  post,
+  fill = false,
+}: {
+  post: SocialPost;
+  fill?: boolean;
+}) {
   return (
     <a
       href={post.href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="View this look on Instagram"
-      className="group relative block aspect-square overflow-hidden rounded-2xl bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+      className={cn(
+        "group block overflow-hidden rounded-2xl bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
+        fill ? "absolute inset-0" : "relative aspect-square",
+      )}
     >
       <Image
         src={post.image}

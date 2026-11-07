@@ -1,7 +1,10 @@
 import { Section } from "@/components/ui/Section";
 import {
   CategoryCard,
+  CategoryCardCircle,
+  CategoryCardListRow,
   CategoryCardMinimal,
+  CategoryCardTile,
   CategorySpotlightCard,
 } from "@/components/home/CategoryCard";
 import type { Category } from "@/types";
@@ -26,6 +29,9 @@ export function CategorySection({
     >
       {layout === "row" && <CategoryRow categories={categories} />}
       {layout === "spotlight" && <CategorySpotlight categories={categories} />}
+      {layout === "circles" && <CategoryCircles categories={categories} />}
+      {layout === "list" && <CategoryList categories={categories} />}
+      {layout === "tiles" && <CategoryTiles categories={categories} />}
       {layout === "grid" && <CategoryGrid categories={categories} />}
     </Section>
   );
@@ -70,6 +76,40 @@ function CategorySpotlight({ categories }: { categories: Category[] }) {
           <CategoryCard key={category.id} category={category} />
         ))}
       </div>
+    </div>
+  );
+}
+
+function CategoryCircles({ categories }: { categories: Category[] }) {
+  return (
+    <div className="flex snap-x snap-mandatory justify-start gap-5 overflow-x-auto pb-2 sm:flex-wrap sm:justify-center sm:overflow-visible">
+      {categories.map((category) => (
+        <CategoryCardCircle
+          key={category.id}
+          category={category}
+          className="shrink-0 snap-start"
+        />
+      ))}
+    </div>
+  );
+}
+
+function CategoryList({ categories }: { categories: Category[] }) {
+  return (
+    <div className="mx-auto max-w-2xl divide-y divide-beige rounded-2xl border border-beige bg-white px-4 sm:px-6">
+      {categories.map((category) => (
+        <CategoryCardListRow key={category.id} category={category} />
+      ))}
+    </div>
+  );
+}
+
+function CategoryTiles({ categories }: { categories: Category[] }) {
+  return (
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {categories.map((category) => (
+        <CategoryCardTile key={category.id} category={category} />
+      ))}
     </div>
   );
 }

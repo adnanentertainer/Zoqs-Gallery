@@ -115,3 +115,107 @@ export function CategorySpotlightCard({
     </Link>
   );
 }
+
+/** Circular photo + label, Instagram-story-style -- used by the "circles"
+ * category layout. */
+export function CategoryCardCircle({
+  category,
+  className,
+}: CategoryCardProps & { className?: string }) {
+  return (
+    <Link
+      href={`/category/${category.slug}`}
+      className={cn(
+        "group flex flex-col items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
+        className,
+      )}
+    >
+      <span className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-gold via-maroon to-gold p-[2.5px] transition-transform duration-300 group-hover:scale-105 sm:h-24 sm:w-24">
+        <span className="relative h-full w-full overflow-hidden rounded-full border-2 border-white bg-beige">
+          <Image
+            src={category.image}
+            alt={category.name}
+            fill
+            sizes="96px"
+            loading="lazy"
+            className="object-cover"
+          />
+        </span>
+      </span>
+      <span className="max-w-[5.5rem] truncate font-body text-xs font-medium text-primary transition-colors group-hover:text-gold">
+        {category.name}
+      </span>
+    </Link>
+  );
+}
+
+/** A single settings-menu-style row -- small thumbnail, name, product
+ * count, chevron -- used by the "list" category layout. */
+export function CategoryCardListRow({ category }: CategoryCardProps) {
+  return (
+    <Link
+      href={`/category/${category.slug}`}
+      className="group flex items-center gap-4 border-b border-beige py-3 transition-colors last:border-b-0 hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold"
+    >
+      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-beige">
+        <Image
+          src={category.image}
+          alt={category.name}
+          fill
+          sizes="56px"
+          loading="lazy"
+          className="object-cover"
+        />
+      </div>
+      <div className="flex flex-1 flex-col">
+        <span className="font-heading text-sm font-semibold text-primary transition-colors group-hover:text-gold">
+          {category.name}
+        </span>
+        <span className="font-body text-xs text-muted">
+          {category.productCount} Products
+        </span>
+      </div>
+      <ArrowRight
+        className="h-4 w-4 shrink-0 text-muted transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-gold"
+        aria-hidden="true"
+      />
+    </Link>
+  );
+}
+
+/** Wide rectangular tile with the name overlaid on every photo -- used by
+ * the "tiles" category layout (every tile gets the spotlight treatment,
+ * not just one). */
+export function CategoryCardTile({
+  category,
+  className,
+}: CategoryCardProps & { className?: string }) {
+  return (
+    <Link
+      href={`/category/${category.slug}`}
+      className={cn(
+        "group relative flex aspect-[16/10] w-full overflow-hidden rounded-xl bg-beige shadow-sm transition-all duration-300 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
+        className,
+      )}
+    >
+      <Image
+        src={category.image}
+        alt={category.name}
+        fill
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        loading="lazy"
+        className="object-cover transition-transform duration-500 group-hover:scale-105"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-gradient-to-t from-primary/75 via-primary/5 to-transparent"
+      />
+      <div className="relative mt-auto flex w-full items-center justify-between gap-2 p-4">
+        <span className="font-heading text-base font-semibold text-white">
+          {category.name}
+        </span>
+        <ArrowRight className="h-4 w-4 text-white/90" aria-hidden="true" />
+      </div>
+    </Link>
+  );
+}

@@ -3,6 +3,7 @@ import { Quote } from "lucide-react";
 import { Section } from "@/components/ui/Section";
 import { RatingStars } from "@/components/shared/RatingStars";
 import { Badge } from "@/components/ui/Badge";
+import { cn } from "@/lib/utils";
 import { getFeaturedTestimonials } from "@/lib/services/reviewService";
 import type { Testimonial } from "@/types";
 import type { ReviewsLayoutId } from "@/types/layoutTemplate";
@@ -43,7 +44,7 @@ export async function ReviewsSection({
         </p>
       </div>
 
-      {layout === "carousel" ? (
+      {layout === "carousel" && (
         <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2">
           {testimonials.map((review) => (
             <div
@@ -54,7 +55,54 @@ export async function ReviewsSection({
             </div>
           ))}
         </div>
-      ) : (
+      )}
+
+      {layout === "spotlight" && testimonials[0] && (
+        <div className="flex flex-col gap-6 lg:flex-row">
+          <div className="lg:flex-[2]">
+            <ReviewCard review={testimonials[0]} featured />
+          </div>
+          <div className="flex flex-col gap-6 lg:flex-1">
+            {testimonials.slice(1, 3).map((review) => (
+              <ReviewCard key={review.id} review={review} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {layout === "masonry" && (
+        <div className="columns-1 gap-6 sm:columns-2 lg:columns-3">
+          {testimonials.map((review) => (
+            <div key={review.id} className="mb-6 break-inside-avoid">
+              <ReviewCard review={review} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {layout === "list" && (
+        <div className="mx-auto flex max-w-2xl flex-col divide-y divide-beige">
+          {testimonials.map((review) => (
+            <div key={review.id} className="flex flex-col gap-3 py-6">
+              <RatingStars rating={review.rating} />
+              <blockquote className="font-body text-base leading-relaxed text-primary">
+                &ldquo;{review.reviewText}&rdquo;
+              </blockquote>
+              <div className="flex items-center gap-2">
+                <span className="font-heading text-sm font-semibold text-primary">
+                  {review.customerName}
+                </span>
+                <span className="text-muted">&middot;</span>
+                <span className="truncate font-body text-xs text-muted">
+                  {review.purchasedProduct}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {layout === "grid" && (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((review) => (
             <ReviewCard key={review.id} review={review} />
@@ -65,15 +113,31 @@ export async function ReviewsSection({
   );
 }
 
-function ReviewCard({ review }: { review: Testimonial }) {
+function ReviewCard({
+  review,
+  featured = false,
+}: {
+  review: Testimonial;
+  featured?: boolean;
+}) {
   const card = (
-    <figure className="group flex h-full flex-col gap-4 rounded-sm border border-beige bg-white p-7 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+    <figure
+      className={cn(
+        "group flex h-full flex-col gap-4 rounded-sm border border-beige bg-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md",
+        featured ? "p-8 sm:p-10" : "p-7",
+      )}
+    >
       <Quote
-        className="h-7 w-7 text-gold/40"
+        className={featured ? "h-9 w-9 text-gold/40" : "h-7 w-7 text-gold/40"}
         aria-hidden="true"
         fill="currentColor"
       />
-      <blockquote className="flex-1 font-body text-[0.95rem] leading-relaxed text-primary">
+      <blockquote
+        className={cn(
+          "flex-1 font-body leading-relaxed text-primary",
+          featured ? "text-lg sm:text-xl" : "text-[0.95rem]",
+        )}
+      >
         &ldquo;{review.reviewText}&rdquo;
       </blockquote>
       <figcaption className="flex flex-col gap-2 border-t border-beige pt-4">

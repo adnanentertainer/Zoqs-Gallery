@@ -36,6 +36,15 @@ export function HeroSection({
   if (layout === "editorial") {
     return <HeroEditorial imageUrl={imageUrl} imageAlt={imageAlt} />;
   }
+  if (layout === "minimal") {
+    return <HeroMinimal />;
+  }
+  if (layout === "panel") {
+    return <HeroPanel imageUrl={imageUrl} imageAlt={imageAlt} />;
+  }
+  if (layout === "badge") {
+    return <HeroBadge imageUrl={imageUrl} imageAlt={imageAlt} />;
+  }
   return <HeroClassic imageUrl={imageUrl} imageAlt={imageAlt} />;
 }
 
@@ -297,6 +306,197 @@ function HeroEditorial({ imageUrl, imageAlt }: HeroVariantProps) {
           light
           className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2"
         />
+      </Container>
+    </section>
+  );
+}
+
+function HeroMinimal() {
+  return (
+    <section className="relative overflow-hidden bg-secondary">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(230,164,33,0.12),transparent_55%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none font-heading text-[28rem] leading-none text-primary/[0.03]"
+      >
+        Z
+      </div>
+
+      <Container className="relative flex flex-col items-center gap-6 py-20 text-center sm:py-28 lg:py-32 animate-fade-rise-in">
+        <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.25em] text-gold">
+          <span className="h-px w-10 bg-gold" aria-hidden="true" />
+          Premium Artificial Jewellery
+          <span className="h-px w-10 bg-gold" aria-hidden="true" />
+        </span>
+
+        <Heading variant="display" as="h1" className="max-w-2xl">
+          Jewellery That Completes Your Story
+        </Heading>
+
+        <Text variant="bodyLg" className="max-w-lg text-muted">
+          Discover elegant artificial jewellery and fashion accessories
+          designed to make every moment beautiful.
+        </Text>
+
+        <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+          <Link
+            href="#new-arrivals"
+            className={buttonVariants(
+              "gold",
+              "lg",
+              "group transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+            )}
+          >
+            Shop New Arrivals
+            <ArrowRight
+              className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+              aria-hidden="true"
+            />
+          </Link>
+          <Link
+            href="#categories"
+            className={buttonVariants(
+              "outline-gold",
+              "lg",
+              "transition-transform duration-200 hover:-translate-y-0.5",
+            )}
+          >
+            Explore Collections
+          </Link>
+        </div>
+
+        <TrustBadges className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-4" />
+      </Container>
+    </section>
+  );
+}
+
+function HeroPanel({ imageUrl, imageAlt }: HeroVariantProps) {
+  return (
+    <section className="relative overflow-hidden bg-secondary">
+      <div className="flex flex-col lg:min-h-[80vh] lg:flex-row">
+        <div className="relative order-1 aspect-[4/3] w-full sm:aspect-[16/9] lg:order-2 lg:aspect-auto lg:w-[45%]">
+          <Image
+            src={imageUrl || heroImage}
+            alt={imageAlt || defaultImageAlt}
+            fill
+            preload
+            sizes="(max-width: 1024px) 100vw, 45vw"
+            className="object-cover"
+          />
+        </div>
+
+        <div className="order-2 flex flex-1 flex-col items-center justify-center gap-5 px-4 py-10 text-center sm:px-6 lg:order-1 lg:items-start lg:px-16 lg:text-left animate-fade-rise-in">
+          <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+            <span className="h-px w-8 bg-gold" aria-hidden="true" />
+            Premium Artificial Jewellery
+          </span>
+
+          <Heading variant="display" as="h1" className="max-w-md">
+            Jewellery That Completes Your Story
+          </Heading>
+
+          <Text variant="bodyLg" className="max-w-md text-muted">
+            Discover elegant artificial jewellery and fashion accessories
+            designed to make every moment beautiful.
+          </Text>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="#new-arrivals"
+              className={buttonVariants(
+                "gold",
+                "lg",
+                "group transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+              )}
+            >
+              Shop New Arrivals
+              <ArrowRight
+                className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+                aria-hidden="true"
+              />
+            </Link>
+            <Link
+              href="#categories"
+              className={buttonVariants(
+                "outline-gold",
+                "lg",
+                "transition-transform duration-200 hover:-translate-y-0.5",
+              )}
+            >
+              Explore Collections
+            </Link>
+          </div>
+
+          <TrustBadges className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-2 lg:justify-start" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HeroBadge({ imageUrl, imageAlt }: HeroVariantProps) {
+  return (
+    <section className="relative min-h-[70vh] overflow-hidden bg-primary lg:min-h-[85vh]">
+      <Image
+        src={imageUrl || heroImage}
+        alt={imageAlt || defaultImageAlt}
+        fill
+        preload
+        sizes="100vw"
+        className="object-cover [object-position:65%_20%]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 to-transparent"
+      />
+
+      <Container className="relative flex h-full min-h-[70vh] items-end py-8 sm:py-10 lg:min-h-[85vh] lg:py-14">
+        <div className="w-full max-w-md rounded-2xl bg-white/95 p-6 shadow-[0_25px_60px_-15px_rgba(31,31,31,0.35)] backdrop-blur sm:p-8 animate-fade-rise-in">
+          <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+            <span className="h-px w-8 bg-gold" aria-hidden="true" />
+            Premium Artificial Jewellery
+          </span>
+
+          <Heading variant="h1" as="h1" className="mt-3">
+            Jewellery That Completes Your Story
+          </Heading>
+
+          <Text variant="body" className="mt-2 text-muted">
+            Discover elegant artificial jewellery and fashion accessories
+            designed to make every moment beautiful.
+          </Text>
+
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="#new-arrivals"
+              className={buttonVariants(
+                "gold",
+                "md",
+                "group transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+              )}
+            >
+              Shop New Arrivals
+              <ArrowRight
+                className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+                aria-hidden="true"
+              />
+            </Link>
+            <Link
+              href="#categories"
+              className={buttonVariants(
+                "outline-gold",
+                "md",
+                "transition-transform duration-200 hover:-translate-y-0.5",
+              )}
+            >
+              Explore Collections
+            </Link>
+          </div>
+        </div>
       </Container>
     </section>
   );

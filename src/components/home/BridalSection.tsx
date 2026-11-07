@@ -16,6 +16,9 @@ interface BridalSectionProps {
 
 export function BridalSection({ layout = "classic" }: BridalSectionProps) {
   if (layout === "editorial") return <BridalEditorial />;
+  if (layout === "quote") return <BridalQuote />;
+  if (layout === "side") return <BridalSide />;
+  if (layout === "banner") return <BridalBanner />;
   return <BridalClassic />;
 }
 
@@ -102,6 +105,107 @@ function BridalEditorial() {
 
       <Container className="relative flex flex-col items-start gap-5 py-16 sm:py-20 lg:py-28">
         <BridalCopy />
+      </Container>
+    </section>
+  );
+}
+
+function BridalQuote() {
+  return (
+    <section className="relative overflow-hidden bg-primary text-white">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(230,164,33,0.14),transparent_55%)]"
+      />
+
+      <Container className="relative flex flex-col items-center gap-6 py-20 text-center sm:py-24 lg:py-28">
+        <span className="h-px w-10 bg-gold" aria-hidden="true" />
+        <span className="font-body text-xs font-semibold uppercase tracking-[0.25em] text-gold">
+          Bridal Collection
+        </span>
+        <Heading
+          variant="display"
+          as="h2"
+          className="max-w-2xl font-normal italic text-white"
+        >
+          &ldquo;Made for Your Most Beautiful Moments&rdquo;
+        </Heading>
+        <Text variant="bodyLg" className="max-w-lg text-white/80">
+          Discover elegant bridal jewellery designed for unforgettable
+          celebrations.
+        </Text>
+        <Link
+          href="/category/bridal-jewellery"
+          className={cn(
+            buttonVariants("gold", "lg"),
+            "group mt-2 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+          )}
+        >
+          Explore Bridal Collection
+          <ArrowRight
+            className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+            aria-hidden="true"
+          />
+        </Link>
+        <span className="mt-2 h-px w-10 bg-gold" aria-hidden="true" />
+      </Container>
+    </section>
+  );
+}
+
+function BridalSide() {
+  return (
+    <section className="relative overflow-hidden bg-primary text-white">
+      <div className="flex flex-col lg:min-h-[60vh] lg:flex-row-reverse">
+        <div className="relative order-1 aspect-[4/3] w-full sm:aspect-[16/9] lg:order-2 lg:aspect-auto lg:w-[45%]">
+          <Image
+            src={bridalBannerImage}
+            alt="Bride in a flowing red and gold embroidered lehenga wearing a gold choker necklace, jhumka earrings, maang tikka and bangles"
+            fill
+            loading="lazy"
+            sizes="(max-width: 1024px) 100vw, 45vw"
+            className="object-cover [object-position:50%_20%]"
+          />
+        </div>
+
+        <div className="order-2 flex flex-1 flex-col items-center justify-center gap-5 px-4 py-14 text-center sm:px-6 lg:order-1 lg:items-start lg:px-16 lg:text-left">
+          <BridalCopy />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BridalBanner() {
+  return (
+    <section className="relative overflow-hidden bg-primary text-white">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_50%,rgba(230,164,33,0.14),transparent_55%)]"
+      />
+      <Container className="relative flex flex-col items-center gap-6 py-10 text-center sm:py-12 lg:flex-row lg:justify-between lg:text-left">
+        <div className="flex flex-col items-center gap-2 lg:items-start">
+          <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+            <span className="h-px w-8 bg-gold" aria-hidden="true" />
+            Bridal Collection
+          </span>
+          <Heading variant="h3" as="h2" className="max-w-md text-white">
+            Made for Your Most Beautiful Moments
+          </Heading>
+        </div>
+        <Link
+          href="/category/bridal-jewellery"
+          className={cn(
+            buttonVariants("gold", "lg"),
+            "group shrink-0 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+          )}
+        >
+          Explore Bridal Collection
+          <ArrowRight
+            className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+            aria-hidden="true"
+          />
+        </Link>
       </Container>
     </section>
   );
