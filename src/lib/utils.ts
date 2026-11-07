@@ -79,7 +79,7 @@ export function buildOpenGraph({
     url: path,
     title,
     description,
-    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
   };
 }
 
