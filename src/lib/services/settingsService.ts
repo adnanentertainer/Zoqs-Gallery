@@ -30,6 +30,7 @@ const MOCK_SETTINGS: Record<string, unknown> = {
   social_links: siteConfig.socialLinks,
   festival_banner: DEFAULT_FESTIVAL_BANNER,
   default_hero_image: "",
+  bridal_banner_image: "",
   blessed_friday_offer: DEFAULT_BLESSED_FRIDAY_OFFER,
   wedding_promotion: DEFAULT_WEDDING_PROMOTION_SETTINGS,
   color_theme: DEFAULT_COLOR_THEME_ID,

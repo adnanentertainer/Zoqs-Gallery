@@ -4,11 +4,13 @@ import { Heading, Text } from "@/components/ui/Typography";
 import { SettingsForm } from "@/components/admin/SettingsForm";
 import { FestivalBannerForm } from "@/components/admin/FestivalBannerForm";
 import { DefaultHeroImageForm } from "@/components/admin/DefaultHeroImageForm";
+import { BridalBannerImageForm } from "@/components/admin/BridalBannerImageForm";
 import { BlessedFridayOfferForm } from "@/components/admin/BlessedFridayOfferForm";
 import { WeddingPromotionForm } from "@/components/admin/WeddingPromotionForm";
 import { getAdminStoreSettings } from "@/lib/services/admin/adminSettingsService";
 import { getAdminFestivalBanner } from "@/lib/services/admin/adminFestivalBannerService";
 import { getAdminDefaultHeroImage } from "@/lib/services/admin/adminHeroImageService";
+import { getAdminBridalBannerImage } from "@/lib/services/admin/adminBridalBannerImageService";
 import { getAdminBlessedFridayOffer } from "@/lib/services/admin/adminBlessedFridayOfferService";
 import { getAdminWeddingPromotionSettings } from "@/lib/services/admin/adminWeddingPromotionService";
 
@@ -22,12 +24,14 @@ export default async function AdminSettingsPage() {
     settings,
     festivalBanner,
     defaultHeroImage,
+    bridalBannerImage,
     blessedFridayOffer,
     weddingPromotion,
   ] = await Promise.all([
     getAdminStoreSettings(),
     getAdminFestivalBanner(),
     getAdminDefaultHeroImage(),
+    getAdminBridalBannerImage(),
     getAdminBlessedFridayOffer(),
     getAdminWeddingPromotionSettings(),
   ]);
@@ -82,6 +86,17 @@ export default async function AdminSettingsPage() {
         </Text>
       </div>
       <DefaultHeroImageForm initialValue={defaultHeroImage} />
+
+      <div className="mt-4">
+        <Heading variant="h3" as="h2">
+          Bridal Collection Banner Image
+        </Heading>
+        <Text variant="bodySm" className="mt-1 text-muted">
+          The photo used by the homepage&apos;s Bridal Collection Banner
+          section (see Admin → Layout for its layout variants).
+        </Text>
+      </div>
+      <BridalBannerImageForm initialValue={bridalBannerImage} />
     </div>
   );
 }

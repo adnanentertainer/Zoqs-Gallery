@@ -39,6 +39,7 @@ export default async function Home() {
     socialPosts,
     activeHeroImage,
     defaultHeroImage,
+    bridalBannerImageUrl,
     weddingPromotion,
     weddingPicks,
     layoutTemplate,
@@ -49,6 +50,7 @@ export default async function Home() {
     getSocialPosts(),
     getActiveHeroImage(),
     getSiteSetting<string>("default_hero_image"),
+    getSiteSetting<string>("bridal_banner_image"),
     getWeddingPromotionSettings(),
     getWeddingPicks(),
     getActiveLayoutTemplate(),
@@ -119,7 +121,10 @@ export default async function Home() {
         />
       </Reveal>
       <Reveal>
-        <BridalSection layout={layoutTemplate.bridal} />
+        <BridalSection
+          layout={layoutTemplate.bridal}
+          imageUrl={bridalBannerImageUrl || undefined}
+        />
       </Reveal>
       <Reveal>
         <BenefitsSection layout={layoutTemplate.benefits} />

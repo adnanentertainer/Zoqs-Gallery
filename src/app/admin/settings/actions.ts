@@ -11,6 +11,10 @@ import {
   updateAdminDefaultHeroImage,
   uploadDefaultHeroImage,
 } from "@/lib/services/admin/adminHeroImageService";
+import {
+  updateAdminBridalBannerImage,
+  uploadBridalBannerImage,
+} from "@/lib/services/admin/adminBridalBannerImageService";
 import { updateAdminBlessedFridayOffer } from "@/lib/services/admin/adminBlessedFridayOfferService";
 import {
   updateAdminWeddingPromotionSettings,
@@ -92,6 +96,29 @@ export async function uploadDefaultHeroImageAction(
     return { error: "No file provided." };
   }
   return uploadDefaultHeroImage(file);
+}
+
+export async function updateAdminBridalBannerImageAction(
+  url: string,
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const result = await updateAdminBridalBannerImage(url);
+  if (!result.error) {
+    revalidatePath("/admin/settings");
+    revalidatePath("/");
+  }
+  return result;
+}
+
+export async function uploadBridalBannerImageAction(
+  formData: FormData,
+): Promise<{ url?: string; error?: string }> {
+  await requireAdmin();
+  const file = formData.get("file");
+  if (!(file instanceof File)) {
+    return { error: "No file provided." };
+  }
+  return uploadBridalBannerImage(file);
 }
 
 export async function uploadWeddingBannerImageAction(

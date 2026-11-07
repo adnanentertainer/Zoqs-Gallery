@@ -195,13 +195,13 @@ export const BRIDAL_LAYOUTS: LayoutVariantOption<BridalLayoutId>[] = [
     id: "classic",
     name: "Classic Split",
     description: "Boxed photo beside the text -- the current look.",
-    spec: "Uses the site's bridal banner photo (4:5 portrait crop). Not yet admin-editable.",
+    spec: "Photo: 1200×1500px (4:5 portrait) or larger. Edit in Admin → Settings → Bridal Collection Banner Image.",
   },
   {
     id: "editorial",
     name: "Editorial Full-Bleed",
     description: "Full-bleed cinematic photo with the text overlaid on top.",
-    spec: "Uses the site's bridal banner photo (wide landscape crop). Not yet admin-editable.",
+    spec: "Photo: 1920×1200px (landscape) or larger -- fills the full screen. Edit in Admin → Settings → Bridal Collection Banner Image.",
   },
   {
     id: "quote",
@@ -213,7 +213,7 @@ export const BRIDAL_LAYOUTS: LayoutVariantOption<BridalLayoutId>[] = [
     id: "side",
     name: "Side Accent",
     description: "Photo bleeds edge-to-edge beside a solid-color text panel.",
-    spec: "Uses the site's bridal banner photo (portrait or landscape crop). Not yet admin-editable.",
+    spec: "Photo: 1600×1200px or larger, portrait or landscape both work. Edit in Admin → Settings → Bridal Collection Banner Image.",
   },
   {
     id: "banner",

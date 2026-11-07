@@ -12,14 +12,24 @@ interface BridalSectionProps {
   /** Which of the admin-selected layout variants to render -- see
    * src/types/layoutTemplate.ts. Defaults to the original "classic" look. */
   layout?: BridalLayoutId;
+  /** Overrides the built-in placeholder photo — set in Admin → Settings →
+   * Bridal Collection Banner Image. Unused by the photo-free "quote" and
+   * "banner" variants. */
+  imageUrl?: string;
 }
 
-export function BridalSection({ layout = "classic" }: BridalSectionProps) {
-  if (layout === "editorial") return <BridalEditorial />;
+const defaultBridalImageAlt =
+  "Bride in a flowing red and gold embroidered lehenga wearing a gold choker necklace, jhumka earrings, maang tikka and bangles";
+
+export function BridalSection({
+  layout = "classic",
+  imageUrl,
+}: BridalSectionProps) {
+  if (layout === "editorial") return <BridalEditorial imageUrl={imageUrl} />;
   if (layout === "quote") return <BridalQuote />;
-  if (layout === "side") return <BridalSide />;
+  if (layout === "side") return <BridalSide imageUrl={imageUrl} />;
   if (layout === "banner") return <BridalBanner />;
-  return <BridalClassic />;
+  return <BridalClassic imageUrl={imageUrl} />;
 }
 
 function BridalCopy() {
@@ -53,7 +63,7 @@ function BridalCopy() {
   );
 }
 
-function BridalClassic() {
+function BridalClassic({ imageUrl }: { imageUrl?: string }) {
   return (
     <section className="relative overflow-hidden bg-primary text-white">
       <div
@@ -69,8 +79,8 @@ function BridalClassic() {
           />
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] ring-1 ring-gold/40">
             <Image
-              src={bridalBannerImage}
-              alt="Bride in a flowing red and gold embroidered lehenga wearing a gold choker necklace, jhumka earrings, maang tikka and bangles"
+              src={imageUrl || bridalBannerImage}
+              alt={defaultBridalImageAlt}
               fill
               loading="lazy"
               sizes="(max-width: 1024px) 100vw, 448px"
@@ -87,12 +97,12 @@ function BridalClassic() {
   );
 }
 
-function BridalEditorial() {
+function BridalEditorial({ imageUrl }: { imageUrl?: string }) {
   return (
     <section className="relative flex min-h-[60vh] items-center overflow-hidden bg-primary">
       <Image
-        src={bridalBannerImage}
-        alt="Bride in a flowing red and gold embroidered lehenga wearing a gold choker necklace, jhumka earrings, maang tikka and bangles"
+        src={imageUrl || bridalBannerImage}
+        alt={defaultBridalImageAlt}
         fill
         loading="lazy"
         sizes="100vw"
@@ -153,14 +163,14 @@ function BridalQuote() {
   );
 }
 
-function BridalSide() {
+function BridalSide({ imageUrl }: { imageUrl?: string }) {
   return (
     <section className="relative overflow-hidden bg-primary text-white">
       <div className="flex flex-col lg:min-h-[60vh] lg:flex-row-reverse">
         <div className="relative order-1 aspect-[4/3] w-full sm:aspect-[16/9] lg:order-2 lg:aspect-auto lg:w-[45%]">
           <Image
-            src={bridalBannerImage}
-            alt="Bride in a flowing red and gold embroidered lehenga wearing a gold choker necklace, jhumka earrings, maang tikka and bangles"
+            src={imageUrl || bridalBannerImage}
+            alt={defaultBridalImageAlt}
             fill
             loading="lazy"
             sizes="(max-width: 1024px) 100vw, 45vw"
