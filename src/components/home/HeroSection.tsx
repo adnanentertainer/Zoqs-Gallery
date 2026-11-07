@@ -4,7 +4,9 @@ import { ArrowRight, Banknote, ShieldCheck, Truck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Heading, Text } from "@/components/ui/Typography";
 import { buttonVariants } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 import { heroImage } from "@/constants/images";
+import type { HeroLayoutId } from "@/types/layoutTemplate";
 
 const trustBadges = [
   { icon: Truck, label: "Nationwide Delivery" },
@@ -13,6 +15,9 @@ const trustBadges = [
 ];
 
 interface HeroSectionProps {
+  /** Which of the admin-selected layout variants to render -- see
+   * src/types/layoutTemplate.ts. Defaults to the original "classic" look. */
+  layout?: HeroLayoutId;
   /** Overrides the default model photo — passed down when a scheduled
    * promo code currently has a hero banner uploaded for it. See
    * lib/services/promoCodeService.ts's getActiveHeroImage(). */
@@ -20,7 +25,54 @@ interface HeroSectionProps {
   imageAlt?: string;
 }
 
-export function HeroSection({ imageUrl, imageAlt }: HeroSectionProps) {
+export function HeroSection({
+  layout = "classic",
+  imageUrl,
+  imageAlt,
+}: HeroSectionProps) {
+  if (layout === "centered") {
+    return <HeroCentered imageUrl={imageUrl} imageAlt={imageAlt} />;
+  }
+  if (layout === "editorial") {
+    return <HeroEditorial imageUrl={imageUrl} imageAlt={imageAlt} />;
+  }
+  return <HeroClassic imageUrl={imageUrl} imageAlt={imageAlt} />;
+}
+
+interface HeroVariantProps {
+  imageUrl?: string;
+  imageAlt?: string;
+}
+
+const defaultImageAlt =
+  "Bride wearing a gold statement necklace, drop earrings and maang tikka";
+
+function TrustBadges({
+  className,
+  light = false,
+}: {
+  className?: string;
+  light?: boolean;
+}) {
+  return (
+    <div className={className}>
+      {trustBadges.map(({ icon: Icon, label }) => (
+        <span
+          key={label}
+          className={cn(
+            "flex items-center gap-2 font-body text-xs font-medium",
+            light ? "text-white/80" : "text-muted",
+          )}
+        >
+          <Icon className="h-4 w-4 text-gold" aria-hidden="true" />
+          {label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function HeroClassic({ imageUrl, imageAlt }: HeroVariantProps) {
   return (
     <section className="relative flex items-center overflow-hidden bg-secondary lg:min-h-[85vh]">
       <div
@@ -47,10 +99,7 @@ export function HeroSection({ imageUrl, imageAlt }: HeroSectionProps) {
             <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-[0_25px_60px_-15px_rgba(31,31,31,0.35)] ring-1 ring-gold/30">
               <Image
                 src={imageUrl || heroImage}
-                alt={
-                  imageAlt ||
-                  "Bride wearing a gold statement necklace, drop earrings and maang tikka"
-                }
+                alt={imageAlt || defaultImageAlt}
                 fill
                 preload
                 sizes="(max-width: 1024px) 100vw, 448px"
@@ -102,18 +151,152 @@ export function HeroSection({ imageUrl, imageAlt }: HeroSectionProps) {
             </Link>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-2 lg:justify-start">
-            {trustBadges.map(({ icon: Icon, label }) => (
-              <span
-                key={label}
-                className="flex items-center gap-2 font-body text-xs font-medium text-muted"
-              >
-                <Icon className="h-4 w-4 text-gold" aria-hidden="true" />
-                {label}
-              </span>
-            ))}
+          <TrustBadges className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-2 lg:justify-start" />
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+function HeroCentered({ imageUrl, imageAlt }: HeroVariantProps) {
+  return (
+    <section className="relative overflow-hidden bg-secondary">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(230,164,33,0.12),transparent_50%)]"
+      />
+
+      <Container className="relative flex flex-col items-center gap-8 py-12 text-center sm:py-16 lg:py-20">
+        <div className="flex flex-col items-center gap-5 animate-fade-rise-in">
+          <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+            <span className="h-px w-8 bg-gold" aria-hidden="true" />
+            Premium Artificial Jewellery
+            <span className="h-px w-8 bg-gold" aria-hidden="true" />
+          </span>
+
+          <Heading variant="display" as="h1" className="max-w-2xl">
+            Jewellery That Completes Your Story
+          </Heading>
+
+          <Text variant="bodyLg" className="max-w-xl text-muted">
+            Discover elegant artificial jewellery and fashion accessories
+            designed to make every moment beautiful.
+          </Text>
+
+          <div className="flex flex-col gap-3 pt-1 sm:flex-row">
+            <Link
+              href="#new-arrivals"
+              className={buttonVariants(
+                "gold",
+                "lg",
+                "group transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+              )}
+            >
+              Shop New Arrivals
+              <ArrowRight
+                className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+                aria-hidden="true"
+              />
+            </Link>
+            <Link
+              href="#categories"
+              className={buttonVariants(
+                "outline-gold",
+                "lg",
+                "transition-transform duration-200 hover:-translate-y-0.5",
+              )}
+            >
+              Explore Collections
+            </Link>
+          </div>
+
+          <TrustBadges className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-2" />
+        </div>
+
+        <div className="relative w-full animate-fade-rise-in-delayed">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -inset-2 hidden rounded-2xl border border-gold/25 sm:block"
+          />
+          <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl shadow-[0_25px_60px_-15px_rgba(31,31,31,0.35)] ring-1 ring-gold/30 sm:aspect-[21/8]">
+            <Image
+              src={imageUrl || heroImage}
+              alt={imageAlt || defaultImageAlt}
+              fill
+              preload
+              sizes="100vw"
+              className="object-cover [object-position:50%_20%]"
+            />
           </div>
         </div>
+      </Container>
+    </section>
+  );
+}
+
+function HeroEditorial({ imageUrl, imageAlt }: HeroVariantProps) {
+  return (
+    <section className="relative flex min-h-[70vh] items-end overflow-hidden bg-primary lg:min-h-[88vh]">
+      <Image
+        src={imageUrl || heroImage}
+        alt={imageAlt || defaultImageAlt}
+        fill
+        preload
+        sizes="100vw"
+        className="object-cover [object-position:60%_20%]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/45 to-transparent"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-primary/75 via-primary/15 to-transparent"
+      />
+
+      <Container className="relative flex flex-col items-start gap-5 py-12 sm:py-16 lg:max-w-xl lg:py-24 animate-fade-rise-in">
+        <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-white/90">
+          <span className="h-px w-8 bg-gold" aria-hidden="true" />
+          Premium Artificial Jewellery
+        </span>
+
+        <Heading variant="display" as="h1" className="max-w-md text-white">
+          Jewellery That <em className="italic text-gold">Completes</em> Your
+          Story
+        </Heading>
+
+        <Text variant="bodyLg" className="max-w-md text-white/85">
+          Discover elegant artificial jewellery and fashion accessories
+          designed to make every moment beautiful.
+        </Text>
+
+        <div className="flex flex-col gap-3 pt-1 sm:flex-row">
+          <Link
+            href="#new-arrivals"
+            className={buttonVariants(
+              "gold",
+              "lg",
+              "group transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+            )}
+          >
+            Shop New Arrivals
+            <ArrowRight
+              className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+              aria-hidden="true"
+            />
+          </Link>
+          <Link
+            href="#categories"
+            className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-2xl border border-white/70 px-8 font-body text-base font-semibold uppercase tracking-[0.08em] text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+          >
+            Explore Collections
+          </Link>
+        </div>
+
+        <TrustBadges
+          light
+          className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2"
+        />
       </Container>
     </section>
   );

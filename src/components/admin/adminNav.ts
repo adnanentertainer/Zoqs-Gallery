@@ -18,6 +18,7 @@ import {
   Gift,
   MessageCircle,
   Palette,
+  LayoutTemplate,
   type LucideIcon,
 } from "lucide-react";
 import { SOCIAL_ENGAGEMENT_CAMPAIGNS_ENABLED } from "@/lib/features";
@@ -59,5 +60,10 @@ export const adminNavItems: AdminNavItem[] = [
   { label: "Reels", href: "/admin/reels", icon: Clapperboard },
   { label: "Customers", href: "/admin/customers", icon: Users },
   { label: "Color Theme", href: "/admin/theme", icon: Palette },
+  {
+    label: "Layout",
+    href: "/admin/layout-template",
+    icon: LayoutTemplate,
+  },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];

@@ -20,6 +20,7 @@ import { getSocialPosts } from "@/lib/services/socialPostService";
 import { getActiveHeroImage } from "@/lib/services/promoCodeService";
 import { getSiteSetting } from "@/lib/services/settingsService";
 import { getWeddingPromotionSettings } from "@/lib/services/weddingPromotionService";
+import { getActiveLayoutTemplate } from "@/lib/services/layoutTemplateService";
 
 export const metadata: Metadata = {
   title: "ZOQ's Gallery | Premium Artificial Jewellery in Pakistan",
@@ -40,6 +41,7 @@ export default async function Home() {
     defaultHeroImage,
     weddingPromotion,
     weddingPicks,
+    layoutTemplate,
   ] = await Promise.all([
     getCategories(),
     getNewArrivals(),
@@ -49,6 +51,7 @@ export default async function Home() {
     getSiteSetting<string>("default_hero_image"),
     getWeddingPromotionSettings(),
     getWeddingPicks(),
+    getActiveLayoutTemplate(),
   ]);
 
   const showWeddingPromotion =
@@ -59,6 +62,7 @@ export default async function Home() {
       <WhatsAppFloatingButton ariaLabel="Chat with ZOQ's Gallery on WhatsApp" />
       <PromoBannerSection />
       <HeroSection
+        layout={layoutTemplate.hero}
         imageUrl={activeHeroImage?.imageUrl || defaultHeroImage || undefined}
         imageAlt={activeHeroImage?.imageAlt}
       />
@@ -86,7 +90,10 @@ export default async function Home() {
         </>
       )}
       <Reveal>
-        <CategorySection categories={categories} />
+        <CategorySection
+          categories={categories}
+          layout={layoutTemplate.categories}
+        />
       </Reveal>
       <Reveal>
         <ProductSection

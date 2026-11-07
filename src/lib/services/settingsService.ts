@@ -10,6 +10,7 @@ import {
   DEFAULT_COLOR_THEME_ID,
   DEFAULT_COLOR_THEME_SCHEDULE,
 } from "@/types/colorTheme";
+import { DEFAULT_LAYOUT_TEMPLATE } from "@/types/layoutTemplate";
 
 // Mirrors the site_settings rows seeded by scripts/seed.ts. Used as the mock
 // fallback so getSiteSetting() behaves identically whether or not Supabase is
@@ -33,6 +34,7 @@ const MOCK_SETTINGS: Record<string, unknown> = {
   wedding_promotion: DEFAULT_WEDDING_PROMOTION_SETTINGS,
   color_theme: DEFAULT_COLOR_THEME_ID,
   color_theme_schedule: DEFAULT_COLOR_THEME_SCHEDULE,
+  layout_template: DEFAULT_LAYOUT_TEMPLATE,
 };
 
 // This is a public, admin-managed setting read on nearly every page (festival
