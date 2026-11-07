@@ -186,18 +186,18 @@ function HeroClassic({
           </div>
 
           {showImageOnMobile && (
-            // The whole photo, uncropped (letterboxed against the beige
-            // frame instead) -- shown only below lg, where the tall 4:5
-            // cover-cropped version above stays hidden. A short, wide crop
-            // here would otherwise cut off parts of the same photo the
-            // admin already composed for the tall desktop frame.
+            // Shown only below lg, where the tall 4:5 cover-cropped version
+            // above stays hidden. Uses each slide's own mobile crop when the
+            // admin set one (filling the frame); otherwise falls back to the
+            // same desktop photo shown uncropped (letterboxed against the
+            // beige frame) instead of cutting off parts of it.
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-beige shadow-[0_15px_35px_-10px_rgba(31,31,31,0.3)] ring-1 ring-gold/20 lg:hidden">
               <HeroImageCarousel
                 images={images}
                 fallbackUrl={imageUrl || heroImage}
                 fallbackAlt={imageAlt || defaultImageAlt}
                 sizes="100vw"
-                fit="contain"
+                preferMobileImage
               />
             </div>
           )}

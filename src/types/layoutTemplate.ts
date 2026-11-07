@@ -87,7 +87,7 @@ export const HERO_LAYOUTS: LayoutVariantOption<HeroLayoutId>[] = [
     id: "classic",
     name: "Classic Split",
     description: "Boxed photo beside the headline -- the current look.",
-    spec: "Photo: 900×1125px (4:5 portrait) or larger. Set in Admin → Settings → Homepage Hero Image, or add 2+ in Admin → Hero Carousel to auto-scroll between them.",
+    spec: "Photo: 900×1125px (4:5 portrait) or larger. Set in Admin → Settings → Homepage Hero Image, or add 2+ in Admin → Hero Carousel to auto-scroll between them. Optional mobile crop: 1200×675px (16:9) -- see \"Show hero photo on mobile\" below.",
   },
   {
     id: "centered",

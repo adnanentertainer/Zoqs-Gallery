@@ -25,6 +25,7 @@ interface HeroImageFormProps {
 function emptyHeroImage(): AdminHeroImageInput {
   return {
     imageUrl: "",
+    mobileImageUrl: "",
     altText: "",
     isActive: true,
     displayOrder: 0,
@@ -97,12 +98,30 @@ export function HeroImageForm({
           helpText={
             <p className="font-body text-xs text-muted">
               Upload a tall <strong>portrait photo, cropped to a 4:5 ratio</strong>{" "}
-              (e.g. 1200&times;1500px) so it frames the same way across every
-              hero layout.
+              (e.g. <strong>1200&times;1500px</strong>) so it frames the same
+              way across every hero layout. Also used on mobile (Classic
+              Split, when &ldquo;Show hero photo on mobile&rdquo; is on) when
+              no Mobile Image below is set -- shown there in full, uncropped.
             </p>
           }
           value={values.imageUrl}
           onChange={(url) => update("imageUrl", url)}
+          uploadAction={uploadHeroImageAction}
+        />
+
+        <ImageUploadField
+          label="Mobile Image (optional)"
+          helpText={
+            <p className="font-body text-xs text-muted">
+              Upload a <strong>wide photo, cropped to a 16:9 ratio</strong>{" "}
+              (e.g. <strong>1200&times;675px</strong>) if you want a
+              mobile-specific crop that fills the frame edge-to-edge.
+              Only used by Classic Split&apos;s mobile strip -- leave blank to
+              reuse the Image above there instead (shown uncropped).
+            </p>
+          }
+          value={values.mobileImageUrl}
+          onChange={(url) => update("mobileImageUrl", url)}
           uploadAction={uploadHeroImageAction}
         />
 

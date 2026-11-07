@@ -34,6 +34,7 @@ export async function listAdminHeroImages(): Promise<
   return (data ?? []).map((row) => ({
     id: row.id,
     imageUrl: row.image_url,
+    mobileImageUrl: row.mobile_image_url ?? "",
     altText: row.alt_text ?? "",
     isActive: row.is_active,
     displayOrder: row.display_order,
@@ -64,6 +65,7 @@ export async function getAdminHeroImageById(
   return {
     id: data.id,
     imageUrl: data.image_url,
+    mobileImageUrl: data.mobile_image_url ?? "",
     altText: data.alt_text ?? "",
     isActive: data.is_active,
     displayOrder: data.display_order,
@@ -80,6 +82,7 @@ export async function createHeroImage(
     .from("hero_images")
     .insert({
       image_url: input.imageUrl,
+      mobile_image_url: input.mobileImageUrl.trim() || null,
       alt_text: input.altText.trim() || null,
       is_active: input.isActive,
       display_order: input.displayOrder,
@@ -106,6 +109,7 @@ export async function updateHeroImage(
     .from("hero_images")
     .update({
       image_url: input.imageUrl,
+      mobile_image_url: input.mobileImageUrl.trim() || null,
       alt_text: input.altText.trim() || null,
       is_active: input.isActive,
       display_order: input.displayOrder,

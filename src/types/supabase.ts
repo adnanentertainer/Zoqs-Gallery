@@ -223,6 +223,7 @@ export interface Database {
         Row: {
           id: string;
           image_url: string;
+          mobile_image_url: string | null;
           alt_text: string | null;
           is_active: boolean;
           display_order: number;
@@ -232,6 +233,7 @@ export interface Database {
         Insert: {
           id?: string;
           image_url: string;
+          mobile_image_url?: string | null;
           alt_text?: string | null;
           is_active?: boolean;
           display_order?: number;

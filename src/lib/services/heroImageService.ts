@@ -31,6 +31,7 @@ export async function getActiveHeroImages(): Promise<HeroImage[]> {
     return (data ?? []).map((row) => ({
       id: row.id,
       imageUrl: row.image_url,
+      mobileImageUrl: row.mobile_image_url,
       altText: row.alt_text ?? "",
     }));
   } catch (error) {

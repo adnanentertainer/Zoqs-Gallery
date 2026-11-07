@@ -11,6 +11,7 @@ interface Slide {
   id: string;
   url: string;
   alt: string;
+  fit: "cover" | "contain";
 }
 
 interface HeroImageCarouselProps {
@@ -23,13 +24,12 @@ interface HeroImageCarouselProps {
   fallbackAlt: string;
   sizes: string;
   imageClassName?: string;
-  /** "cover" (default) scales the photo to fill the frame, cropping
-   * whatever overflows -- fine when the frame's aspect ratio roughly
-   * matches the photo. "contain" shows the whole photo with no cropping,
-   * letterboxed against the frame's own background instead -- use this
-   * when the frame's aspect ratio (e.g. a short mobile strip) is likely to
-   * cut off more of the photo than is acceptable. */
-  fit?: "cover" | "contain";
+  /** This is the mobile-strip instance (Classic Split's "Show hero photo on
+   * mobile" toggle). Per slide: if the admin set a `mobileImageUrl`, show
+   * that crop filling the frame (object-cover); otherwise fall back to the
+   * same desktop `imageUrl`, shown whole with no cropping (object-contain,
+   * letterboxed) since it wasn't composed for this frame's aspect ratio. */
+  preferMobileImage?: boolean;
 }
 
 /** Stacked, crossfading `<Image fill>` layers -- drop-in replacement for a
@@ -43,16 +43,27 @@ export function HeroImageCarousel({
   fallbackAlt,
   sizes,
   imageClassName,
-  fit = "cover",
+  preferMobileImage = false,
 }: HeroImageCarouselProps) {
   const slides: Slide[] =
     images.length > 0
-      ? images.map((image) => ({
-          id: image.id,
-          url: image.imageUrl,
-          alt: image.altText || fallbackAlt,
-        }))
-      : [{ id: "fallback", url: fallbackUrl, alt: fallbackAlt }];
+      ? images.map((image) => {
+          const mobileCrop = preferMobileImage ? image.mobileImageUrl : null;
+          return {
+            id: image.id,
+            url: mobileCrop || image.imageUrl,
+            alt: image.altText || fallbackAlt,
+            fit: mobileCrop ? "cover" : preferMobileImage ? "contain" : "cover",
+          };
+        })
+      : [
+          {
+            id: "fallback",
+            url: fallbackUrl,
+            alt: fallbackAlt,
+            fit: preferMobileImage ? "contain" : "cover",
+          },
+        ];
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -77,7 +88,7 @@ export function HeroImageCarousel({
           aria-hidden={index !== activeIndex}
           className={cn(
             imageClassName,
-            fit === "contain" ? "object-contain" : "object-cover",
+            slide.fit === "contain" ? "object-contain" : "object-cover",
             "transition-opacity duration-1000 ease-in-out",
             index === activeIndex ? "opacity-100" : "opacity-0",
           )}
