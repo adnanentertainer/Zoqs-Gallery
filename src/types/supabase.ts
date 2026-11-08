@@ -205,6 +205,7 @@ export interface Database {
           href: string | null;
           is_active: boolean;
           display_order: number;
+          product_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -215,9 +216,18 @@ export interface Database {
           href?: string | null;
           is_active?: boolean;
           display_order?: number;
+          product_id?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["social_posts"]["Insert"]>;
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "products";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       hero_images: {
         Row: {

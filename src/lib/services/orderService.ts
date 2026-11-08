@@ -116,6 +116,9 @@ export async function createOrder(
     );
     if (nowLowOrOutOfStock) {
       revalidateTag(CACHE_TAGS.products, { expire: 0 });
+      // A product reaching 0 here may have a linked "Follow Our Style" post
+      // that needs to disappear from the homepage immediately too.
+      revalidateTag(CACHE_TAGS.socialPosts, { expire: 0 });
     }
   } catch (revalidateError) {
     // Never let a cache-freshness nicety fail an already-placed order.

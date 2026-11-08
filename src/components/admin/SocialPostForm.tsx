@@ -13,12 +13,13 @@ import {
   deleteSocialPostAction,
   updateSocialPostAction,
 } from "@/app/admin/social-posts/actions";
-import type { AdminSocialPostInput } from "@/types/admin";
+import type { AdminSocialPostInput, ProductOption } from "@/types/admin";
 
 interface SocialPostFormProps {
   mode: "create" | "edit";
   postId?: string;
   initialValues?: AdminSocialPostInput;
+  productOptions: ProductOption[];
 }
 
 function emptySocialPost(): AdminSocialPostInput {
@@ -28,6 +29,7 @@ function emptySocialPost(): AdminSocialPostInput {
     href: "",
     isActive: true,
     displayOrder: 0,
+    productId: null,
   };
 }
 
@@ -35,6 +37,7 @@ export function SocialPostForm({
   mode,
   postId,
   initialValues,
+  productOptions,
 }: SocialPostFormProps) {
   const router = useRouter();
   const [values, setValues] = useState<AdminSocialPostInput>(
@@ -131,6 +134,29 @@ export function SocialPostForm({
           <p className="font-body text-xs text-muted">
             Optional. Link to a specific Instagram or Facebook post — leave
             blank to use the site&apos;s Instagram profile.
+          </p>
+        </div>
+        <div className="flex flex-col gap-1.5 sm:col-span-2">
+          <label className="font-body text-sm font-medium text-primary">
+            Linked Product (optional)
+          </label>
+          <select
+            value={values.productId ?? ""}
+            onChange={(event) =>
+              update("productId", event.target.value || null)
+            }
+            className="h-11 rounded-sm border border-beige bg-white px-3 font-body text-sm text-primary focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold"
+          >
+            <option value="">None</option>
+            {productOptions.map((product) => (
+              <option key={product.id} value={product.id}>
+                {product.name}
+              </option>
+            ))}
+          </select>
+          <p className="font-body text-xs text-muted">
+            When set, this post is automatically hidden from the homepage
+            gallery once this product&apos;s stock reaches 0.
           </p>
         </div>
         <Input

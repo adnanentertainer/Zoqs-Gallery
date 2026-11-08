@@ -15,7 +15,7 @@ export async function listAdminSocialPosts(): Promise<
 
   const { data, error } = await supabase
     .from("social_posts")
-    .select("*")
+    .select("*, products(name)")
     .order("display_order", { ascending: true });
 
   if (error) {
@@ -32,6 +32,8 @@ export async function listAdminSocialPosts(): Promise<
     href: row.href,
     isActive: row.is_active,
     displayOrder: row.display_order,
+    productId: row.product_id,
+    productName: (row.products as { name: string } | null)?.name ?? null,
   }));
 }
 
@@ -62,6 +64,7 @@ export async function getAdminSocialPostById(
     href: data.href ?? "",
     isActive: data.is_active,
     displayOrder: data.display_order,
+    productId: data.product_id,
   };
 }
 
@@ -79,6 +82,7 @@ export async function createSocialPost(
       href: input.href || null,
       is_active: input.isActive,
       display_order: input.displayOrder,
+      product_id: input.productId,
     })
     .select("id")
     .single();
@@ -106,6 +110,7 @@ export async function updateSocialPost(
       href: input.href || null,
       is_active: input.isActive,
       display_order: input.displayOrder,
+      product_id: input.productId,
     })
     .eq("id", id);
 

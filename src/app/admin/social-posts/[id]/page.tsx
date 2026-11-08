@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin";
 import { SocialPostForm } from "@/components/admin/SocialPostForm";
 import { getAdminSocialPostById } from "@/lib/services/admin/adminSocialPostService";
+import { listProductOptions } from "@/lib/services/admin/adminProductService";
 
 export const metadata: Metadata = {
   title: "Edit Post | Admin | ZOQ's Gallery",
@@ -17,13 +18,21 @@ export default async function EditSocialPostPage({
   params,
 }: EditSocialPostPageProps) {
   const { id } = await params;
-  const post = await getAdminSocialPostById(id);
+  const [post, productOptions] = await Promise.all([
+    getAdminSocialPostById(id),
+    listProductOptions(),
+  ]);
   if (!post) notFound();
 
   return (
     <div className="flex flex-col gap-6">
       <AdminPageHeader title="Edit Post" description={post.alt} />
-      <SocialPostForm mode="edit" postId={post.id} initialValues={post} />
+      <SocialPostForm
+        mode="edit"
+        postId={post.id}
+        initialValues={post}
+        productOptions={productOptions}
+      />
     </div>
   );
 }

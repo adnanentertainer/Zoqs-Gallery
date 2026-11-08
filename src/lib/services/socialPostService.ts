@@ -11,12 +11,21 @@ const getSocialPostsUncached = unstable_cache(
     const supabase = getSupabasePublicClient();
     const { data, error } = await supabase
       .from("social_posts")
-      .select("*")
+      .select("*, products(stock)")
       .eq("is_active", true)
       .order("display_order", { ascending: true });
 
     if (error) throw error;
-    return (data ?? []).map(mapSocialPostRow);
+    // A post with no linked product always shows; a linked product that's
+    // sold out hides its post automatically instead of advertising a look
+    // customers can't actually buy.
+    return (data ?? [])
+      .filter((row) => {
+        if (!row.product_id) return true;
+        const product = row.products as { stock: number } | null;
+        return (product?.stock ?? 0) > 0;
+      })
+      .map(mapSocialPostRow);
   },
   ["social-posts:active"],
   { tags: [CACHE_TAGS.socialPosts], revalidate: 3600 },

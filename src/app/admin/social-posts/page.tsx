@@ -37,6 +37,7 @@ export default async function AdminSocialPostsPage() {
                 <tr className="border-b border-beige font-body text-xs uppercase tracking-wide text-muted">
                   <th className="px-5 py-3 font-medium">Post</th>
                   <th className="px-5 py-3 font-medium">Link</th>
+                  <th className="px-5 py-3 font-medium">Linked Product</th>
                   <th className="px-5 py-3 font-medium">Status</th>
                   <th className="px-5 py-3 font-medium">Order</th>
                   <th className="px-5 py-3 font-medium">
@@ -70,6 +71,9 @@ export default async function AdminSocialPostsPage() {
                     </td>
                     <td className="max-w-[220px] truncate px-5 py-3 font-body text-sm text-muted">
                       {post.href || "Site default"}
+                    </td>
+                    <td className="px-5 py-3 font-body text-sm text-muted">
+                      {post.productName ?? "—"}
                     </td>
                     <td className="px-5 py-3">
                       <StatusBadge

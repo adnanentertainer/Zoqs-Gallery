@@ -439,6 +439,9 @@ export interface AdminSocialPostListItem {
   href: string | null;
   isActive: boolean;
   displayOrder: number;
+  productId: string | null;
+  /** Null when productId is null, or the linked product was deleted. */
+  productName: string | null;
 }
 
 export interface AdminSocialPostInput {
@@ -447,6 +450,9 @@ export interface AdminSocialPostInput {
   href: string;
   isActive: boolean;
   displayOrder: number;
+  /** Optional -- when set, this post is automatically hidden from the
+   * homepage gallery once the linked product's stock reaches 0. */
+  productId: string | null;
 }
 
 export interface AdminReviewListItem {

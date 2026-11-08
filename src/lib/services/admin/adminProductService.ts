@@ -357,6 +357,7 @@ export async function createProduct(
     return { error: "Unable to create this product right now." };
   }
   revalidateTag(CACHE_TAGS.products, { expire: 0 });
+  revalidateTag(CACHE_TAGS.socialPosts, { expire: 0 });
 
   try {
     await syncProductImagesAndVariants(product.id, input);
@@ -457,6 +458,7 @@ export async function updateProduct(
     return { error: "Unable to update this product right now." };
   }
   revalidateTag(CACHE_TAGS.products, { expire: 0 });
+  revalidateTag(CACHE_TAGS.socialPosts, { expire: 0 });
 
   try {
     await syncProductImagesAndVariants(id, input);
@@ -582,6 +584,7 @@ export async function setProductActive(
     return { error: "Unable to update this product right now." };
   }
   revalidateTag(CACHE_TAGS.products, { expire: 0 });
+  revalidateTag(CACHE_TAGS.socialPosts, { expire: 0 });
 
   if (isActive) {
     try {
@@ -610,5 +613,6 @@ export async function deleteProduct(id: string): Promise<{ error?: string }> {
     return { error: "Unable to delete this product right now." };
   }
   revalidateTag(CACHE_TAGS.products, { expire: 0 });
+  revalidateTag(CACHE_TAGS.socialPosts, { expire: 0 });
   return {};
 }
