@@ -73,7 +73,7 @@ function BridalClassic({ imageUrl }: { imageUrl?: string }) {
     <section className="relative overflow-hidden bg-primary text-white">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_15%,rgba(230,164,33,0.14),transparent_50%),radial-gradient(circle_at_10%_90%,rgba(230,164,33,0.10),transparent_50%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_15%,color-mix(in_oklab,var(--color-gold)_14%,transparent),transparent_50%),radial-gradient(circle_at_10%_90%,color-mix(in_oklab,var(--color-gold)_10%,transparent),transparent_50%)]"
       />
 
       <Container className="relative grid grid-cols-1 items-center gap-10 py-16 sm:py-20 lg:grid-cols-2 lg:gap-16 lg:py-28">
@@ -130,7 +130,7 @@ function BridalQuote() {
     <section className="relative overflow-hidden bg-primary text-white">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(230,164,33,0.14),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklab,var(--color-gold)_14%,transparent),transparent_55%)]"
       />
 
       <Container className="relative flex flex-col items-center gap-6 py-20 text-center sm:py-24 lg:py-28">
@@ -196,7 +196,7 @@ function BridalBanner() {
     <section className="relative overflow-hidden bg-primary text-white">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_50%,rgba(230,164,33,0.14),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_50%,color-mix(in_oklab,var(--color-gold)_14%,transparent),transparent_55%)]"
       />
       <Container className="relative flex flex-col items-center gap-6 py-10 text-center sm:py-12 lg:flex-row lg:justify-between lg:text-left">
         <div className="flex flex-col items-center gap-2 lg:items-start">
@@ -253,7 +253,7 @@ function BridalFrame({ imageUrl }: { imageUrl?: string }) {
     <section className="relative overflow-hidden bg-primary text-white">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(230,164,33,0.12),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklab,var(--color-gold)_12%,transparent),transparent_55%)]"
       />
       <Container className="relative flex flex-col items-center gap-6 py-16 text-center sm:py-20 lg:py-24">
         <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-gold">

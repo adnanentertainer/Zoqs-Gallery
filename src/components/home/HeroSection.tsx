@@ -128,7 +128,7 @@ function HeroClassic({
     <section className="relative flex items-center overflow-hidden bg-secondary lg:min-h-[85vh]">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(230,164,33,0.14),transparent_45%),radial-gradient(circle_at_85%_85%,rgba(230,164,33,0.10),transparent_45%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,color-mix(in_oklab,var(--color-gold)_14%,transparent),transparent_45%),radial-gradient(circle_at_85%_85%,color-mix(in_oklab,var(--color-gold)_10%,transparent),transparent_45%)]"
       />
 
       <Container className="relative grid grid-cols-1 items-center gap-8 py-10 sm:py-14 lg:grid-cols-2 lg:gap-16 lg:py-24">
@@ -229,7 +229,7 @@ function HeroCentered({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
     <section className="relative overflow-hidden bg-secondary">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(230,164,33,0.12),transparent_50%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklab,var(--color-gold)_12%,transparent),transparent_50%)]"
       />
 
       <Container className="relative flex flex-col items-center gap-8 py-12 text-center sm:py-16 lg:py-20">
@@ -371,7 +371,7 @@ function HeroMinimal() {
     <section className="relative overflow-hidden bg-secondary">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(230,164,33,0.12),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklab,var(--color-gold)_12%,transparent),transparent_55%)]"
       />
       <div
         aria-hidden="true"
@@ -662,7 +662,7 @@ function HeroFrame({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
     <section className="relative overflow-hidden bg-secondary">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(230,164,33,0.12),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklab,var(--color-gold)_12%,transparent),transparent_55%)]"
       />
 
       <Container className="relative flex flex-col items-center gap-6 py-12 text-center sm:py-16 lg:py-20 animate-fade-rise-in">
@@ -753,7 +753,7 @@ function HeroDuo({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
     <section className="relative flex items-center overflow-hidden bg-secondary lg:min-h-[80vh]">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(230,164,33,0.14),transparent_45%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,color-mix(in_oklab,var(--color-gold)_14%,transparent),transparent_45%)]"
       />
 
       <Container className="relative grid grid-cols-1 items-center gap-10 py-12 sm:py-16 lg:grid-cols-2 lg:gap-16 lg:py-24">

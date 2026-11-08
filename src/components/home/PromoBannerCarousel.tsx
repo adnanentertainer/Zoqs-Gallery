@@ -97,7 +97,7 @@ function RadialGradientBackdrop() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(230,164,33,0.16),transparent_50%),radial-gradient(circle_at_80%_80%,rgba(230,164,33,0.12),transparent_50%)]"
+      className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,color-mix(in_oklab,var(--color-gold)_16%,transparent),transparent_50%),radial-gradient(circle_at_80%_80%,color-mix(in_oklab,var(--color-gold)_12%,transparent),transparent_50%)]"
     />
   );
 }

@@ -39,7 +39,7 @@ export function NewsletterSection() {
     <section className="relative overflow-hidden bg-primary text-white">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(230,164,33,0.12),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklab,var(--color-gold)_12%,transparent),transparent_55%)]"
       />
       <Container className="relative flex flex-col items-center gap-6 py-16 text-center sm:py-20">
         <span className="inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-gold">
