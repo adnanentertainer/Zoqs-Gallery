@@ -9,7 +9,13 @@ import { getSupabasePublicClient } from "@/lib/supabase/server";
 import { computeRatingAggregate, mapProductRow } from "@/lib/supabase/mappers";
 import { CACHE_TAGS } from "@/lib/cache/tags";
 import type { Database } from "@/types/supabase";
-import type { Product } from "@/types";
+import type {
+  Product,
+  ProductColor,
+  ProductMaterial,
+  ProductOccasion,
+  ProductSearchSummary,
+} from "@/types";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 type ProductImageRow = Database["public"]["Tables"]["product_images"]["Row"];
@@ -218,6 +224,78 @@ export async function getProducts(): Promise<Product[]> {
     return await hydrateProducts(rows);
   } catch (error) {
     console.error("[productService.getProducts] Supabase query failed:", error);
+    throw new Error("Unable to load products right now.");
+  }
+}
+
+interface ProductSearchRow {
+  id: string;
+  slug: string;
+  name: string;
+  price: number;
+  material: string | null;
+  color: string | null;
+  occasion: string | null;
+  tags: string[] | null;
+  categories: { slug: string } | null;
+}
+
+// Selects only the columns /api/products/search's fuzzy-match + suggestion
+// row need -- no images/variants/reviews joins, unlike getProducts(), since
+// those accounted for nearly all of that endpoint's latency despite the
+// JSON response itself already being trimmed down to this same shape.
+async function fetchProductSearchRowsUncached(): Promise<ProductSearchRow[]> {
+  const supabase = getSupabasePublicClient();
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, slug, name, price, material, color, occasion, tags, categories(slug)")
+    .eq("is_active", true);
+
+  if (error) throw error;
+  return (data ?? []) as unknown as ProductSearchRow[];
+}
+
+const fetchProductSearchRows = unstable_cache(
+  fetchProductSearchRowsUncached,
+  ["products:search-rows"],
+  { tags: [CACHE_TAGS.products], revalidate: 3600 },
+);
+
+export async function getProductSearchSummaries(): Promise<
+  ProductSearchSummary[]
+> {
+  if (!isSupabaseConfigured()) {
+    return mockAllProducts.map((product) => ({
+      id: product.id,
+      slug: product.slug,
+      name: product.name,
+      categorySlug: product.categorySlug,
+      price: product.price,
+      material: product.material,
+      color: product.color,
+      occasion: product.occasion,
+      tags: product.tags,
+    }));
+  }
+
+  try {
+    const rows = await fetchProductSearchRows();
+    return rows.map((row) => ({
+      id: row.id,
+      slug: row.slug,
+      name: row.name,
+      categorySlug: row.categories?.slug ?? "",
+      price: row.price,
+      material: (row.material ?? "Alloy") as ProductMaterial,
+      color: (row.color ?? "Multicolor") as ProductColor,
+      occasion: (row.occasion ?? "Everyday") as ProductOccasion,
+      tags: row.tags ?? [],
+    }));
+  } catch (error) {
+    console.error(
+      "[productService.getProductSearchSummaries] Supabase query failed:",
+      error,
+    );
     throw new Error("Unable to load products right now.");
   }
 }
