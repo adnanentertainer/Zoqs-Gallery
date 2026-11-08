@@ -31,6 +31,12 @@
 
 html {
   scroll-behavior: smooth;
+  /* Belt-and-suspenders alongside layout.tsx's `viewport.colorScheme`
+     meta tag -- some browsers (in-app webviews, certain Android forced-
+     dark implementations) honor this CSS property more reliably than the
+     meta tag alone, so without it a device set to dark mode could still
+     repaint native form controls/scrollbars dark or auto-invert the page. */
+  color-scheme: light only;
 }
 
 body {
