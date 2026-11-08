@@ -102,6 +102,29 @@ const fetchActiveProductRowBySlug = unstable_cache(
   { tags: [CACHE_TAGS.products], revalidate: 3600 },
 );
 
+// Sorted slug list as the cache key (same convention as
+// fetchProductRelations's sorted id list) so equivalent sets share one
+// entry instead of fragmenting the cache by input order.
+async function fetchActiveProductRowsBySlugsUncached(
+  slugs: string[],
+): Promise<ProductRowWithCategory[]> {
+  const supabase = getSupabasePublicClient();
+  const { data, error } = await supabase
+    .from("products")
+    .select("*, categories(slug)")
+    .in("slug", slugs)
+    .eq("is_active", true);
+
+  if (error) throw error;
+  return (data ?? []) as unknown as ProductRowWithCategory[];
+}
+
+const fetchActiveProductRowsBySlugs = unstable_cache(
+  fetchActiveProductRowsBySlugsUncached,
+  ["products:rows-by-slugs"],
+  { tags: [CACHE_TAGS.products], revalidate: 3600 },
+);
+
 function groupByProductId<T extends { product_id: string }>(
   rows: T[],
 ): Map<string, T[]> {
@@ -217,6 +240,35 @@ export async function getProductBySlug(
       error,
     );
     throw new Error("Unable to load this product right now.");
+  }
+}
+
+/**
+ * Batched equivalent of calling getProductBySlug() once per slug -- one
+ * `.in("slug", ...)` round trip instead of N separate ones. Backs
+ * /api/products/lookup (cart/wishlist items not already in the client
+ * product cache). Order isn't guaranteed to match `slugs`; callers that
+ * care should re-sort by the slug they requested.
+ */
+export async function getProductsBySlugs(slugs: string[]): Promise<Product[]> {
+  if (slugs.length === 0) return [];
+
+  if (!isSupabaseConfigured()) {
+    return slugs
+      .map((slug) => getMockProductBySlug(slug))
+      .filter((product): product is Product => Boolean(product));
+  }
+
+  try {
+    const sortedUniqueSlugs = [...new Set(slugs)].sort();
+    const rows = await fetchActiveProductRowsBySlugs(sortedUniqueSlugs);
+    return await hydrateProducts(rows);
+  } catch (error) {
+    console.error(
+      "[productService.getProductsBySlugs] Supabase query failed:",
+      error,
+    );
+    throw new Error("Unable to load these products right now.");
   }
 }
 

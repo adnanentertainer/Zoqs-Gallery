@@ -172,15 +172,28 @@ export function sortProducts(products: Product[], sortKey: SortKey): Product[] {
   }
 }
 
-export function searchProducts(
-  products: Product[],
+/** Fields searchProducts() actually reads -- generic over this (rather than
+ * the full Product) so callers that only have a lightweight summary (e.g.
+ * SearchTrigger's quick-match overlay, which doesn't need full product
+ * payloads with images/variants) can reuse the same matching logic. */
+interface SearchableProduct {
+  name: string;
+  categorySlug: string;
+  material: string;
+  occasion: string;
+  color: string;
+  tags: string[];
+}
+
+export function searchProducts<T extends SearchableProduct>(
+  products: T[],
   rawQuery: string,
-): Product[] {
+): T[] {
   const query = rawQuery.trim().toLowerCase();
   if (!query) return [];
 
-  const nameMatches: Product[] = [];
-  const otherMatches: Product[] = [];
+  const nameMatches: T[] = [];
+  const otherMatches: T[] = [];
 
   for (const product of products) {
     const category = getCategoryBySlug(product.categorySlug);

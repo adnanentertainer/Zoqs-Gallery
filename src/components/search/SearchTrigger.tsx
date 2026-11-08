@@ -20,7 +20,7 @@ import {
   recordSearchTerm,
 } from "@/lib/recentSearchesStore";
 import { categoryLabel, cn, formatPrice } from "@/lib/utils";
-import type { Product } from "@/types";
+import type { ProductSearchSummary } from "@/types";
 
 const POPULAR_SEARCHES = [
   "Earrings",
@@ -56,7 +56,7 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductSearchSummary[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
   const isMounted = useIsClient();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -87,7 +87,7 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
     hasFetchedProducts.current = true;
     fetch("/api/products/search")
       .then((response) => (response.ok ? response.json() : []))
-      .then((data: Product[]) => setProducts(data))
+      .then((data: ProductSearchSummary[]) => setProducts(data))
       .catch(() => {
         hasFetchedProducts.current = false;
       });
@@ -107,7 +107,7 @@ export function SearchTrigger({ className }: SearchTriggerProps) {
     closeOverlay();
   }
 
-  function goToProduct(product: Product) {
+  function goToProduct(product: ProductSearchSummary) {
     router.push(`/product/${product.slug}`);
     closeOverlay();
   }

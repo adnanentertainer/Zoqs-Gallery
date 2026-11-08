@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getProductBySlug } from "@/lib/services/productService";
+import { getProductsBySlugs } from "@/lib/services/productService";
 
 const MAX_SLUGS = 50;
 
@@ -24,9 +24,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json([]);
   }
 
-  const products = await Promise.all(
-    slugs.map((slug) => getProductBySlug(slug)),
-  );
+  const products = await getProductsBySlugs(slugs);
+  // getProductsBySlugs doesn't guarantee row order -- restore the order the
+  // caller requested so clients can zip results back up with their slugs.
+  const bySlug = new Map(products.map((product) => [product.slug, product]));
+  const ordered = slugs
+    .map((slug) => bySlug.get(slug))
+    .filter((product): product is NonNullable<typeof product> =>
+      Boolean(product),
+    );
 
-  return NextResponse.json(products.filter(Boolean));
+  return NextResponse.json(ordered);
 }

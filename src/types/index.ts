@@ -127,6 +127,22 @@ export interface Product {
   updatedAt?: string;
 }
 
+/** Minimal projection of Product for the quick-search overlay
+ * (SearchTrigger) -- just the fields searchProducts() matches on plus what
+ * the suggestion row renders, so that one-time catalog fetch isn't also
+ * hauling every product's images/variants/description over the wire. */
+export interface ProductSearchSummary {
+  id: string;
+  slug: string;
+  name: string;
+  categorySlug: string;
+  price: number;
+  material: ProductMaterial;
+  color: ProductColor;
+  occasion: ProductOccasion;
+  tags: string[];
+}
+
 export interface Category {
   id: string;
   name: string;

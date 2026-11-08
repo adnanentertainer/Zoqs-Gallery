@@ -46,6 +46,62 @@ export default function HomeLoading() {
         </div>
         <ProductGridSkeleton count={4} />
       </Container>
+
+      <Container className="flex flex-col gap-8 bg-cream py-12 sm:py-16">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Skeleton className="h-7 w-56" />
+          <Skeleton className="h-4 w-80 max-w-full" />
+        </div>
+        <ProductGridSkeleton count={4} />
+      </Container>
+
+      <section className="overflow-hidden bg-primary">
+        <Container className="grid grid-cols-1 items-center gap-10 py-16 sm:py-20 lg:grid-cols-2 lg:gap-16 lg:py-28">
+          <Skeleton className="aspect-[4/5] w-full max-w-md justify-self-center lg:justify-self-start" />
+          <div className="flex flex-col items-center gap-4 lg:items-start">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-9 w-full max-w-sm" />
+            <Skeleton className="h-4 w-full max-w-sm" />
+            <Skeleton className="h-12 w-48" />
+          </div>
+        </Container>
+      </section>
+
+      <Container className="grid grid-cols-1 gap-x-8 gap-y-8 py-10 sm:grid-cols-2 sm:py-14 lg:grid-cols-4">
+        {Array.from({ length: 4 }, (_, index) => (
+          <div key={index} className="flex items-center gap-4">
+            <Skeleton className="h-12 w-12 shrink-0 rounded-full" />
+            <div className="flex flex-1 flex-col gap-1.5">
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-3 w-full" />
+            </div>
+          </div>
+        ))}
+      </Container>
+
+      <Container className="flex flex-col gap-8 py-12 sm:py-16">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Skeleton className="h-7 w-56" />
+          <Skeleton className="h-4 w-80 max-w-full" />
+        </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 3 }, (_, index) => (
+            <Skeleton key={index} className="h-40 w-full" />
+          ))}
+        </div>
+      </Container>
+
+      <Container className="flex flex-col gap-8 py-12 sm:py-16">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Skeleton className="h-7 w-56" />
+          <Skeleton className="h-4 w-80 max-w-full" />
+        </div>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6">
+          {Array.from({ length: 6 }, (_, index) => (
+            <Skeleton key={index} className="aspect-square w-full rounded-2xl" />
+          ))}
+        </div>
+      </Container>
     </>
   );
 }
