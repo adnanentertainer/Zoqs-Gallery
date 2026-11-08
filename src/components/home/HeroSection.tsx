@@ -58,6 +58,21 @@ export function HeroSection({
   if (layout === "badge") {
     return <HeroBadge imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
   }
+  if (layout === "stacked") {
+    return <HeroStacked imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
+  }
+  if (layout === "frame") {
+    return <HeroFrame imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
+  }
+  if (layout === "diagonal") {
+    return <HeroDiagonal imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
+  }
+  if (layout === "duo") {
+    return <HeroDuo imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
+  }
+  if (layout === "overlay") {
+    return <HeroOverlay imageUrl={imageUrl} imageAlt={imageAlt} images={images} />;
+  }
   return (
     <HeroClassic
       imageUrl={imageUrl}
@@ -543,6 +558,304 @@ function HeroBadge({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
               Explore Collections
             </Link>
           </div>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+function HeroCtaButtons({
+  className,
+  light = false,
+}: {
+  className?: string;
+  light?: boolean;
+}) {
+  return (
+    <div className={className}>
+      <Link
+        href="#new-arrivals"
+        className={buttonVariants(
+          "gold",
+          "lg",
+          "group transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+        )}
+      >
+        Shop New Arrivals
+        <ArrowRight
+          className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+          aria-hidden="true"
+        />
+      </Link>
+      {light ? (
+        <Link
+          href="#categories"
+          className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-2xl border border-white/70 px-8 font-body text-base font-semibold uppercase tracking-[0.08em] text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+        >
+          Explore Collections
+        </Link>
+      ) : (
+        <Link
+          href="#categories"
+          className={buttonVariants(
+            "outline-gold",
+            "lg",
+            "transition-transform duration-200 hover:-translate-y-0.5",
+          )}
+        >
+          Explore Collections
+        </Link>
+      )}
+    </div>
+  );
+}
+
+function HeroEyebrow({ className }: { className?: string }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-gold",
+        className,
+      )}
+    >
+      <span className="h-px w-8 bg-gold" aria-hidden="true" />
+      Premium Artificial Jewellery
+    </span>
+  );
+}
+
+function HeroStacked({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
+  return (
+    <section className="relative overflow-hidden bg-secondary">
+      <div className="relative aspect-[16/9] w-full sm:aspect-[21/9]">
+        <HeroImageCarousel
+          images={images}
+          fallbackUrl={imageUrl || heroImage}
+          fallbackAlt={imageAlt || defaultImageAlt}
+          sizes="100vw"
+          imageClassName="[object-position:50%_25%]"
+        />
+      </div>
+
+      <Container className="relative flex flex-col items-center gap-5 py-10 text-center sm:py-14 animate-fade-rise-in">
+        <HeroEyebrow />
+
+        <Heading variant="display" as="h1" className="max-w-2xl">
+          Jewellery That Completes Your Story
+        </Heading>
+
+        <Text variant="bodyLg" className="max-w-xl text-muted">
+          Discover elegant artificial jewellery and fashion accessories
+          designed to make every moment beautiful.
+        </Text>
+
+        <HeroCtaButtons className="flex flex-col gap-3 pt-1 sm:flex-row" />
+
+        <TrustBadges className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-2" />
+      </Container>
+    </section>
+  );
+}
+
+function HeroFrame({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
+  return (
+    <section className="relative overflow-hidden bg-secondary">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(230,164,33,0.12),transparent_55%)]"
+      />
+
+      <Container className="relative flex flex-col items-center gap-6 py-12 text-center sm:py-16 lg:py-20 animate-fade-rise-in">
+        <HeroEyebrow />
+
+        <Heading variant="display" as="h1" className="max-w-xl">
+          Jewellery That Completes Your Story
+        </Heading>
+
+        <div className="relative mt-2 w-full max-w-xs animate-fade-rise-in-delayed sm:max-w-sm">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -inset-2 rounded-sm border border-gold/40"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -inset-4 rounded-sm border border-gold/15"
+          />
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm shadow-[0_25px_60px_-15px_rgba(31,31,31,0.35)] ring-1 ring-gold/30">
+            <HeroImageCarousel
+              images={images}
+              fallbackUrl={imageUrl || heroImage}
+              fallbackAlt={imageAlt || defaultImageAlt}
+              sizes="(max-width: 640px) 90vw, 384px"
+            />
+          </div>
+        </div>
+
+        <Text variant="bodyLg" className="max-w-md text-muted">
+          Discover elegant artificial jewellery and fashion accessories
+          designed to make every moment beautiful.
+        </Text>
+
+        <HeroCtaButtons className="flex flex-col gap-3 pt-1 sm:flex-row" />
+
+        <TrustBadges className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-2" />
+      </Container>
+    </section>
+  );
+}
+
+function HeroDiagonal({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
+  return (
+    <section className="relative overflow-hidden bg-primary lg:min-h-[80vh]">
+      <div className="flex flex-col lg:flex-row">
+        <div className="relative order-2 flex flex-1 flex-col items-center justify-center gap-5 px-4 py-12 text-center sm:px-6 lg:order-1 lg:items-start lg:px-16 lg:py-0 lg:text-left animate-fade-rise-in">
+          <HeroEyebrow className="text-white" />
+
+          <Heading variant="display" as="h1" className="max-w-md text-white">
+            Jewellery That <em className="italic text-gold">Completes</em>{" "}
+            Your Story
+          </Heading>
+
+          <Text variant="bodyLg" className="max-w-md text-white/80">
+            Discover elegant artificial jewellery and fashion accessories
+            designed to make every moment beautiful.
+          </Text>
+
+          <HeroCtaButtons light className="flex flex-col gap-3 sm:flex-row" />
+
+          <TrustBadges
+            light
+            className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-2 lg:justify-start"
+          />
+        </div>
+
+        <div
+          className="relative order-1 aspect-[4/3] w-full sm:aspect-[16/9] lg:order-2 lg:aspect-auto lg:w-[48%]"
+          style={{
+            clipPath: "polygon(0 8%, 100% 0, 100% 100%, 0 100%)",
+          }}
+        >
+          <HeroImageCarousel
+            images={images}
+            fallbackUrl={imageUrl || heroImage}
+            fallbackAlt={imageAlt || defaultImageAlt}
+            sizes="(max-width: 1024px) 100vw, 48vw"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HeroDuo({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
+  const [first, second] = images.length > 0 ? images : [];
+  return (
+    <section className="relative flex items-center overflow-hidden bg-secondary lg:min-h-[80vh]">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(230,164,33,0.14),transparent_45%)]"
+      />
+
+      <Container className="relative grid grid-cols-1 items-center gap-10 py-12 sm:py-16 lg:grid-cols-2 lg:gap-16 lg:py-24">
+        <div className="order-2 hidden justify-center lg:flex animate-fade-rise-in-delayed">
+          <div className="relative h-[420px] w-full max-w-md">
+            <div className="absolute left-0 top-6 aspect-[4/5] w-[72%] overflow-hidden rounded-2xl shadow-[0_20px_50px_-15px_rgba(31,31,31,0.35)] ring-1 ring-gold/30">
+              <HeroImageCarousel
+                images={first ? [first] : []}
+                fallbackUrl={imageUrl || heroImage}
+                fallbackAlt={imageAlt || defaultImageAlt}
+                sizes="(max-width: 1024px) 100vw, 320px"
+              />
+            </div>
+            <div className="absolute bottom-0 right-0 aspect-[4/5] w-[52%] overflow-hidden rounded-2xl shadow-[0_20px_50px_-15px_rgba(31,31,31,0.35)] ring-4 ring-secondary">
+              <HeroImageCarousel
+                images={second ? [second] : first ? [first] : []}
+                fallbackUrl={imageUrl || heroImage}
+                fallbackAlt={imageAlt || defaultImageAlt}
+                sizes="(max-width: 1024px) 100vw, 230px"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="order-1 flex flex-col items-center gap-5 text-center lg:items-start lg:text-left animate-fade-rise-in">
+          <HeroEyebrow />
+
+          <Heading variant="display" as="h1" className="max-w-md">
+            Jewellery That Completes Your Story
+          </Heading>
+
+          <Text variant="bodyLg" className="max-w-md text-muted">
+            Discover elegant artificial jewellery and fashion accessories
+            designed to make every moment beautiful.
+          </Text>
+
+          <HeroCtaButtons className="flex flex-col gap-3 sm:flex-row" />
+
+          {/* lg:hidden mirror of the two-photo spotlight above -- every other
+              hero variant shows a photo on mobile, so duo shouldn't be the
+              one exception just because its desktop layout is absolutely
+              positioned and awkward to shrink responsively. */}
+          <div className="relative h-[280px] w-full max-w-sm lg:hidden">
+            <div className="absolute left-0 top-4 aspect-[4/5] w-[68%] overflow-hidden rounded-2xl shadow-[0_15px_35px_-10px_rgba(31,31,31,0.3)] ring-1 ring-gold/30">
+              <HeroImageCarousel
+                images={first ? [first] : []}
+                fallbackUrl={imageUrl || heroImage}
+                fallbackAlt={imageAlt || defaultImageAlt}
+                sizes="60vw"
+              />
+            </div>
+            <div className="absolute bottom-0 right-0 aspect-[4/5] w-[48%] overflow-hidden rounded-2xl shadow-[0_15px_35px_-10px_rgba(31,31,31,0.3)] ring-4 ring-secondary">
+              <HeroImageCarousel
+                images={second ? [second] : first ? [first] : []}
+                fallbackUrl={imageUrl || heroImage}
+                fallbackAlt={imageAlt || defaultImageAlt}
+                sizes="42vw"
+              />
+            </div>
+          </div>
+
+          <TrustBadges className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-2 lg:justify-start" />
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+function HeroOverlay({ imageUrl, imageAlt, images = [] }: HeroVariantProps) {
+  return (
+    <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden bg-primary lg:min-h-[88vh]">
+      <HeroImageCarousel
+        images={images}
+        fallbackUrl={imageUrl || heroImage}
+        fallbackAlt={imageAlt || defaultImageAlt}
+        sizes="100vw"
+        imageClassName="[object-position:50%_25%]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-primary/55"
+      />
+
+      <Container className="relative flex justify-center py-12 sm:py-16 lg:py-20">
+        <div className="flex w-full max-w-lg flex-col items-center gap-5 rounded-2xl border border-white/20 bg-white/10 p-8 text-center backdrop-blur-md sm:p-10 animate-fade-rise-in">
+          <HeroEyebrow className="text-white" />
+
+          <Heading variant="display" as="h1" className="max-w-md text-white">
+            Jewellery That Completes Your Story
+          </Heading>
+
+          <Text variant="bodyLg" className="max-w-md text-white/85">
+            Discover elegant artificial jewellery and fashion accessories
+            designed to make every moment beautiful.
+          </Text>
+
+          <HeroCtaButtons light className="flex flex-col gap-3 sm:flex-row" />
+
+          <TrustBadges
+            light
+            className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 pt-2"
+          />
         </div>
       </Container>
     </section>

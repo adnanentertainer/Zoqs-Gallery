@@ -41,6 +41,7 @@ interface BenefitsSectionProps {
 
 export function BenefitsSection({ layout = "inline" }: BenefitsSectionProps) {
   if (layout === "banner") return <BenefitsBanner />;
+  if (layout === "marquee") return <BenefitsMarquee />;
 
   return (
     <Section background="cream">
@@ -140,7 +141,100 @@ export function BenefitsSection({ layout = "inline" }: BenefitsSectionProps) {
           ))}
         </div>
       )}
+
+      {layout === "circles" && (
+        <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-10">
+          {benefits.map(({ icon: Icon, title, description }) => (
+            <div key={title} className="flex max-w-[9rem] flex-col items-center gap-2 text-center">
+              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gold/10">
+                <Icon className="h-7 w-7 text-gold" strokeWidth={1.5} aria-hidden="true" />
+              </span>
+              <span className="font-heading text-sm font-semibold text-primary">
+                {title}
+              </span>
+              <span className="font-body text-xs text-muted">{description}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {layout === "minimalDivider" && (
+        <div className="flex flex-wrap items-center justify-center divide-x divide-beige">
+          {benefits.map(({ title }) => (
+            <span
+              key={title}
+              className="px-5 py-1 font-body text-sm font-medium uppercase tracking-[0.08em] text-primary first:pl-0 last:pr-0"
+            >
+              {title}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {layout === "iconGrid" && (
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {benefits.map(({ icon: Icon, title, description }) => (
+            <div
+              key={title}
+              className="flex flex-col items-center gap-3 rounded-2xl bg-gold/10 p-6 text-center"
+            >
+              <Icon className="h-8 w-8 text-gold" strokeWidth={1.5} aria-hidden="true" />
+              <div className="flex flex-col gap-0.5">
+                <span className="font-heading text-base font-semibold text-primary">
+                  {title}
+                </span>
+                <span className="font-body text-sm text-muted">
+                  {description}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {layout === "stackedList" && (
+        <div className="mx-auto flex max-w-2xl flex-col divide-y divide-beige">
+          {benefits.map(({ icon: Icon, title, description }) => (
+            <div key={title} className="flex items-center gap-4 py-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gold/10">
+                <Icon className="h-6 w-6 text-gold" strokeWidth={1.5} aria-hidden="true" />
+              </span>
+              <div className="flex flex-col gap-0.5">
+                <span className="font-heading text-base font-semibold text-primary">
+                  {title}
+                </span>
+                <span className="font-body text-sm text-muted">
+                  {description}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </Section>
+  );
+}
+
+function BenefitsMarquee() {
+  const item = (
+    <div className="flex items-center gap-8">
+      {benefits.map(({ icon: Icon, title }) => (
+        <div key={title} className="mx-4 flex items-center gap-2">
+          <Icon className="h-4 w-4 shrink-0 text-gold" strokeWidth={1.5} aria-hidden="true" />
+          <span className="font-body text-sm font-medium text-primary">{title}</span>
+        </div>
+      ))}
+    </div>
+  );
+  return (
+    <section className="overflow-hidden bg-cream py-6">
+      <div className="flex w-max animate-marquee">
+        {item}
+        {item}
+        {item}
+        {item}
+      </div>
+    </section>
   );
 }
 

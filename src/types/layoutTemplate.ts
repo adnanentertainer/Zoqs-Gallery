@@ -4,7 +4,12 @@ export type HeroLayoutId =
   | "editorial"
   | "minimal"
   | "panel"
-  | "badge";
+  | "badge"
+  | "stacked"
+  | "frame"
+  | "diagonal"
+  | "duo"
+  | "overlay";
 export type PromoBannerLayoutId =
   | "classic"
   | "splitReverse"
@@ -13,44 +18,79 @@ export type PromoBannerLayoutId =
   | "badge"
   | "centered"
   | "ticker"
-  | "stacked";
+  | "stacked"
+  | "diagonal"
+  | "marquee"
+  | "frame"
+  | "layered"
+  | "minimalText";
 export type CategoryLayoutId =
   | "grid"
   | "row"
   | "spotlight"
   | "circles"
   | "list"
-  | "tiles";
+  | "tiles"
+  | "masonry"
+  | "carousel"
+  | "banner"
+  | "numbered"
+  | "quad";
 export type ProductLayoutId =
   | "grid"
   | "carousel"
   | "featured"
   | "compact"
-  | "duo";
+  | "duo"
+  | "masonry"
+  | "list"
+  | "spotlight"
+  | "banner"
+  | "wide";
 export type BridalLayoutId =
   | "classic"
   | "editorial"
   | "quote"
   | "side"
-  | "banner";
+  | "banner"
+  | "overlay"
+  | "frame"
+  | "diagonal"
+  | "ribbon"
+  | "minimalCta";
 export type BenefitsLayoutId =
   | "inline"
   | "cards"
   | "steps"
   | "ticker"
-  | "banner";
+  | "banner"
+  | "circles"
+  | "minimalDivider"
+  | "iconGrid"
+  | "marquee"
+  | "stackedList";
 export type ReviewsLayoutId =
   | "grid"
   | "carousel"
   | "spotlight"
   | "masonry"
-  | "list";
+  | "list"
+  | "compact"
+  | "quote"
+  | "marquee"
+  | "avatar"
+  | "highlight";
 export type SocialGalleryLayoutId =
   | "grid"
   | "carousel"
   | "mosaic"
   | "banner"
-  | "circles";
+  | "circles"
+  | "masonry"
+  | "storiesBar"
+  | "quad"
+  | "filmstrip"
+  | "pinned";
 
 export interface LayoutTemplate {
   hero: HeroLayoutId;
@@ -134,6 +174,41 @@ export const HERO_LAYOUTS: LayoutVariantOption<HeroLayoutId>[] = [
       "Full-bleed photo with the headline in a floating card over the corner.",
     spec: "Photo: 1920×1200px (landscape) or larger -- fills the full screen. Set in Admin → Settings → Homepage Hero Image, or add 2+ in Admin → Hero Carousel to auto-scroll between them.",
   },
+  {
+    id: "stacked",
+    name: "Stacked Photo Top",
+    description:
+      "A full-width photo banner on top, headline and CTAs centered beneath it.",
+    spec: "Photo: 1600×900px (16:9 landscape) or larger. Set in Admin → Settings → Homepage Hero Image, or add 2+ in Admin → Hero Carousel to auto-scroll between them.",
+  },
+  {
+    id: "frame",
+    name: "Gallery Frame",
+    description:
+      "A single centered portrait photo in an elegant thin gold frame, poster-style.",
+    spec: "Photo: 900×1125px (4:5 portrait) or larger. Set in Admin → Settings → Homepage Hero Image, or add 2+ in Admin → Hero Carousel to auto-scroll between them.",
+  },
+  {
+    id: "diagonal",
+    name: "Diagonal Split",
+    description:
+      "Text panel and photo divided by a bold diagonal edge instead of a straight line.",
+    spec: "Photo: 1200×1200px (square) or larger. Set in Admin → Settings → Homepage Hero Image, or add 2+ in Admin → Hero Carousel to auto-scroll between them.",
+  },
+  {
+    id: "duo",
+    name: "Duo Photo Spotlight",
+    description:
+      "Two offset, overlapping photo cards beside the text, a mood-board feel.",
+    spec: "Add 2+ photos in Admin → Hero Carousel to fill both cards -- with only one photo, it's shown in both. Photo: 900×1125px (4:5 portrait) or larger.",
+  },
+  {
+    id: "overlay",
+    name: "Center Overlay Card",
+    description:
+      "Full-bleed photo with a translucent glass card centered over it.",
+    spec: "Photo: 1920×1200px (landscape) or larger -- fills the full screen. Set in Admin → Settings → Homepage Hero Image, or add 2+ in Admin → Hero Carousel to auto-scroll between them.",
+  },
 ];
 
 export const PROMO_BANNER_LAYOUTS: LayoutVariantOption<PromoBannerLayoutId>[] =
@@ -192,6 +267,41 @@ export const PROMO_BANNER_LAYOUTS: LayoutVariantOption<PromoBannerLayoutId>[] =
       description: "A wide photo on top, text and button centered beneath it.",
       spec: "Banner Image: 1200×675px (16:9 landscape) or larger. Edit each banner in Admin → Promo Banners.",
     },
+    {
+      id: "diagonal",
+      name: "Diagonal Split",
+      description:
+        "Text panel and photo divided by a bold diagonal edge instead of a straight line.",
+      spec: "Banner Image: 600×600px (square) or larger. Edit each banner in Admin → Promo Banners.",
+    },
+    {
+      id: "marquee",
+      name: "Scrolling Marquee",
+      description:
+        "A continuously auto-scrolling single-line announcement strip.",
+      spec: "No photo needed -- text-only, auto-scrolling layout.",
+    },
+    {
+      id: "frame",
+      name: "Framed Square",
+      description:
+        "Same idea as Classic Split, but the photo is a square in a thick gold frame instead of a circle.",
+      spec: "Banner Image: 500×500px (square) or larger. Edit each banner in Admin → Promo Banners.",
+    },
+    {
+      id: "layered",
+      name: "Layered Depth",
+      description:
+        "A dimmed full-bleed background photo behind a circular badge photo and text, for extra depth.",
+      spec: "Uses both images -- Background Image: 1920×600px (wide landscape); Banner Image: 400×400px (square), shown as a circle on top. Edit each banner in Admin → Promo Banners.",
+    },
+    {
+      id: "minimalText",
+      name: "Minimal Text Only",
+      description:
+        "The smallest footprint variant -- just a headline and a text link, no button or photo.",
+      spec: "No photo needed -- text-only, ultra-compact layout.",
+    },
   ];
 
 export const CATEGORY_LAYOUTS: LayoutVariantOption<CategoryLayoutId>[] = [
@@ -231,6 +341,39 @@ export const CATEGORY_LAYOUTS: LayoutVariantOption<CategoryLayoutId>[] = [
     description: "Wide rectangular tiles with the name overlaid on each photo.",
     spec: "Photos: 900×560px (16:10 landscape) or larger. Edit each category's photo in Admin → Categories.",
   },
+  {
+    id: "masonry",
+    name: "Masonry",
+    description: "Staggered columns of varying height, Pinterest-style.",
+    spec: "Photos: 600×600px (square) or larger. Edit each category's photo in Admin → Categories.",
+  },
+  {
+    id: "carousel",
+    name: "Scrolling Carousel",
+    description: "A horizontally scrollable row of rounded category cards.",
+    spec: "Photos: 600×600px (square) or larger. Edit each category's photo in Admin → Categories.",
+  },
+  {
+    id: "banner",
+    name: "Full Banners",
+    description:
+      "One large full-width banner per category, stacked -- a bolder, slower-scrolling showcase.",
+    spec: "Photos: 1600×700px (wide landscape) or larger. Edit each category's photo in Admin → Categories.",
+  },
+  {
+    id: "numbered",
+    name: "Numbered List",
+    description:
+      "Like Compact List, with a large number badge beside each row.",
+    spec: "Photos: any size works (square crop recommended). Edit each category's photo in Admin → Categories.",
+  },
+  {
+    id: "quad",
+    name: "Quad Feature",
+    description:
+      "Exactly four large equal-size square tiles, a bigger showcase feel.",
+    spec: "Photos: 800×800px (square) or larger -- only the first four categories are shown. Edit each category's photo in Admin → Categories.",
+  },
 ];
 
 export const PRODUCT_LAYOUTS: LayoutVariantOption<ProductLayoutId>[] = [
@@ -263,6 +406,40 @@ export const PRODUCT_LAYOUTS: LayoutVariantOption<ProductLayoutId>[] = [
     name: "Duo Feature",
     description: "The first two products shown large beside a smaller grid.",
     spec: "Uses your product photos as-is (3:4 portrait, already set per product). No extra setup for this layout.",
+  },
+  {
+    id: "masonry",
+    name: "Masonry",
+    description: "Staggered columns of varying height, Pinterest-style.",
+    spec: "Uses your product photos as-is (3:4 portrait, already set per product). No extra setup for this layout.",
+  },
+  {
+    id: "list",
+    name: "Compact List",
+    description:
+      "Horizontal rows -- thumbnail on the left, name and price on the right.",
+    spec: "Uses your product photos as-is (3:4 portrait, already set per product). No extra setup for this layout.",
+  },
+  {
+    id: "spotlight",
+    name: "Featured Spotlight",
+    description:
+      "One large featured product spanning the full height beside a smaller grid of the rest.",
+    spec: "Uses your product photos as-is (3:4 portrait, already set per product). No extra setup for this layout.",
+  },
+  {
+    id: "banner",
+    name: "Banner Strip",
+    description:
+      "One wide featured product banner on top, the rest in a grid beneath it.",
+    spec: "Uses your product photos as-is (3:4 portrait, already set per product). No extra setup for this layout.",
+  },
+  {
+    id: "wide",
+    name: "Wide Cards",
+    description:
+      "Two columns of wide, landscape-oriented cards instead of the usual portrait grid.",
+    spec: "Uses your product photos as-is (3:4 portrait, cropped wider). No extra setup for this layout.",
   },
 ];
 
@@ -297,6 +474,41 @@ export const BRIDAL_LAYOUTS: LayoutVariantOption<BridalLayoutId>[] = [
     description: "A shorter single-row banner -- photo, text and CTA inline.",
     spec: "No photo -- compact text-only banner.",
   },
+  {
+    id: "overlay",
+    name: "Center Overlay Card",
+    description:
+      "Full-bleed photo with a translucent glass card centered over it.",
+    spec: "Photo: 1920×1200px (landscape) or larger -- fills the full screen. Edit in Admin → Settings → Bridal Collection Banner Image.",
+  },
+  {
+    id: "frame",
+    name: "Gallery Frame",
+    description:
+      "A single centered portrait photo in an elegant thin gold frame, poster-style.",
+    spec: "Photo: 1200×1500px (4:5 portrait) or larger. Edit in Admin → Settings → Bridal Collection Banner Image.",
+  },
+  {
+    id: "diagonal",
+    name: "Diagonal Split",
+    description:
+      "Text panel and photo divided by a bold diagonal edge instead of a straight line.",
+    spec: "Photo: 1200×1200px (square) or larger. Edit in Admin → Settings → Bridal Collection Banner Image.",
+  },
+  {
+    id: "ribbon",
+    name: "Ribbon Banner",
+    description:
+      "An edge-to-edge two-tone split -- a solid color text panel beside the photo, no padding gaps.",
+    spec: "Photo: 1200×1200px (square) or larger. Edit in Admin → Settings → Bridal Collection Banner Image.",
+  },
+  {
+    id: "minimalCta",
+    name: "Minimal CTA Line",
+    description:
+      "An even shorter single line -- headline and link inline, no button.",
+    spec: "No photo -- ultra-compact text-only line.",
+  },
 ];
 
 export const BENEFITS_LAYOUTS: LayoutVariantOption<BenefitsLayoutId>[] = [
@@ -328,6 +540,39 @@ export const BENEFITS_LAYOUTS: LayoutVariantOption<BenefitsLayoutId>[] = [
     id: "banner",
     name: "Color Banner",
     description: "The whole strip on a bold color band, icons and text in white.",
+    spec: "No photos used -- icon + text only.",
+  },
+  {
+    id: "circles",
+    name: "Icon Circles",
+    description: "Each icon in a larger circular badge, label centered beneath.",
+    spec: "No photos used -- icon + text only.",
+  },
+  {
+    id: "minimalDivider",
+    name: "Minimal Divider Row",
+    description:
+      "Text-only -- just the titles in a single row divided by thin lines, no icons.",
+    spec: "No photos used -- text only, no icons.",
+  },
+  {
+    id: "iconGrid",
+    name: "Icon Grid",
+    description:
+      "A 2x2 grid of large icons on soft tinted backgrounds, more colorful than Bordered Cards.",
+    spec: "No photos used -- icon + text only.",
+  },
+  {
+    id: "marquee",
+    name: "Scrolling Marquee",
+    description: "The benefits continuously auto-scroll in a single row.",
+    spec: "No photos used -- icon + text only, auto-scrolling.",
+  },
+  {
+    id: "stackedList",
+    name: "Stacked List",
+    description:
+      "Full-width rows, icon and text left-aligned, stacked vertically.",
     spec: "No photos used -- icon + text only.",
   },
 ];
@@ -363,6 +608,40 @@ export const REVIEWS_LAYOUTS: LayoutVariantOption<ReviewsLayoutId>[] = [
     description: "No cards -- a clean divided list of quotes.",
     spec: "No photos used -- text only, pulled from your approved reviews.",
   },
+  {
+    id: "compact",
+    name: "Compact Cards",
+    description: "A denser grid with more, smaller cards per row.",
+    spec: "No photos used -- text only, pulled from your approved reviews.",
+  },
+  {
+    id: "quote",
+    name: "Single Big Quote",
+    description:
+      "One large centered featured quote, with the rest in a small grid beneath it.",
+    spec: "No photos used -- text only, pulled from your approved reviews.",
+  },
+  {
+    id: "marquee",
+    name: "Scrolling Marquee",
+    description:
+      "Short review snippets continuously auto-scroll in a single row.",
+    spec: "No photos used -- text only, pulled from your approved reviews.",
+  },
+  {
+    id: "avatar",
+    name: "Avatar Grid",
+    description:
+      "Each card leads with a large initials avatar and name, quote beneath.",
+    spec: "No photos used -- text only, pulled from your approved reviews.",
+  },
+  {
+    id: "highlight",
+    name: "Highlighted Banner",
+    description:
+      "A bold rating-stat banner on top, then the usual grid of reviews beneath it.",
+    spec: "No photos used -- text only, pulled from your approved reviews.",
+  },
 ];
 
 export const SOCIAL_GALLERY_LAYOUTS: LayoutVariantOption<SocialGalleryLayoutId>[] =
@@ -396,6 +675,40 @@ export const SOCIAL_GALLERY_LAYOUTS: LayoutVariantOption<SocialGalleryLayoutId>[
       name: "Circle Row",
       description: "Round photo avatars in a row, story-style.",
       spec: "Photos: 400×400px (square) or larger. Edit in Admin → Follow Our Style.",
+    },
+    {
+      id: "masonry",
+      name: "Masonry",
+      description: "Staggered columns of varying height, Pinterest-style.",
+      spec: "Photos: 450×450px (square) or larger. Edit in Admin → Follow Our Style.",
+    },
+    {
+      id: "storiesBar",
+      name: "Stories Bar",
+      description:
+        "A tight scrollable row of circle avatars on top, a larger photo grid beneath.",
+      spec: "Photos: 450×450px (square) or larger. Edit in Admin → Follow Our Style.",
+    },
+    {
+      id: "quad",
+      name: "Quad Feature",
+      description:
+        "Exactly four large equal-size square photos, a bigger showcase feel.",
+      spec: "Photos: 800×800px (square) or larger -- only the first four photos are shown. Edit in Admin → Follow Our Style.",
+    },
+    {
+      id: "filmstrip",
+      name: "Filmstrip",
+      description:
+        "A single continuous edge-to-edge horizontal strip of photos, no gaps.",
+      spec: "Photos: 450×450px (square) or larger. Edit in Admin → Follow Our Style.",
+    },
+    {
+      id: "pinned",
+      name: "Pinned Feature",
+      description:
+        "One large pinned photo on the left spanning the full height of a smaller grid on the right.",
+      spec: "The first photo looks best at 900×900px (square) or larger; the rest at 450×450px. Edit in Admin → Follow Our Style.",
     },
   ];
 

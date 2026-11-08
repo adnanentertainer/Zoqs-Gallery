@@ -107,3 +107,25 @@ body {
     animation: none;
   }
 }
+
+/* Continuous horizontal scroll for the "marquee" layout variants (Promo
+   Banner, Benefits, Reviews) -- the content is duplicated by the component
+   so this only needs to translate by exactly -50% to loop seamlessly. */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee-scroll 22s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+}

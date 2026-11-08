@@ -391,6 +391,211 @@ function SlideStacked({ banner }: { banner: PromoBanner }) {
   );
 }
 
+/** Diagonal Split: text panel and photo divided by a diagonal edge. */
+function SlideDiagonal({ banner }: { banner: PromoBanner }) {
+  const photo = banner.bannerImageUrl || banner.backgroundImageUrl;
+  return (
+    <div className="relative overflow-hidden bg-primary">
+      <div className="flex flex-col sm:min-h-[320px] sm:flex-row">
+        <div className="relative flex flex-1 flex-col items-center justify-center gap-3 px-4 py-10 text-center sm:px-6 lg:items-start lg:px-10 lg:text-left">
+          {!photo && <RadialGradientBackdrop />}
+          <PromoTextLabel text={banner.promoText} />
+          <h2 className="font-heading text-3xl font-semibold text-white sm:text-4xl">
+            {banner.title}
+          </h2>
+          {banner.subtitle && (
+            <p className="max-w-md font-body text-base text-white/85">
+              {banner.subtitle}
+            </p>
+          )}
+          <PromoCodeBadge code={banner.promoCode} />
+          <div className="mt-1">
+            <CtaButton banner={banner} />
+          </div>
+        </div>
+        {photo && (
+          <div
+            className="relative aspect-[16/9] w-full sm:aspect-auto sm:w-[42%]"
+            style={{
+              clipPath: "polygon(8% 0, 100% 0, 100% 100%, 0 100%)",
+            }}
+          >
+            <Image
+              src={photo}
+              alt=""
+              fill
+              sizes="(max-width: 640px) 100vw, 42vw"
+              className="object-cover"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Scrolling Marquee: a continuously auto-scrolling single-line strip. */
+function SlideMarquee({ banner }: { banner: PromoBanner }) {
+  const item = (
+    <span className="mx-6 inline-flex items-center gap-3 font-heading text-lg font-semibold text-white sm:text-xl">
+      <Tag className="h-4 w-4 text-gold" aria-hidden="true" />
+      {banner.title}
+      {banner.promoCode && (
+        <span className="font-body text-sm font-normal text-gold">
+          Use code {banner.promoCode}
+        </span>
+      )}
+    </span>
+  );
+  return (
+    <div className="relative overflow-hidden bg-primary py-4">
+      <div className="flex w-max animate-marquee">
+        {item}
+        {item}
+        {item}
+        {item}
+      </div>
+    </div>
+  );
+}
+
+/** Framed Square: like Classic Split, but a square photo in a thick gold frame. */
+function SlideFrame({ banner }: { banner: PromoBanner }) {
+  return (
+    <div
+      className="relative flex items-center overflow-hidden bg-primary"
+      style={
+        banner.backgroundImageUrl
+          ? {
+              backgroundImage: `url(${banner.backgroundImageUrl})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }
+          : undefined
+      }
+    >
+      {banner.backgroundImageUrl ? (
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/60 to-primary/30"
+          aria-hidden="true"
+        />
+      ) : (
+        <RadialGradientBackdrop />
+      )}
+      <div className="relative mx-auto flex w-full max-w-7xl flex-row items-center justify-between gap-4 px-4 py-5 text-left sm:gap-6 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 flex-col items-start gap-2 sm:gap-3">
+          <PromoTextLabel text={banner.promoText} />
+          <h2 className="font-heading text-lg font-semibold text-white sm:text-3xl lg:text-4xl">
+            {banner.title}
+          </h2>
+          {banner.subtitle && (
+            <p className="max-w-md font-body text-xs text-white/85 sm:text-base">
+              {banner.subtitle}
+            </p>
+          )}
+          <PromoCodeBadge code={banner.promoCode} />
+          <div className="mt-1">
+            <CtaButton banner={banner} size="md" />
+          </div>
+        </div>
+        {banner.bannerImageUrl && (
+          <div className="relative h-[clamp(96px,26vw,180px)] w-[clamp(96px,26vw,180px)] shrink-0 overflow-hidden rounded-xl border-4 border-gold/70 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)]">
+            <Image
+              src={banner.bannerImageUrl}
+              alt=""
+              fill
+              sizes="(max-width: 1024px) 26vw, 180px"
+              className="object-cover"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Layered Depth: dimmed full-bleed background behind a circular badge + text. */
+function SlideLayered({ banner }: { banner: PromoBanner }) {
+  return (
+    <div className="relative flex min-h-[320px] items-center justify-center overflow-hidden bg-primary sm:min-h-[360px]">
+      {banner.backgroundImageUrl ? (
+        <Image
+          src={banner.backgroundImageUrl}
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover opacity-30"
+        />
+      ) : (
+        <RadialGradientBackdrop />
+      )}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-primary/55"
+      />
+      <div className="relative mx-auto flex w-full max-w-2xl flex-col items-center gap-3 px-4 py-10 text-center sm:px-6">
+        {banner.bannerImageUrl && (
+          <div className="mb-2 h-20 w-20 shrink-0 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_20px_45px_-15px_rgba(0,0,0,0.45)] sm:h-24 sm:w-24">
+            <Image
+              src={banner.bannerImageUrl}
+              alt=""
+              width={96}
+              height={96}
+              className="h-full w-full object-cover"
+            />
+          </div>
+        )}
+        <PromoTextLabel text={banner.promoText} />
+        <h2 className="font-heading text-2xl font-semibold text-white sm:text-3xl">
+          {banner.title}
+        </h2>
+        {banner.subtitle && (
+          <p className="max-w-md font-body text-sm text-white/85">
+            {banner.subtitle}
+          </p>
+        )}
+        <PromoCodeBadge code={banner.promoCode} />
+        <div className="mt-1">
+          <CtaButton banner={banner} size="md" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Minimal Text Only: the smallest footprint -- headline and a text link. */
+function SlideMinimalText({ banner }: { banner: PromoBanner }) {
+  return (
+    <div className="relative overflow-hidden bg-primary">
+      <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-2 px-4 py-6 text-center sm:px-6">
+        <h2 className="font-heading text-xl font-semibold text-white sm:text-2xl">
+          {banner.title}
+        </h2>
+        {banner.subtitle && (
+          <p className="max-w-md font-body text-sm text-white/80">
+            {banner.subtitle}
+          </p>
+        )}
+        {banner.buttonText && (
+          <Link
+            href={slideHref(banner)}
+            onClick={() => {
+              if (banner.promoCode) setPendingPromoCode(banner.promoCode);
+            }}
+            className="group inline-flex items-center gap-1.5 font-body text-sm font-semibold uppercase tracking-[0.1em] text-gold underline decoration-gold/40 underline-offset-4 transition-colors hover:text-white"
+          >
+            {banner.buttonText}
+            <ArrowRight
+              className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1"
+              aria-hidden="true"
+            />
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Slide({
   banner,
   layout,
@@ -413,6 +618,16 @@ function Slide({
       return <SlideTicker banner={banner} />;
     case "stacked":
       return <SlideStacked banner={banner} />;
+    case "diagonal":
+      return <SlideDiagonal banner={banner} />;
+    case "marquee":
+      return <SlideMarquee banner={banner} />;
+    case "frame":
+      return <SlideFrame banner={banner} />;
+    case "layered":
+      return <SlideLayered banner={banner} />;
+    case "minimalText":
+      return <SlideMinimalText banner={banner} />;
     default:
       return <SlideClassic banner={banner} />;
   }

@@ -6,15 +6,32 @@ import type { Category } from "@/types";
 
 interface CategoryCardProps {
   category: Category;
+  className?: string;
+  /** Overrides the photo's aspect ratio (default "aspect-square") -- used
+   * by the "masonry" category layout to give columns genuinely different
+   * heights. */
+  aspectClassName?: string;
 }
 
-export function CategoryCard({ category }: CategoryCardProps) {
+export function CategoryCard({
+  category,
+  className,
+  aspectClassName = "aspect-square",
+}: CategoryCardProps) {
   return (
     <Link
       href={`/category/${category.slug}`}
-      className="group flex w-full flex-col rounded-2xl transition-transform duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+      className={cn(
+        "group flex w-full flex-col rounded-2xl transition-transform duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
+        className,
+      )}
     >
-      <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-beige shadow-sm ring-1 ring-black/5 transition-all duration-300 group-hover:shadow-lg group-hover:ring-2 group-hover:ring-gold">
+      <div
+        className={cn(
+          "relative w-full overflow-hidden rounded-2xl bg-beige shadow-sm ring-1 ring-black/5 transition-all duration-300 group-hover:shadow-lg group-hover:ring-2 group-hover:ring-gold",
+          aspectClassName,
+        )}
+      >
         <Image
           src={category.image}
           alt={category.name}

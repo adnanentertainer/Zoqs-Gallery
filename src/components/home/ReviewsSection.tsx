@@ -109,33 +109,141 @@ export async function ReviewsSection({
           ))}
         </div>
       )}
+
+      {layout === "compact" && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {testimonials.map((review) => (
+            <ReviewCard key={review.id} review={review} compact />
+          ))}
+        </div>
+      )}
+
+      {layout === "quote" && testimonials[0] && (
+        <div className="flex flex-col gap-10">
+          <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 text-center">
+            <Quote className="h-10 w-10 text-gold/40" aria-hidden="true" fill="currentColor" />
+            <blockquote className="font-body text-xl leading-relaxed text-primary sm:text-2xl">
+              &ldquo;{testimonials[0].reviewText}&rdquo;
+            </blockquote>
+            <RatingStars rating={testimonials[0].rating} />
+            <span className="font-heading text-sm font-semibold text-primary">
+              {testimonials[0].customerName}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {testimonials.slice(1).map((review) => (
+              <ReviewCard key={review.id} review={review} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {layout === "marquee" && (
+        <ReviewsMarquee testimonials={testimonials} />
+      )}
+
+      {layout === "avatar" && (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {testimonials.map((review) => (
+            <div
+              key={review.id}
+              className="flex flex-col gap-3 rounded-sm border border-beige bg-white p-6"
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold/15 font-heading text-base font-semibold text-gold">
+                  {review.customerName.charAt(0).toUpperCase()}
+                </span>
+                <div className="flex flex-col">
+                  <span className="font-heading text-sm font-semibold text-primary">
+                    {review.customerName}
+                  </span>
+                  <RatingStars rating={review.rating} starClassName="h-3.5 w-3.5" />
+                </div>
+              </div>
+              <blockquote className="font-body text-sm leading-relaxed text-primary">
+                &ldquo;{review.reviewText}&rdquo;
+              </blockquote>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {layout === "highlight" && (
+        <div className="flex flex-col gap-10">
+          <div className="mx-auto flex flex-col items-center gap-2 rounded-2xl bg-primary px-8 py-6 text-center text-white">
+            <span className="font-heading text-4xl font-semibold text-gold">
+              {averageRating.toFixed(1)}★
+            </span>
+            <span className="font-body text-sm text-white/80">
+              from {testimonials.length}+ happy ZOQ&apos;s Gallery customers
+            </span>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {testimonials.map((review) => (
+              <ReviewCard key={review.id} review={review} />
+            ))}
+          </div>
+        </div>
+      )}
     </Section>
+  );
+}
+
+function ReviewsMarquee({ testimonials }: { testimonials: Testimonial[] }) {
+  const item = (
+    <div className="flex items-center gap-6">
+      {testimonials.map((review) => (
+        <div
+          key={review.id}
+          className="mx-3 flex w-80 shrink-0 items-center gap-3 rounded-sm border border-beige bg-white px-5 py-4"
+        >
+          <RatingStars rating={review.rating} starClassName="h-3.5 w-3.5" />
+          <blockquote className="line-clamp-1 font-body text-sm text-primary">
+            &ldquo;{review.reviewText}&rdquo;
+          </blockquote>
+        </div>
+      ))}
+    </div>
+  );
+  return (
+    <div className="overflow-hidden">
+      <div className="flex w-max animate-marquee">
+        {item}
+        {item}
+      </div>
+    </div>
   );
 }
 
 function ReviewCard({
   review,
   featured = false,
+  compact = false,
 }: {
   review: Testimonial;
   featured?: boolean;
+  compact?: boolean;
 }) {
   const card = (
     <figure
       className={cn(
         "group flex h-full flex-col gap-4 rounded-sm border border-beige bg-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md",
-        featured ? "p-8 sm:p-10" : "p-7",
+        featured ? "p-8 sm:p-10" : compact ? "p-5" : "p-7",
       )}
     >
       <Quote
-        className={featured ? "h-9 w-9 text-gold/40" : "h-7 w-7 text-gold/40"}
+        className={featured ? "h-9 w-9 text-gold/40" : compact ? "h-5 w-5 text-gold/40" : "h-7 w-7 text-gold/40"}
         aria-hidden="true"
         fill="currentColor"
       />
       <blockquote
         className={cn(
           "flex-1 font-body leading-relaxed text-primary",
-          featured ? "text-lg sm:text-xl" : "text-[0.95rem]",
+          featured
+            ? "text-lg sm:text-xl"
+            : compact
+              ? "line-clamp-3 text-sm"
+              : "text-[0.95rem]",
         )}
       >
         &ldquo;{review.reviewText}&rdquo;
@@ -147,16 +255,18 @@ function ReviewCard({
           </span>
           <RatingStars rating={review.rating} />
         </div>
-        <div className="flex items-center gap-2">
-          <span className="truncate font-body text-xs text-muted">
-            {review.purchasedProduct}
-          </span>
-          {review.verifiedPurchase && (
-            <Badge variant="success" className="shrink-0">
-              Verified Buyer
-            </Badge>
-          )}
-        </div>
+        {!compact && (
+          <div className="flex items-center gap-2">
+            <span className="truncate font-body text-xs text-muted">
+              {review.purchasedProduct}
+            </span>
+            {review.verifiedPurchase && (
+              <Badge variant="success" className="shrink-0">
+                Verified Buyer
+              </Badge>
+            )}
+          </div>
+        )}
       </figcaption>
     </figure>
   );
